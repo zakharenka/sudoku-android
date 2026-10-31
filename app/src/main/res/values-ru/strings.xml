@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Отмена</string>
     <string name="settings_reset_done">Рекорды сброшены.</string>
     <string name="settings_about">О приложении</string>
-    <string name="settings_about_version">Судоку 9×9 · версия 1.0</string>
+    <string name="settings_about_version">Судоку 9×9 · версия %1$s</string>
+    <string name="settings_developer_website">Сайт разработчика</string>
     <string name="settings_about_storage">Рекорды и текущая игра хранятся только на этом устройстве.</string>
 </resources>

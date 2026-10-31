@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Скасувати</string>
     <string name="settings_reset_done">Рекорди скинуто.</string>
     <string name="settings_about">Про застосунок</string>
-    <string name="settings_about_version">Судоку 9×9 · версія 1.0</string>
+    <string name="settings_about_version">Судоку 9×9 · версія %1$s</string>
+    <string name="settings_developer_website">Сайт розробника</string>
     <string name="settings_about_storage">Рекорди та поточна гра зберігаються лише на цьому пристрої.</string>
 </resources>

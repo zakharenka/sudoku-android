@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Annuler</string>
     <string name="settings_reset_done">Records réinitialisés.</string>
     <string name="settings_about">À propos</string>
-    <string name="settings_about_version">Sudoku 9×9 · version 1.0</string>
+    <string name="settings_about_version">Sudoku 9×9 · version %1$s</string>
+    <string name="settings_developer_website">Site du développeur</string>
     <string name="settings_about_storage">Les records et la partie en cours sont enregistrés uniquement sur cet appareil.</string>
 </resources>

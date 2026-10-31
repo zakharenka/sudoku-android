@@ -24,7 +24,8 @@
   умолчанию берётся из системы, смена — через нативный экран «Язык приложения»
   Android;
 - светлая и тёмная темы, а также режим «как в системе»;
-- настройки: выбор темы, переход к системному выбору языка и сброс рекордов;
+- настройки: выбор темы, переход к системному выбору языка, ссылка на сайт
+  разработчика и сброс рекордов;
 - сохранение текущей игры при выходе: таймер останавливается, при следующем
   запуске партия восстанавливается на паузе;
 - экран победы с временем и сообщением о новом рекорде;
@@ -40,6 +41,24 @@
 - `android:localeConfig` и нативные per-app language settings Android 13+.
 
 Приложение не использует сеть, аналитику и не запрашивает разрешений.
+
+## Версия
+
+Версия задаётся в одном месте — в `gradle.properties`:
+
+```properties
+app.version=1.0.0
+```
+
+`app/build.gradle.kts` использует это значение как `versionName` и вычисляет
+`versionCode` по схеме:
+
+```text
+major * 1_000_000 + minor * 1_000 + patch
+```
+
+Для `1.0.0` это `versionCode = 1000000`. Версии следуют семантическому
+версионированию `MAJOR.MINOR.PATCH`; релизные версии отмечаются git-тегами.
 
 ## Сборка
 
@@ -62,6 +81,26 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 APK появится в `app/build/outputs/apk/release/app-release-unsigned.apk`.
+
+## Публикация
+
+Пакет для Google Play собирается локально в `store_out/` и не коммитится
+(папка добавлена в `.gitignore`). В нём лежат тексты листинга, иконка,
+feature graphic, скриншоты, ответы для Play Console и AAB.
+
+```bash
+./gradlew :app:bundleRelease
+```
+
+AAB появится в `app/build/outputs/bundle/release/app-release.aab`. Перед
+загрузкой его нужно подписать upload-ключом.
+
+Документы для Play Console:
+
+- политика конфиденциальности:
+  `https://zakharenka.me/privacy/android_sudoku_privacy.html`;
+- условия использования:
+  `https://zakharenka.me/privacy/android_sudoku_terms.html`.
 
 ## Тесты и проверка
 

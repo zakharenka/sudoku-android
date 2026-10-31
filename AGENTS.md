@@ -41,6 +41,21 @@ adb shell am start -n me.zakharenka.sudoku/.MainActivity
 Требования: JDK 17+, Android SDK 37, Gradle Wrapper 9.6. `local.properties`
 содержит локальный путь к SDK и не коммитится.
 
+## Версии и релизы
+
+- Единственный источник версии — `app.version` в `gradle.properties`.
+- Формат строго семантический: `MAJOR.MINOR.PATCH`.
+- `versionName` берётся из `app.version`, а `versionCode` вычисляется в
+  `app/build.gradle.kts` как
+  `major * 1_000_000 + minor * 1_000 + patch`.
+- Не хардкодь версию в строках интерфейса: используй
+  `BuildConfig.VERSION_NAME`.
+- Релизные версии отмечаются аннотированным git-тегом, например `1.0.0`.
+- Для Google Play собирай `./gradlew :app:bundleRelease`; AAB в
+  `app/build/outputs/bundle/release/` нужно подписать upload-ключом.
+- Публикационный пакет складывается в `store_out/`. Папка в `.gitignore`
+  и не должна попадать в коммиты.
+
 ## Архитектура
 
 ```text
@@ -91,7 +106,8 @@ SudokuScreen
 
 ### Настройки
 
-- В настройках только тема, язык, сброс рекордов и «О приложении».
+- В настройках только тема, язык, сброс рекордов, «О приложении» и ссылка на
+  сайт разработчика `https://zakharenka.me`.
 - «Правила» и «Рекорды» находятся в шапке и не дублируются в настройках.
 - Язык меняется только через нативный экран Android
   (`android.settings.APP_LOCALE_SETTINGS`), без собственного выбора языка.
@@ -200,6 +216,8 @@ SudokuScreen
 - Коммить только по просьбе пользователя. Не делай `amend`, rebase или
   force-push без явной просьбы.
 - Перед коммитом проверяй `git diff --check` и отсутствие лишних файлов.
+- `store_out/` — локальный пакет для Google Play, он в `.gitignore` и не
+  коммитится.
 
 ## Эмулятор и визуальная проверка
 
@@ -232,3 +250,5 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 | `ui/theme/Theme.kt` | светлая и тёмная палитры |
 | `res/values*/strings.xml` | локализованные строки |
 | `docs/languages.md` | текущие языки и план следующих волн |
+| `gradle.properties` | версия приложения (`app.version`) |
+| `app/build.gradle.kts` | вычисление `versionCode`, сборка AAB |

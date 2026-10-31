@@ -13,8 +13,17 @@ android {
         applicationId = "me.zakharenka.sudoku"
         minSdk = 30
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+
+        val appVersionName = providers.gradleProperty("app.version").getOrElse("1.0.0")
+        val versionParts = appVersionName.split(".")
+        require(versionParts.size == 3) {
+            "app.version must use semantic versioning: MAJOR.MINOR.PATCH"
+        }
+
+        versionCode = versionParts[0].toInt() * 1_000_000 +
+            versionParts[1].toInt() * 1_000 +
+            versionParts[2].toInt()
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
+import androidx.core.net.toUri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.zakharenka.sudoku.GameUiState
+import me.zakharenka.sudoku.BuildConfig
 import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.SudokuViewModel
 import me.zakharenka.sudoku.data.ThemeMode
@@ -815,7 +817,7 @@ private fun SettingsDialog(
         SectionLabel(stringResource(R.string.settings_about))
 
         Text(
-            text = stringResource(R.string.settings_about_version),
+            text = stringResource(R.string.settings_about_version, BuildConfig.VERSION_NAME),
             color = colors.inkSoft,
             fontSize = 15.sp,
             fontFamily = HandFont,
@@ -827,6 +829,16 @@ private fun SettingsDialog(
             fontSize = 13.sp,
             fontFamily = HandFont,
             lineHeight = 18.sp,
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        SettingsActionButton(
+            icon = LANGUAGE,
+            label = stringResource(R.string.settings_developer_website),
+            seed = 851,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { openDeveloperWebsite(context) },
         )
     }
 }
@@ -1049,6 +1061,12 @@ private fun Difficulty.noteRes(): Int = when (this) {
 }
 
 private const val APP_LOCALE_SETTINGS_ACTION = "android.settings.APP_LOCALE_SETTINGS"
+private const val DEVELOPER_WEBSITE = "https://zakharenka.me"
+
+private fun openDeveloperWebsite(context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW, DEVELOPER_WEBSITE.toUri())
+    runCatching { context.startActivity(intent) }
+}
 
 private fun openAppLanguageSettings(context: Context) {
     val appLocaleIntent = Intent(APP_LOCALE_SETTINGS_ACTION).apply {

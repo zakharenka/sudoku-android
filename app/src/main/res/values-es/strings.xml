@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Cancelar</string>
     <string name="settings_reset_done">Récords restablecidos.</string>
     <string name="settings_about">Acerca de</string>
-    <string name="settings_about_version">Sudoku 9×9 · versión 1.0</string>
+    <string name="settings_about_version">Sudoku 9×9 · versión %1$s</string>
+    <string name="settings_developer_website">Sitio del desarrollador</string>
     <string name="settings_about_storage">Los récords y la partida actual se guardan solo en este dispositivo.</string>
 </resources>

@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Адмяніць</string>
     <string name="settings_reset_done">Рэкорды скінуты.</string>
     <string name="settings_about">Пра праграму</string>
-    <string name="settings_about_version">Судоку 9×9 · версія 1.0</string>
+    <string name="settings_about_version">Судоку 9×9 · версія %1$s</string>
+    <string name="settings_developer_website">Сайт распрацоўшчыка</string>
     <string name="settings_about_storage">Рэкорды і бягучая гульня захоўваюцца толькі на гэтай прыладзе.</string>
 </resources>

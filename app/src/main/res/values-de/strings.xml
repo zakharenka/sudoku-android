@@ -94,6 +94,7 @@
     <string name="settings_reset_cancel">Abbrechen</string>
     <string name="settings_reset_done">Rekorde zurückgesetzt.</string>
     <string name="settings_about">Über</string>
-    <string name="settings_about_version">Sudoku 9×9 · Version 1.0</string>
+    <string name="settings_about_version">Sudoku 9×9 · Version %1$s</string>
+    <string name="settings_developer_website">Entwickler-Website</string>
     <string name="settings_about_storage">Rekorde und das aktuelle Spiel werden nur auf diesem Gerät gespeichert.</string>
 </resources>
