@@ -10,6 +10,7 @@ import androidx.core.net.toUri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -106,29 +107,43 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             )
         }
 
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .windowInsetsPadding(WindowInsets.safeDrawing),
         ) {
-            Header(
-                onRules = { showRules = true },
-                onRecords = { showRecords = true },
-                onSettings = { showSettings = true },
+            val isWide = maxWidth >= 900.dp
+            val wideBoardMax = maxOf(
+                320.dp,
+                minOf(760.dp, maxWidth * 0.56f, maxHeight - 160.dp),
             )
 
-            Spacer(Modifier.height(10.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Header(
+                    isWide = isWide,
+                    onRules = { showRules = true },
+                    onRecords = { showRecords = true },
+                    onSettings = { showSettings = true },
+                )
 
-            GamePanel(
-                state = state,
-                winDismissed = winDismissed,
-                onDismissWin = { dismissedGameId = state.gameId },
-                onNewGameClick = { showNewGameDialog = true },
-                viewModel = viewModel,
-            )
+                Spacer(Modifier.height(10.dp))
+
+                GamePanel(
+                    state = state,
+                    isWide = isWide,
+                    boardMax = wideBoardMax,
+                    winDismissed = winDismissed,
+                    onDismissWin = { dismissedGameId = state.gameId },
+                    onNewGameClick = { showNewGameDialog = true },
+                    viewModel = viewModel,
+                )
+            }
         }
     }
 
@@ -168,6 +183,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 @Composable
 private fun GamePanel(
     state: GameUiState,
+    isWide: Boolean,
+    boardMax: Dp,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onNewGameClick: () -> Unit,
@@ -177,8 +194,8 @@ private fun GamePanel(
 
     SketchSurface(
         modifier = Modifier
-            .fillMaxWidth()
-            .widthIn(max = 620.dp),
+            .widthIn(max = if (isWide) 1120.dp else 720.dp)
+            .fillMaxWidth(),
         fill = colors.paperAlt,
         border = colors.inkSoft,
         strokeWidth = 1.6.dp,
@@ -187,51 +204,112 @@ private fun GamePanel(
         contentPadding = PaddingValues(10.dp),
         contentAlignment = Alignment.TopStart,
     ) {
-        Column(Modifier.fillMaxWidth()) {
-            TopToolbar(
-                difficulty = state.difficulty,
-                mistakes = state.mistakes,
-                elapsedSeconds = state.elapsedSeconds,
-                paused = state.paused,
-                enabled = !state.loading && !state.won,
-                onTogglePause = viewModel::togglePause,
-                onNewGame = onNewGameClick,
-            )
+        if (isWide) {
+            Column(Modifier.fillMaxWidth()) {
+                TopToolbar(
+                    difficulty = state.difficulty,
+                    mistakes = state.mistakes,
+                    elapsedSeconds = state.elapsedSeconds,
+                    paused = state.paused,
+                    enabled = !state.loading && !state.won,
+                    onTogglePause = viewModel::togglePause,
+                    onNewGame = onNewGameClick,
+                )
 
-            Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(10.dp))
 
-            BoardBox(
-                state = state,
-                winDismissed = winDismissed,
-                onDismissWin = onDismissWin,
-                onSelect = viewModel::select,
-                onResume = viewModel::resume,
-                onNewGame = onNewGameClick,
-            )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    BoardBox(
+                        state = state,
+                        winDismissed = winDismissed,
+                        onDismissWin = onDismissWin,
+                        onSelect = viewModel::select,
+                        onResume = viewModel::resume,
+                        onNewGame = onNewGameClick,
+                        modifier = Modifier
+                            .width(boardMax)
+                            .aspectRatio(1f),
+                    )
 
-            Spacer(Modifier.height(8.dp))
+                    GameControls(
+                        state = state,
+                        onNewGameClick = onNewGameClick,
+                        viewModel = viewModel,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        } else {
+            Column(Modifier.fillMaxWidth()) {
+                TopToolbar(
+                    difficulty = state.difficulty,
+                    mistakes = state.mistakes,
+                    elapsedSeconds = state.elapsedSeconds,
+                    paused = state.paused,
+                    enabled = !state.loading && !state.won,
+                    onTogglePause = viewModel::togglePause,
+                    onNewGame = onNewGameClick,
+                )
 
-            NumberPad(
-                cells = state.cells,
-                enabled = !state.loading && !state.paused && !state.won,
-                onNumber = viewModel::enter,
-            )
+                Spacer(Modifier.height(10.dp))
 
-            Spacer(Modifier.height(8.dp))
+                BoardBox(
+                    state = state,
+                    winDismissed = winDismissed,
+                    onDismissWin = onDismissWin,
+                    onSelect = viewModel::select,
+                    onResume = viewModel::resume,
+                    onNewGame = onNewGameClick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            ActionRow(
-                state = state,
-                onUndo = viewModel::undo,
-                onErase = viewModel::erase,
-                onNotes = viewModel::toggleNotes,
-                onHint = viewModel::hint,
-            )
+                Spacer(Modifier.height(8.dp))
 
-            StatusText(
-                status = state.status,
-                kind = state.statusKind,
-            )
+                GameControls(
+                    state = state,
+                    onNewGameClick = onNewGameClick,
+                    viewModel = viewModel,
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun GameControls(
+    state: GameUiState,
+    onNewGameClick: () -> Unit,
+    viewModel: SudokuViewModel,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        NumberPad(
+            cells = state.cells,
+            enabled = !state.loading && !state.paused && !state.won,
+            onNumber = viewModel::enter,
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        ActionRow(
+            state = state,
+            onUndo = viewModel::undo,
+            onErase = viewModel::erase,
+            onNotes = viewModel::toggleNotes,
+            onHint = viewModel::hint,
+        )
+
+        StatusText(
+            status = state.status,
+            kind = state.statusKind,
+        )
     }
 }
 
@@ -243,13 +321,12 @@ private fun BoardBox(
     onSelect: (Int) -> Unit,
     onResume: () -> Unit,
     onNewGame: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = SudokuTheme.colors
 
     SketchSurface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f),
+        modifier = modifier.aspectRatio(1f),
         fill = colors.paperAlt,
         border = colors.gridLineStrong,
         strokeWidth = 2.dp,
@@ -284,6 +361,7 @@ private fun BoardBox(
 
 @Composable
 private fun Header(
+    isWide: Boolean,
     onRules: () -> Unit,
     onRecords: () -> Unit,
     onSettings: () -> Unit,
@@ -292,8 +370,8 @@ private fun Header(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .widthIn(max = 620.dp),
+            .widthIn(max = if (isWide) 1120.dp else 720.dp)
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SketchLogo(52.dp)
@@ -453,8 +531,8 @@ private fun SketchDialog(
         ) {
             SketchSurface(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 520.dp),
+                    .widthIn(max = 520.dp)
+                    .fillMaxWidth(),
                 fill = colors.paperAlt,
                 border = colors.ink,
                 strokeWidth = 2.dp,
