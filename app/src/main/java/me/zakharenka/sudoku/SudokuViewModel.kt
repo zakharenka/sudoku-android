@@ -39,6 +39,7 @@ data class GameUiState(
     val status: String = "",
     val statusKind: StatusKind = StatusKind.NEUTRAL,
     val bestTimes: Map<Difficulty, Long?> = emptyMap(),
+    val solvedCounts: Map<Difficulty, Int> = emptyMap(),
     val isNewRecord: Boolean = false,
     val canUndo: Boolean = false,
     val canErase: Boolean = false,
@@ -56,6 +57,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private var elapsedMillis = 0L
     private var timerStartedAt = 0L
     private var bestTimes = records.loadBestTimes()
+    private var solvedCounts = records.loadSolvedCounts()
     private var notesMode = records.notesMode
     private var lastLocale = currentLocaleTag()
 
@@ -66,6 +68,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         GameUiState(
             notesMode = notesMode,
             bestTimes = bestTimes,
+            solvedCounts = solvedCounts,
         ),
     )
         private set
@@ -113,7 +116,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun clearBestTimes() {
         records.clearBestTimes()
         bestTimes = records.loadBestTimes()
-        uiState = uiState.copy(bestTimes = bestTimes)
+        solvedCounts = records.loadSolvedCounts()
+        uiState = uiState.copy(
+            bestTimes = bestTimes,
+            solvedCounts = solvedCounts,
+        )
     }
 
     fun newGame(difficulty: Difficulty = uiState.difficulty) {
@@ -180,18 +187,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 )
             }
         }
-    }
-
-    fun selectDifficulty(difficulty: Difficulty) {
-        if (difficulty == uiState.difficulty && !uiState.won) {
-            uiState = uiState.copy(
-                status = getApplication<Application>().getString(R.string.status_same_difficulty),
-                statusKind = StatusKind.NEUTRAL,
-            )
-            return
-        }
-
-        newGame(difficulty)
     }
 
     fun select(index: Int) {
@@ -326,6 +321,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         val seconds = elapsedMillis / 1000
         val isRecord = records.saveBestTime(session.difficulty, seconds)
+        solvedCounts = records.incrementSolvedCount(session.difficulty)
 
         if (isRecord) {
             bestTimes = records.loadBestTimes()
@@ -361,6 +357,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             status = status ?: uiState.status,
             statusKind = kind ?: uiState.statusKind,
             bestTimes = bestTimes,
+            solvedCounts = solvedCounts,
             isNewRecord = isNewRecord,
             canUndo = session.canUndo,
             canErase = session.canErase,
@@ -436,6 +433,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             status = getApplication<Application>().getString(R.string.status_restored),
             statusKind = StatusKind.NEUTRAL,
             bestTimes = bestTimes,
+            solvedCounts = solvedCounts,
             isNewRecord = false,
             canUndo = false,
             canErase = restored.canErase,

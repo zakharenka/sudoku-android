@@ -53,127 +53,101 @@ import me.zakharenka.sudoku.ui.theme.HandFont
 import me.zakharenka.sudoku.ui.theme.SudokuTheme
 
 @Composable
-fun DifficultySelector(
-    selected: Difficulty,
-    enabled: Boolean,
-    onSelect: (Difficulty) -> Unit,
-) {
-    val colors = SudokuTheme.colors
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-    ) {
-        Difficulty.entries.forEachIndexed { index, difficulty ->
-            val active = difficulty == selected
-
-            SketchButton(
-                onClick = { onSelect(difficulty) },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(58.dp),
-                enabled = enabled,
-                fill = colors.paperSunken,
-                border = colors.gridLine,
-                active = active,
-                seed = 100 + index,
-                contentPadding = PaddingValues(horizontal = 2.dp, vertical = 6.dp),
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(difficulty.labelRes()),
-                        color = if (active) colors.accent else colors.ink,
-                        fontSize = 15.sp,
-                        fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = stringResource(difficulty.noteRes()),
-                        color = if (active) colors.accentSoft else colors.inkSoft,
-                        fontSize = 10.sp,
-                        fontFamily = HandFont,
-                        maxLines = 1,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun NewGameButton(
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val colors = SudokuTheme.colors
-
-    SketchButton(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(46.dp),
-        enabled = enabled,
-        fill = colors.paperSunken,
-        border = colors.gridLine,
-        seed = 200,
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            SketchIcon(
-                icon = REFRESH,
-                tint = colors.inkSoft,
-                modifier = Modifier.size(18.dp),
-            )
-            Text(
-                text = stringResource(R.string.new_game),
-                color = colors.inkSoft,
-                fontSize = 16.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@Composable
-fun Hud(
+fun TopToolbar(
+    difficulty: Difficulty,
     mistakes: Int,
     elapsedSeconds: Long,
     paused: Boolean,
     enabled: Boolean,
     onTogglePause: () -> Unit,
+    onNewGame: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
     val pauseDescription = stringResource(
         if (paused) R.string.action_resume else R.string.action_pause,
     )
+    val newGameDescription = stringResource(R.string.new_game)
+    val time = formatTime(elapsedSeconds)
+    val statsDescription = stringResource(difficulty.labelRes()) + ", " +
+        pluralStringResource(R.plurals.mistakes, mistakes, mistakes) +
+        ", " + stringResource(R.string.timer_content_description, time)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart,
+        SketchSurface(
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp)
+                .semantics { contentDescription = statsDescription },
+            fill = colors.paperSunken,
+            border = colors.gridLine,
+            seed = 300,
+            shadow = colors.shadow,
+            contentPadding = PaddingValues(horizontal = 10.dp),
         ) {
-            HudStat(
-                icon = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(difficulty.labelRes()),
+                    color = colors.ink,
+                    fontSize = 15.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1.2f),
+                )
+
+                ToolbarDivider()
+
+                Row(
+                    modifier = Modifier.weight(0.8f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
                         text = "×",
                         color = colors.danger,
-                        fontSize = 26.sp,
+                        fontSize = 22.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                     )
-                },
-                value = mistakes.toString(),
-                description = pluralStringResource(R.plurals.mistakes, mistakes, mistakes),
-                seed = 300,
-            )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = mistakes.toString(),
+                        color = colors.accent,
+                        fontSize = 19.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                ToolbarDivider()
+
+                Row(
+                    modifier = Modifier.weight(1.4f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SketchIcon(
+                        icon = CLOCK,
+                        tint = colors.inkSoft,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = time,
+                        color = colors.accent,
+                        fontSize = 19.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
         }
 
         SketchButton(
@@ -194,64 +168,34 @@ fun Hud(
             )
         }
 
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterEnd,
+        SketchButton(
+            onClick = onNewGame,
+            modifier = Modifier
+                .size(48.dp)
+                .semantics { contentDescription = newGameDescription },
+            fill = colors.paperSunken,
+            border = colors.gridLine,
+            seed = 302,
+            contentPadding = PaddingValues(0.dp),
         ) {
-            HudStat(
-                icon = {
-                    SketchIcon(
-                        icon = CLOCK,
-                        tint = colors.inkSoft,
-                        modifier = Modifier.size(18.dp),
-                    )
-                },
-                value = formatTime(elapsedSeconds),
-                description = stringResource(
-                    R.string.timer_content_description,
-                    formatTime(elapsedSeconds),
-                ),
-                seed = 302,
+            SketchIcon(
+                icon = REFRESH,
+                tint = colors.inkSoft,
+                modifier = Modifier.size(20.dp),
             )
         }
     }
 }
 
 @Composable
-private fun HudStat(
-    icon: @Composable () -> Unit,
-    value: String,
-    description: String,
-    seed: Int,
-) {
+private fun ToolbarDivider() {
     val colors = SudokuTheme.colors
-
-    SketchSurface(
+    Box(
         modifier = Modifier
-            .height(46.dp)
-            .widthIn(min = 104.dp)
-            .semantics { contentDescription = description },
-        fill = colors.paperSunken,
-        border = colors.gridLine,
-        seed = seed,
-        shadow = colors.shadow,
-        contentPadding = PaddingValues(horizontal = 10.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            icon()
-            Text(
-                text = value,
-                color = colors.accent,
-                fontSize = 20.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
-            )
-        }
-    }
+            .width(1.dp)
+            .height(24.dp)
+            .background(colors.gridLine),
+    )
 }
 
 @Composable
@@ -603,11 +547,4 @@ private fun Difficulty.labelRes(): Int = when (this) {
     Difficulty.MEDIUM -> R.string.difficulty_medium
     Difficulty.HARD -> R.string.difficulty_hard
     Difficulty.EXPERT -> R.string.difficulty_expert
-}
-
-private fun Difficulty.noteRes(): Int = when (this) {
-    Difficulty.EASY -> R.string.difficulty_easy_note
-    Difficulty.MEDIUM -> R.string.difficulty_medium_note
-    Difficulty.HARD -> R.string.difficulty_hard_note
-    Difficulty.EXPERT -> R.string.difficulty_expert_note
 }

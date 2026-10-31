@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Судоку</string>
-    <string name="app_subtitle">Логика без спешки</string>
 
     <string name="difficulty_easy">Легко</string>
     <string name="difficulty_easy_note">разминка</string>
@@ -12,6 +11,8 @@
     <string name="difficulty_expert_note">максимум</string>
 
     <string name="new_game">Новая игра</string>
+    <string name="new_game_confirm">Выберите сложность, чтобы начать новую игру. Текущий прогресс будет потерян.</string>
+    <string name="new_game_cancel">Отмена</string>
     <string name="action_undo">Отменить</string>
     <string name="action_erase">Стереть</string>
     <string name="action_notes">Заметки</string>
@@ -41,7 +42,6 @@
     <string name="status_resumed">Продолжаем</string>
     <string name="status_new_record">Решено! Новый рекорд: %1$s</string>
     <string name="status_solved">Решено! Время: %1$s</string>
-    <string name="status_same_difficulty">Этот уровень уже выбран</string>
 
     <string name="message_select_cell">Сначала выберите клетку</string>
     <string name="message_cell_filled">Эта клетка уже заполнена</string>
@@ -68,6 +68,7 @@
 
     <string name="dialog_close">Закрыть</string>
     <string name="records_title">Лучшие результаты</string>
+    <string name="records_solved_level">Разгадано: %1$d</string>
     <string name="records_note">Рекорды хранятся только на этом устройстве.</string>
     <string name="rules_title">Как играть</string>
     <string name="rules_1">1–9 — вписать цифру в выбранную клетку</string>
@@ -88,8 +89,6 @@
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
     <string name="settings_game">Игра</string>
-    <string name="settings_how_to_play">Как играть</string>
-    <string name="settings_records">Рекорды</string>
     <string name="settings_reset_records">Сбросить рекорды</string>
     <string name="settings_reset_confirm">Сбросить все рекорды?</string>
     <string name="settings_reset_yes">Да</string>

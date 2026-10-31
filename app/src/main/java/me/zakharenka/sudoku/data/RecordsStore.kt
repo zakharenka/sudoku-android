@@ -23,14 +23,30 @@ class RecordsStore(context: Context) {
             return false
         }
 
-        preferences.edit { putLong(key, seconds) }
+        preferences.edit(commit = true) { putLong(key, seconds) }
         return true
     }
 
+    fun loadSolvedCounts(): Map<Difficulty, Int> = Difficulty.entries.associateWith { difficulty ->
+        preferences.getInt(solvedKey(difficulty), 0)
+    }
+
+    fun incrementSolvedCount(difficulty: Difficulty): Map<Difficulty, Int> {
+        val counts = loadSolvedCounts().toMutableMap()
+        counts[difficulty] = (counts[difficulty] ?: 0) + 1
+
+        preferences.edit(commit = true) {
+            putInt(solvedKey(difficulty), counts[difficulty] ?: 0)
+        }
+
+        return counts
+    }
+
     fun clearBestTimes() {
-        preferences.edit {
+        preferences.edit(commit = true) {
             Difficulty.entries.forEach { difficulty ->
                 remove(bestKey(difficulty))
+                remove(solvedKey(difficulty))
             }
         }
     }
@@ -48,6 +64,8 @@ class RecordsStore(context: Context) {
         }
 
     private fun bestKey(difficulty: Difficulty): String = "best:${difficulty.key}"
+
+    private fun solvedKey(difficulty: Difficulty): String = "solved:${difficulty.key}"
 
     private companion object {
         const val PREFERENCES = "sudoku"

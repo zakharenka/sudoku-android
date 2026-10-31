@@ -64,6 +64,7 @@ import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.INFO
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.LANGUAGE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.PLAY
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.SETTINGS
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.TROPHY
 import me.zakharenka.sudoku.ui.sketch.SketchSurface
@@ -83,6 +84,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     var showRecords by rememberSaveable { mutableStateOf(false) }
     var showRules by rememberSaveable { mutableStateOf(false) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showNewGameDialog by rememberSaveable { mutableStateOf(false) }
     var dismissedGameId by rememberSaveable { mutableStateOf<Long?>(null) }
     val winDismissed = dismissedGameId == state.gameId
 
@@ -123,6 +125,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 state = state,
                 winDismissed = winDismissed,
                 onDismissWin = { dismissedGameId = state.gameId },
+                onNewGameClick = { showNewGameDialog = true },
                 viewModel = viewModel,
             )
         }
@@ -131,6 +134,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     if (showRecords) {
         RecordsDialog(
             bestTimes = state.bestTimes,
+            solvedCounts = state.solvedCounts,
             onDismiss = { showRecords = false },
         )
     }
@@ -143,16 +147,18 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
         SettingsDialog(
             themeMode = viewModel.themeMode,
             onThemeModeChange = viewModel::updateThemeMode,
-            onRules = {
-                showSettings = false
-                showRules = true
-            },
-            onRecords = {
-                showSettings = false
-                showRecords = true
-            },
             onResetRecords = viewModel::clearBestTimes,
             onDismiss = { showSettings = false },
+        )
+    }
+
+    if (showNewGameDialog) {
+        NewGameDialog(
+            onStart = { difficulty ->
+                showNewGameDialog = false
+                viewModel.newGame(difficulty)
+            },
+            onDismiss = { showNewGameDialog = false },
         )
     }
 }
@@ -162,6 +168,7 @@ private fun GamePanel(
     state: GameUiState,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
+    onNewGameClick: () -> Unit,
     viewModel: SudokuViewModel,
 ) {
     val colors = SudokuTheme.colors
@@ -179,27 +186,14 @@ private fun GamePanel(
         contentAlignment = Alignment.TopStart,
     ) {
         Column(Modifier.fillMaxWidth()) {
-            DifficultySelector(
-                selected = state.difficulty,
-                enabled = !state.loading,
-                onSelect = viewModel::selectDifficulty,
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            NewGameButton(
-                enabled = !state.loading,
-                onClick = { viewModel.newGame() },
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Hud(
+            TopToolbar(
+                difficulty = state.difficulty,
                 mistakes = state.mistakes,
                 elapsedSeconds = state.elapsedSeconds,
                 paused = state.paused,
                 enabled = !state.loading && !state.won,
                 onTogglePause = viewModel::togglePause,
+                onNewGame = onNewGameClick,
             )
 
             Spacer(Modifier.height(10.dp))
@@ -210,7 +204,7 @@ private fun GamePanel(
                 onDismissWin = onDismissWin,
                 onSelect = viewModel::select,
                 onResume = viewModel::resume,
-                onNewGame = { viewModel.newGame() },
+                onNewGame = onNewGameClick,
             )
 
             Spacer(Modifier.height(8.dp))
@@ -304,22 +298,16 @@ private fun Header(
 
         Spacer(Modifier.width(12.dp))
 
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(R.string.app_name),
-                color = colors.ink,
-                fontSize = 34.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 36.sp,
-            )
-            Text(
-                text = stringResource(R.string.app_subtitle),
-                color = colors.inkSoft,
-                fontSize = 14.sp,
-                fontFamily = HandFont,
-            )
-        }
+        Text(
+            text = stringResource(R.string.app_name),
+            color = colors.ink,
+            fontSize = 34.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 36.sp,
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+        )
 
         HeaderIconButton(
             icon = INFO,
@@ -528,6 +516,7 @@ private fun DialogHeader(
 @Composable
 private fun RecordsDialog(
     bestTimes: Map<Difficulty, Long?>,
+    solvedCounts: Map<Difficulty, Int>,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -547,12 +536,23 @@ private fun RecordsDialog(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = stringResource(difficulty.labelRes()),
-                    color = colors.inkSoft,
-                    fontSize = 18.sp,
-                    fontFamily = HandFont,
-                )
+                Column {
+                    Text(
+                        text = stringResource(difficulty.labelRes()),
+                        color = colors.inkSoft,
+                        fontSize = 18.sp,
+                        fontFamily = HandFont,
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.records_solved_level,
+                            solvedCounts[difficulty] ?: 0,
+                        ),
+                        color = colors.inkSoft.copy(alpha = 0.7f),
+                        fontSize = 12.sp,
+                        fontFamily = HandFont,
+                    )
+                }
                 Text(
                     text = bestTimes[difficulty]?.let(::formatTime) ?: "—",
                     color = colors.accent,
@@ -632,8 +632,6 @@ private fun RuleLine(text: String) {
 private fun SettingsDialog(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
-    onRules: () -> Unit,
-    onRecords: () -> Unit,
     onResetRecords: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -676,7 +674,7 @@ private fun SettingsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    ThemeRadio(active = active)
+                    SketchRadio(active = active)
                     Spacer(Modifier.width(10.dp))
                     Text(
                         text = stringResource(mode.labelRes()),
@@ -717,28 +715,6 @@ private fun SettingsDialog(
         )
 
         SectionLabel(stringResource(R.string.settings_game))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            SettingsActionButton(
-                icon = INFO,
-                label = stringResource(R.string.settings_how_to_play),
-                seed = 840,
-                modifier = Modifier.weight(1f),
-                onClick = onRules,
-            )
-            SettingsActionButton(
-                icon = TROPHY,
-                label = stringResource(R.string.settings_records),
-                seed = 841,
-                modifier = Modifier.weight(1f),
-                onClick = onRecords,
-            )
-        }
-
-        Spacer(Modifier.height(8.dp))
 
         SketchButton(
             onClick = {
@@ -858,6 +834,96 @@ private fun SettingsDialog(
 }
 
 @Composable
+private fun NewGameDialog(
+    onStart: (Difficulty) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+
+    SketchDialog(onDismiss = onDismiss, seed = 860) {
+        DialogHeader(
+            title = stringResource(R.string.new_game),
+            seed = 861,
+            onDismiss = onDismiss,
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(R.string.new_game_confirm),
+            color = colors.inkSoft,
+            fontSize = 15.sp,
+            fontFamily = HandFont,
+            lineHeight = 21.sp,
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Difficulty.entries.forEachIndexed { index, difficulty ->
+            SketchButton(
+                onClick = { onStart(difficulty) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                seed = 870 + index,
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(difficulty.labelRes()),
+                            color = colors.ink,
+                            fontSize = 17.sp,
+                            fontFamily = HandFont,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = stringResource(difficulty.noteRes()),
+                            color = colors.inkSoft,
+                            fontSize = 12.sp,
+                            fontFamily = HandFont,
+                        )
+                    }
+                    SketchIcon(
+                        icon = PLAY,
+                        tint = colors.accent,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(6.dp))
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        SketchButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp),
+            fill = colors.paperSunken,
+            border = colors.gridLine,
+            seed = 881,
+            contentPadding = PaddingValues(horizontal = 12.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.new_game_cancel),
+                color = colors.inkSoft,
+                fontSize = 16.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+@Composable
 private fun SectionLabel(text: String) {
     val colors = SudokuTheme.colors
 
@@ -873,7 +939,7 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ThemeRadio(active: Boolean) {
+private fun SketchRadio(active: Boolean) {
     val colors = SudokuTheme.colors
 
     Canvas(Modifier.size(20.dp)) {
@@ -948,6 +1014,13 @@ private fun Difficulty.labelRes(): Int = when (this) {
     Difficulty.MEDIUM -> R.string.difficulty_medium
     Difficulty.HARD -> R.string.difficulty_hard
     Difficulty.EXPERT -> R.string.difficulty_expert
+}
+
+private fun Difficulty.noteRes(): Int = when (this) {
+    Difficulty.EASY -> R.string.difficulty_easy_note
+    Difficulty.MEDIUM -> R.string.difficulty_medium_note
+    Difficulty.HARD -> R.string.difficulty_hard_note
+    Difficulty.EXPERT -> R.string.difficulty_expert_note
 }
 
 private const val APP_LOCALE_SETTINGS_ACTION = "android.settings.APP_LOCALE_SETTINGS"

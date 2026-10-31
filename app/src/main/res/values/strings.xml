@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Sudoku</string>
-    <string name="app_subtitle">Logic without rush</string>
 
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_easy_note">warm-up</string>
@@ -12,6 +11,8 @@
     <string name="difficulty_expert_note">maximum</string>
 
     <string name="new_game">New game</string>
+    <string name="new_game_confirm">Choose a difficulty to start a new game. Current progress will be lost.</string>
+    <string name="new_game_cancel">Cancel</string>
     <string name="action_undo">Undo</string>
     <string name="action_erase">Erase</string>
     <string name="action_notes">Notes</string>
@@ -41,7 +42,6 @@
     <string name="status_resumed">Resuming</string>
     <string name="status_new_record">Solved! New record: %1$s</string>
     <string name="status_solved">Solved! Time: %1$s</string>
-    <string name="status_same_difficulty">This difficulty is already selected</string>
 
     <string name="message_select_cell">Choose a cell first</string>
     <string name="message_cell_filled">This cell is already filled</string>
@@ -68,6 +68,7 @@
 
     <string name="dialog_close">Close</string>
     <string name="records_title">Best results</string>
+    <string name="records_solved_level">Solved: %1$d</string>
     <string name="records_note">Records are stored only on this device.</string>
     <string name="rules_title">How to play</string>
     <string name="rules_1">1–9 — enter a digit in the selected cell</string>
@@ -88,8 +89,6 @@
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
     <string name="settings_game">Game</string>
-    <string name="settings_how_to_play">How to play</string>
-    <string name="settings_records">Records</string>
     <string name="settings_reset_records">Reset records</string>
     <string name="settings_reset_confirm">Reset all records?</string>
     <string name="settings_reset_yes">Yes</string>
