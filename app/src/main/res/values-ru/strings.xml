@@ -11,7 +11,8 @@
     <string name="difficulty_expert_note">максимум</string>
 
     <string name="new_game">Новая игра</string>
-    <string name="new_game_confirm">Выберите сложность, чтобы начать новую игру. Текущий прогресс будет потерян.</string>
+    <string name="new_game_confirm">Начать новую игру? Текущий прогресс будет потерян.</string>
+    <string name="new_game_start">Начать</string>
     <string name="new_game_cancel">Отмена</string>
     <string name="action_undo">Отменить</string>
     <string name="action_erase">Стереть</string>

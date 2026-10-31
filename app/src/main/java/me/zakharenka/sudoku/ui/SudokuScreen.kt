@@ -64,7 +64,6 @@ import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.INFO
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.LANGUAGE
-import me.zakharenka.sudoku.ui.sketch.SketchIcon.PLAY
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.SETTINGS
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.TROPHY
 import me.zakharenka.sudoku.ui.sketch.SketchSurface
@@ -154,6 +153,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
     if (showNewGameDialog) {
         NewGameDialog(
+            initialDifficulty = state.difficulty,
             onStart = { difficulty ->
                 showNewGameDialog = false
                 viewModel.newGame(difficulty)
@@ -835,10 +835,12 @@ private fun SettingsDialog(
 
 @Composable
 private fun NewGameDialog(
+    initialDifficulty: Difficulty,
     onStart: (Difficulty) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
+    var selected by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
 
     SketchDialog(onDismiss = onDismiss, seed = 860) {
         DialogHeader(
@@ -860,13 +862,16 @@ private fun NewGameDialog(
         Spacer(Modifier.height(12.dp))
 
         Difficulty.entries.forEachIndexed { index, difficulty ->
+            val active = difficulty == selected
+
             SketchButton(
-                onClick = { onStart(difficulty) },
+                onClick = { selected = difficulty },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(52.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
+                active = active,
                 seed = 870 + index,
                 contentPadding = PaddingValues(horizontal = 12.dp),
             ) {
@@ -874,13 +879,15 @@ private fun NewGameDialog(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(Modifier.weight(1f)) {
+                    SketchRadio(active = active)
+                    Spacer(Modifier.width(10.dp))
+                    Column {
                         Text(
                             text = stringResource(difficulty.labelRes()),
-                            color = colors.ink,
+                            color = if (active) colors.accent else colors.ink,
                             fontSize = 17.sp,
                             fontFamily = HandFont,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                         )
                         Text(
                             text = stringResource(difficulty.noteRes()),
@@ -889,11 +896,6 @@ private fun NewGameDialog(
                             fontFamily = HandFont,
                         )
                     }
-                    SketchIcon(
-                        icon = PLAY,
-                        tint = colors.accent,
-                        modifier = Modifier.size(18.dp),
-                    )
                 }
             }
 
@@ -902,23 +904,48 @@ private fun NewGameDialog(
 
         Spacer(Modifier.height(10.dp))
 
-        SketchButton(
-            onClick = onDismiss,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(46.dp),
-            fill = colors.paperSunken,
-            border = colors.gridLine,
-            seed = 881,
-            contentPadding = PaddingValues(horizontal = 12.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = stringResource(R.string.new_game_cancel),
-                color = colors.inkSoft,
-                fontSize = 16.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-            )
+            SketchButton(
+                onClick = { onStart(selected) },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp),
+                fill = colors.accentWash,
+                border = colors.accent,
+                active = true,
+                seed = 880,
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.new_game_start),
+                    color = colors.accent,
+                    fontSize = 16.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            SketchButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp),
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                seed = 881,
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.new_game_cancel),
+                    color = colors.inkSoft,
+                    fontSize = 16.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }

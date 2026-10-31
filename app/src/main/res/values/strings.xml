@@ -11,7 +11,8 @@
     <string name="difficulty_expert_note">maximum</string>
 
     <string name="new_game">New game</string>
-    <string name="new_game_confirm">Choose a difficulty to start a new game. Current progress will be lost.</string>
+    <string name="new_game_confirm">Start a new game? Current progress will be lost.</string>
+    <string name="new_game_start">Start</string>
     <string name="new_game_cancel">Cancel</string>
     <string name="action_undo">Undo</string>
     <string name="action_erase">Erase</string>

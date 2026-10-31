@@ -1,6 +1,7 @@
 package me.zakharenka.sudoku.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,7 +100,9 @@ fun TopToolbar(
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    modifier = Modifier.weight(1.2f),
+                    modifier = Modifier
+                        .weight(1.2f)
+                        .clickable(onClick = onNewGame),
                 )
 
                 ToolbarDivider()
