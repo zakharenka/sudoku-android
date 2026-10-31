@@ -25,7 +25,6 @@ data class SketchColors(
     val paperSunken: Color,
     val ink: Color,
     val inkSoft: Color,
-    val inkFaint: Color,
     val accent: Color,
     val accentSoft: Color,
     val accentWash: Color,
@@ -37,7 +36,6 @@ data class SketchColors(
     val gridLine: Color,
     val gridLineStrong: Color,
     val paperSpeckle: Color,
-    val scrim: Color,
 )
 
 val LightSketchColors = SketchColors(
@@ -47,7 +45,6 @@ val LightSketchColors = SketchColors(
     paperSunken = Color(0xFFEDE5D5),
     ink = Color(0xFF243447),
     inkSoft = Color(0xFF5E6B7A),
-    inkFaint = Color(0xFF9AA5B1),
     accent = Color(0xFF1F6F9C),
     accentSoft = Color(0xFF4C9AC4),
     accentWash = Color(0xFFCFE7F2),
@@ -59,7 +56,6 @@ val LightSketchColors = SketchColors(
     gridLine = Color(0x59243447),
     gridLineStrong = Color(0xBF243447),
     paperSpeckle = Color(0x0D243447),
-    scrim = Color(0x73243447),
 )
 
 val DarkSketchColors = SketchColors(
@@ -69,7 +65,6 @@ val DarkSketchColors = SketchColors(
     paperSunken = Color(0xFF0F1115),
     ink = Color(0xFFE9E4D8),
     inkSoft = Color(0xFFB0AA9E),
-    inkFaint = Color(0xFF706B62),
     accent = Color(0xFF7DD3FC),
     accentSoft = Color(0xFFA5E3FF),
     accentWash = Color(0xFF1E3A4A),
@@ -81,7 +76,6 @@ val DarkSketchColors = SketchColors(
     gridLine = Color(0x4DE9E4D8),
     gridLineStrong = Color(0xCCE9E4D8),
     paperSpeckle = Color(0x0DE9E4D8),
-    scrim = Color(0x99000000),
 )
 
 private val LocalSketchColors = staticCompositionLocalOf { LightSketchColors }
