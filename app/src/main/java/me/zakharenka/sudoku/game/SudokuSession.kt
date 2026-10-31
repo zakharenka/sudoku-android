@@ -9,7 +9,7 @@ enum class StatusKind {
 }
 
 data class MoveOutcome(
-    val message: String = "",
+    val message: GameMessage? = null,
     val kind: StatusKind = StatusKind.NEUTRAL,
     val changed: Boolean = false,
     val won: Boolean = false,
@@ -85,7 +85,7 @@ class SudokuSession(
 
         notesMode = !notesMode
         return MoveOutcome(
-            message = if (notesMode) "Заметки включены" else "Заметки выключены",
+            message = if (notesMode) GameMessage.NotesEnabled else GameMessage.NotesDisabled,
             changed = true,
         )
     }
@@ -96,18 +96,18 @@ class SudokuSession(
         }
 
         val index = selected
-            ?: return MoveOutcome("Сначала выберите клетку", StatusKind.ERROR)
+            ?: return MoveOutcome(GameMessage.SelectCellFirst, StatusKind.ERROR)
 
         val cell = cells[index]
 
         if (cell.given) {
-            return MoveOutcome("Эта клетка уже заполнена")
+            return MoveOutcome(GameMessage.CellAlreadyFilled)
         }
 
         if (notesMode) {
             if (cell.value != 0) {
                 return MoveOutcome(
-                    "Сначала сотрите цифру, чтобы добавить заметку",
+                    GameMessage.EraseNumberFirst,
                     StatusKind.ERROR,
                 )
             }
@@ -124,9 +124,9 @@ class SudokuSession(
 
             return MoveOutcome(
                 message = if (number in notes) {
-                    "Заметка $number добавлена"
+                    GameMessage.NoteAdded(number)
                 } else {
-                    "Заметка $number убрана"
+                    GameMessage.NoteRemoved(number)
                 },
                 changed = true,
             )
@@ -158,10 +158,10 @@ class SudokuSession(
         val finished = checkWin()
 
         return when {
-            finished -> MoveOutcome("Решено!", StatusKind.SUCCESS, changed = true, won = true)
-            correct -> MoveOutcome("Верно", changed = true)
+            finished -> MoveOutcome(GameMessage.Solved, StatusKind.SUCCESS, changed = true, won = true)
+            correct -> MoveOutcome(GameMessage.Correct, changed = true)
             else -> MoveOutcome(
-                "Неверная цифра. Ошибок: $mistakes.",
+                GameMessage.WrongNumber(mistakes),
                 StatusKind.ERROR,
                 changed = true,
             )
@@ -177,7 +177,7 @@ class SudokuSession(
         val cell = cells[index]
 
         if (cell.given) {
-            return MoveOutcome("Эту клетку нельзя стереть", StatusKind.ERROR)
+            return MoveOutcome(GameMessage.CannotEraseGiven, StatusKind.ERROR)
         }
 
         if (cell.value == 0 && cell.notes.isEmpty()) {
@@ -188,7 +188,7 @@ class SudokuSession(
         cells[index] = cell.copy(value = 0, error = false, notes = emptySet())
         pushHistory(entry)
 
-        return MoveOutcome("Клетка очищена", changed = true)
+        return MoveOutcome(GameMessage.CellCleared, changed = true)
     }
 
     fun undo(): MoveOutcome {
@@ -205,7 +205,7 @@ class SudokuSession(
         mistakes = entry.mistakes
         selected = entry.changes.firstOrNull()?.index ?: selected
 
-        return MoveOutcome("Ход отменён", changed = true)
+        return MoveOutcome(GameMessage.MoveUndone, changed = true)
     }
 
     fun hint(): MoveOutcome {
@@ -218,7 +218,7 @@ class SudokuSession(
         }
 
         if (candidates.isEmpty()) {
-            return MoveOutcome("Поле уже заполнено верно")
+            return MoveOutcome(GameMessage.BoardAlreadyCorrect)
         }
 
         val index = selected?.takeIf { it in candidates }
@@ -246,7 +246,7 @@ class SudokuSession(
         val col = index % SIZE + 1
 
         return MoveOutcome(
-            message = "Подсказка: $number — строка $row, столбец $col",
+            message = GameMessage.Hint(number, row, col),
             kind = StatusKind.SUCCESS,
             changed = true,
             won = finished,

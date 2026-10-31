@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.ui.sketch.sketchFill
 import me.zakharenka.sudoku.ui.sketch.sketchLine
@@ -162,6 +164,33 @@ private fun SudokuCell(
 
     val fontSize = with(LocalDensity.current) { (cellSize * 0.5f).toSp() }
     val interactionSource = remember { MutableInteractionSource() }
+    val description = when {
+        cell.error && cell.value != 0 -> stringResource(
+            R.string.cell_error,
+            row + 1,
+            col + 1,
+            cell.value,
+        )
+        cell.value != 0 && cell.given -> stringResource(
+            R.string.cell_given,
+            row + 1,
+            col + 1,
+            cell.value,
+        )
+        cell.value != 0 -> stringResource(
+            R.string.cell_value,
+            row + 1,
+            col + 1,
+            cell.value,
+        )
+        cell.notes.isNotEmpty() -> stringResource(
+            R.string.cell_notes,
+            row + 1,
+            col + 1,
+            cell.notes.sorted().joinToString(" "),
+        )
+        else -> stringResource(R.string.cell_empty, row + 1, col + 1)
+    }
 
     Box(
         modifier = modifier
@@ -183,7 +212,7 @@ private fun SudokuCell(
                 onClick = onClick,
             )
             .semantics {
-                contentDescription = cellDescription(row, col, cell)
+                contentDescription = description
                 role = Role.Button
                 this.selected = selected
             },
@@ -267,21 +296,4 @@ private fun arePeers(first: Int, second: Int): Boolean {
     return firstRow == secondRow ||
         firstCol == secondCol ||
         (firstRow / 3 == secondRow / 3 && firstCol / 3 == secondCol / 3)
-}
-
-private fun cellDescription(row: Int, col: Int, cell: Cell): String {
-    val builder = StringBuilder("Строка ${row + 1}, столбец ${col + 1}")
-
-    if (cell.given) {
-        builder.append(", подсказка")
-    }
-
-    when {
-        cell.error && cell.value != 0 -> builder.append(", ошибка, цифра ${cell.value}")
-        cell.value != 0 -> builder.append(", цифра ${cell.value}")
-        cell.notes.isNotEmpty() -> builder.append(", заметки ${cell.notes.sorted().joinToString(" ")}")
-        else -> builder.append(", пусто")
-    }
-
-    return builder.toString()
 }

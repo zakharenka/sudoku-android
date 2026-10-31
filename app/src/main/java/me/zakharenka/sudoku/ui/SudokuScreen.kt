@@ -1,5 +1,10 @@
 package me.zakharenka.sudoku.ui
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.zakharenka.sudoku.GameUiState
+import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.SudokuViewModel
 import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Difficulty
@@ -54,6 +63,7 @@ import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.INFO
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.LANGUAGE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.SETTINGS
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.TROPHY
 import me.zakharenka.sudoku.ui.sketch.SketchSurface
@@ -296,7 +306,7 @@ private fun Header(
 
         Column(Modifier.weight(1f)) {
             Text(
-                text = "Судоку",
+                text = stringResource(R.string.app_name),
                 color = colors.ink,
                 fontSize = 34.sp,
                 fontFamily = HandFont,
@@ -304,7 +314,7 @@ private fun Header(
                 lineHeight = 36.sp,
             )
             Text(
-                text = "Логика без спешки",
+                text = stringResource(R.string.app_subtitle),
                 color = colors.inkSoft,
                 fontSize = 14.sp,
                 fontFamily = HandFont,
@@ -313,7 +323,7 @@ private fun Header(
 
         HeaderIconButton(
             icon = INFO,
-            description = "Правила",
+            description = stringResource(R.string.header_rules),
             seed = 700,
             onClick = onRules,
         )
@@ -322,7 +332,7 @@ private fun Header(
 
         HeaderIconButton(
             icon = TROPHY,
-            description = "Рекорды",
+            description = stringResource(R.string.header_records),
             seed = 701,
             onClick = onRecords,
         )
@@ -331,7 +341,7 @@ private fun Header(
 
         HeaderIconButton(
             icon = SETTINGS,
-            description = "Настройки",
+            description = stringResource(R.string.header_settings),
             seed = 702,
             onClick = onSettings,
         )
@@ -494,11 +504,13 @@ private fun DialogHeader(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
         )
+        val closeDescription = stringResource(R.string.dialog_close)
+
         SketchButton(
             onClick = onDismiss,
             modifier = Modifier
                 .size(40.dp)
-                .semantics { contentDescription = "Закрыть" },
+                .semantics { contentDescription = closeDescription },
             fill = colors.paperSunken,
             border = colors.gridLine,
             seed = seed,
@@ -522,7 +534,7 @@ private fun RecordsDialog(
 
     SketchDialog(onDismiss = onDismiss, seed = 800) {
         DialogHeader(
-            title = "Лучшие результаты",
+            title = stringResource(R.string.records_title),
             seed = 801,
             onDismiss = onDismiss,
         )
@@ -536,7 +548,7 @@ private fun RecordsDialog(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = difficulty.label,
+                    text = stringResource(difficulty.labelRes()),
                     color = colors.inkSoft,
                     fontSize = 18.sp,
                     fontFamily = HandFont,
@@ -555,7 +567,7 @@ private fun RecordsDialog(
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = "Рекорды хранятся только на этом устройстве.",
+            text = stringResource(R.string.records_note),
             color = colors.inkSoft,
             fontSize = 13.sp,
             fontFamily = HandFont,
@@ -569,22 +581,22 @@ private fun RulesDialog(onDismiss: () -> Unit) {
 
     SketchDialog(onDismiss = onDismiss, seed = 810) {
         DialogHeader(
-            title = "Как играть",
+            title = stringResource(R.string.rules_title),
             seed = 811,
             onDismiss = onDismiss,
         )
 
         Spacer(Modifier.height(12.dp))
 
-        RuleLine("1–9 — вписать цифру в выбранную клетку")
-        RuleLine("Заметки — записывать возможные варианты в пустой клетке")
-        RuleLine("Пауза — остановить таймер и скрыть поле")
-        RuleLine("Подсказка — открыть правильную цифру")
+        RuleLine(stringResource(R.string.rules_1))
+        RuleLine(stringResource(R.string.rules_2))
+        RuleLine(stringResource(R.string.rules_3))
+        RuleLine(stringResource(R.string.rules_4))
 
         Spacer(Modifier.height(10.dp))
 
         Text(
-            text = "В каждой строке, каждом столбце и каждом блоке 3 × 3 цифры от 1 до 9 должны встречаться ровно один раз. Ошибки подсвечиваются красным.",
+            text = stringResource(R.string.rules_text),
             color = colors.inkSoft,
             fontSize = 15.sp,
             fontFamily = HandFont,
@@ -626,17 +638,25 @@ private fun SettingsDialog(
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val currentLocale = configuration.locales[0]
+    val currentLanguage = if (currentLocale.language == "ru") {
+        stringResource(R.string.language_russian)
+    } else {
+        stringResource(R.string.language_english)
+    }
     var confirmReset by remember { mutableStateOf(false) }
     var resetDone by remember { mutableStateOf(false) }
 
     SketchDialog(onDismiss = onDismiss, seed = 820) {
         DialogHeader(
-            title = "Настройки",
+            title = stringResource(R.string.settings_title),
             seed = 821,
             onDismiss = onDismiss,
         )
 
-        SectionLabel("Тема")
+        SectionLabel(stringResource(R.string.settings_theme))
 
         ThemeMode.entries.forEachIndexed { index, mode ->
             val active = themeMode == mode
@@ -659,7 +679,7 @@ private fun SettingsDialog(
                     ThemeRadio(active = active)
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        text = mode.label,
+                        text = stringResource(mode.labelRes()),
                         color = if (active) colors.accent else colors.ink,
                         fontSize = 17.sp,
                         fontFamily = HandFont,
@@ -671,7 +691,32 @@ private fun SettingsDialog(
             Spacer(Modifier.height(6.dp))
         }
 
-        SectionLabel("Игра")
+        SectionLabel(stringResource(R.string.settings_language))
+
+        Text(
+            text = stringResource(R.string.settings_language_current, currentLanguage),
+            color = colors.ink,
+            fontSize = 16.sp,
+            fontFamily = HandFont,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.settings_language_note),
+            color = colors.inkSoft,
+            fontSize = 13.sp,
+            fontFamily = HandFont,
+            lineHeight = 18.sp,
+        )
+        Spacer(Modifier.height(8.dp))
+        SettingsActionButton(
+            icon = LANGUAGE,
+            label = stringResource(R.string.settings_language_open),
+            seed = 850,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { openAppLanguageSettings(context) },
+        )
+
+        SectionLabel(stringResource(R.string.settings_game))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -679,14 +724,14 @@ private fun SettingsDialog(
         ) {
             SettingsActionButton(
                 icon = INFO,
-                label = "Как играть",
+                label = stringResource(R.string.settings_how_to_play),
                 seed = 840,
                 modifier = Modifier.weight(1f),
                 onClick = onRules,
             )
             SettingsActionButton(
                 icon = TROPHY,
-                label = "Рекорды",
+                label = stringResource(R.string.settings_records),
                 seed = 841,
                 modifier = Modifier.weight(1f),
                 onClick = onRecords,
@@ -709,7 +754,7 @@ private fun SettingsDialog(
             contentPadding = PaddingValues(horizontal = 12.dp),
         ) {
             Text(
-                text = "Сбросить рекорды",
+                text = stringResource(R.string.settings_reset_records),
                 color = colors.danger,
                 fontSize = 16.sp,
                 fontFamily = HandFont,
@@ -730,7 +775,7 @@ private fun SettingsDialog(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Сбросить все рекорды?",
+                        text = stringResource(R.string.settings_reset_confirm),
                         color = colors.danger,
                         fontSize = 16.sp,
                         fontFamily = HandFont,
@@ -752,7 +797,7 @@ private fun SettingsDialog(
                             contentPadding = PaddingValues(horizontal = 14.dp),
                         ) {
                             Text(
-                                text = "Да",
+                                text = stringResource(R.string.settings_reset_yes),
                                 color = colors.danger,
                                 fontSize = 15.sp,
                                 fontFamily = HandFont,
@@ -768,7 +813,7 @@ private fun SettingsDialog(
                             contentPadding = PaddingValues(horizontal = 14.dp),
                         ) {
                             Text(
-                                text = "Отмена",
+                                text = stringResource(R.string.settings_reset_cancel),
                                 color = colors.inkSoft,
                                 fontSize = 15.sp,
                                 fontFamily = HandFont,
@@ -783,7 +828,7 @@ private fun SettingsDialog(
         if (resetDone) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Рекорды сброшены.",
+                text = stringResource(R.string.settings_reset_done),
                 color = colors.success,
                 fontSize = 15.sp,
                 fontFamily = HandFont,
@@ -793,17 +838,17 @@ private fun SettingsDialog(
             )
         }
 
-        SectionLabel("О приложении")
+        SectionLabel(stringResource(R.string.settings_about))
 
         Text(
-            text = "Судоку 9×9 · версия 1.0",
+            text = stringResource(R.string.settings_about_version),
             color = colors.inkSoft,
             fontSize = 15.sp,
             fontFamily = HandFont,
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = "Рекорды и текущая игра хранятся только на этом устройстве.",
+            text = stringResource(R.string.settings_about_storage),
             color = colors.inkSoft,
             fontSize = 13.sp,
             fontFamily = HandFont,
@@ -892,9 +937,33 @@ private fun SettingsActionButton(
     }
 }
 
-private val ThemeMode.label: String
-    get() = when (this) {
-        ThemeMode.SYSTEM -> "Как в системе"
-        ThemeMode.LIGHT -> "Светлая"
-        ThemeMode.DARK -> "Тёмная"
+private fun ThemeMode.labelRes(): Int = when (this) {
+    ThemeMode.SYSTEM -> R.string.theme_system
+    ThemeMode.LIGHT -> R.string.theme_light
+    ThemeMode.DARK -> R.string.theme_dark
+}
+
+private fun Difficulty.labelRes(): Int = when (this) {
+    Difficulty.EASY -> R.string.difficulty_easy
+    Difficulty.MEDIUM -> R.string.difficulty_medium
+    Difficulty.HARD -> R.string.difficulty_hard
+    Difficulty.EXPERT -> R.string.difficulty_expert
+}
+
+private const val APP_LOCALE_SETTINGS_ACTION = "android.settings.APP_LOCALE_SETTINGS"
+
+private fun openAppLanguageSettings(context: Context) {
+    val appLocaleIntent = Intent(APP_LOCALE_SETTINGS_ACTION).apply {
+        data = Uri.fromParts("package", context.packageName, null)
     }
+    val fallbackIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+    } else {
+        Intent(Settings.ACTION_LOCALE_SETTINGS)
+    }
+
+    runCatching { context.startActivity(appLocaleIntent) }
+        .recoverCatching { context.startActivity(fallbackIntent) }
+}

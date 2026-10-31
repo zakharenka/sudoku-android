@@ -24,11 +24,11 @@ class SudokuGeneratorTest {
             val generated = generator.generate(difficulty)
 
             assertTrue(
-                "Решение для ${difficulty.label} должно быть корректным",
+                "Решение для ${difficulty.name} должно быть корректным",
                 generator.isValidSolution(generated.solution),
             )
             assertEquals(
-                "У поля ${difficulty.label} должно быть одно решение",
+                "У поля ${difficulty.name} должно быть одно решение",
                 1,
                 generator.countSolutions(generated.puzzle, 2),
             )

@@ -13,14 +13,4 @@ class FormattersTest {
         assertEquals("2:03:04", formatTime(7384))
     }
 
-    @Test
-    fun pluralizesMistakes() {
-        assertEquals("ошибка", pluralMistakes(1))
-        assertEquals("ошибки", pluralMistakes(2))
-        assertEquals("ошибок", pluralMistakes(5))
-        assertEquals("ошибок", pluralMistakes(11))
-        assertEquals("ошибок", pluralMistakes(14))
-        assertEquals("ошибка", pluralMistakes(21))
-        assertEquals("ошибки", pluralMistakes(22))
-    }
 }

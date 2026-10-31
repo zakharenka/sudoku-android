@@ -18,6 +18,7 @@ import me.zakharenka.sudoku.data.SavedGameStore
 import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
+import me.zakharenka.sudoku.game.GameMessage
 import me.zakharenka.sudoku.game.MoveOutcome
 import me.zakharenka.sudoku.game.SavedGame
 import me.zakharenka.sudoku.game.StatusKind
@@ -35,7 +36,7 @@ data class GameUiState(
     val paused: Boolean = false,
     val won: Boolean = false,
     val loading: Boolean = true,
-    val status: String = "Выберите клетку и введите цифру",
+    val status: String = "",
     val statusKind: StatusKind = StatusKind.NEUTRAL,
     val bestTimes: Map<Difficulty, Long?> = emptyMap(),
     val isNewRecord: Boolean = false,
@@ -56,6 +57,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private var timerStartedAt = 0L
     private var bestTimes = records.loadBestTimes()
     private var notesMode = records.notesMode
+    private var lastLocale = currentLocaleTag()
 
     var themeMode by mutableStateOf(records.themeMode)
         private set
@@ -69,10 +71,38 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         private set
 
     init {
+        uiState = uiState.copy(
+            status = getApplication<Application>().getString(R.string.status_initial),
+        )
+
         val saved = savedGames.load()
         if (saved == null || !restoreSavedGame(saved)) {
             newGame(Difficulty.EASY)
         }
+    }
+
+    fun onLocaleChanged() {
+        val current = currentLocaleTag()
+        if (lastLocale == current) {
+            return
+        }
+
+        val app = getApplication<Application>()
+        val status = when {
+            uiState.loading -> app.getString(R.string.status_generating)
+            uiState.won -> app.getString(
+                if (uiState.isNewRecord) R.string.status_new_record else R.string.status_solved,
+                formatTime(uiState.elapsedSeconds),
+            )
+            uiState.paused -> app.getString(R.string.status_paused)
+            else -> app.getString(R.string.status_initial)
+        }
+
+        uiState = uiState.copy(
+            status = status,
+            statusKind = if (uiState.won) StatusKind.SUCCESS else StatusKind.NEUTRAL,
+        )
+        lastLocale = current
     }
 
     fun updateThemeMode(mode: ThemeMode) {
@@ -104,7 +134,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             paused = false,
             won = false,
             loading = true,
-            status = "Генерация поля…",
+            status = getApplication<Application>().getString(R.string.status_generating),
             statusKind = StatusKind.NEUTRAL,
             isNewRecord = false,
             canUndo = false,
@@ -131,14 +161,21 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
                 session = newSession
                 uiState = uiState.copy(loading = false)
+                val app = getApplication<Application>()
+                val appLocale = app.resources.configuration.locales[0]
+                val label = app.getString(difficulty.labelRes()).lowercase(appLocale)
                 refresh(
-                    status = "Новая игра: ${difficulty.label.lowercase()}. Подсказок: ${generated.clues}",
+                    status = app.getString(
+                        R.string.status_new_game,
+                        label,
+                        generated.clues,
+                    ),
                 )
                 startTimer()
             }.onFailure {
                 uiState = uiState.copy(
                     loading = false,
-                    status = "Не удалось создать поле. Попробуйте ещё раз.",
+                    status = getApplication<Application>().getString(R.string.status_generation_failed),
                     statusKind = StatusKind.ERROR,
                 )
             }
@@ -148,7 +185,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun selectDifficulty(difficulty: Difficulty) {
         if (difficulty == uiState.difficulty && !uiState.won) {
             uiState = uiState.copy(
-                status = "Этот уровень уже выбран",
+                status = getApplication<Application>().getString(R.string.status_same_difficulty),
                 statusKind = StatusKind.NEUTRAL,
             )
             return
@@ -220,7 +257,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         val outcome = session.toggleNotes()
         notesMode = session.notesMode
         records.notesMode = notesMode
-        refresh(outcome.message, outcome.kind)
+        refresh(outcome.message?.let(::localize), outcome.kind)
     }
 
     fun togglePause() {
@@ -239,7 +276,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         stopTimer()
         uiState = uiState.copy(
             paused = true,
-            status = "Пауза",
+            status = getApplication<Application>().getString(R.string.status_paused),
             statusKind = StatusKind.NEUTRAL,
         )
     }
@@ -251,7 +288,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         uiState = uiState.copy(
             paused = false,
-            status = "Продолжаем",
+            status = getApplication<Application>().getString(R.string.status_resumed),
             statusKind = StatusKind.NEUTRAL,
         )
         startTimer()
@@ -274,9 +311,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
 
-        if (outcome.changed || outcome.message.isNotEmpty()) {
+        val message = outcome.message?.let(::localize)
+        if (outcome.changed || message != null) {
             refresh(
-                status = outcome.message.ifEmpty { null },
+                status = message,
                 kind = outcome.kind,
             )
         }
@@ -293,12 +331,13 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             bestTimes = records.loadBestTimes()
         }
 
+        val app = getApplication<Application>()
         val time = formatTime(seconds)
         refresh(
             status = if (isRecord) {
-                "Решено! Новый рекорд: $time"
+                app.getString(R.string.status_new_record, time)
             } else {
-                "Решено! Время: $time"
+                app.getString(R.string.status_solved, time)
             },
             kind = StatusKind.SUCCESS,
             isNewRecord = isRecord,
@@ -394,7 +433,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             paused = true,
             won = false,
             loading = false,
-            status = "Игра восстановлена. Нажмите «Продолжить».",
+            status = getApplication<Application>().getString(R.string.status_restored),
             statusKind = StatusKind.NEUTRAL,
             bestTimes = bestTimes,
             isNewRecord = false,
@@ -416,6 +455,46 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         savedGames.save(current.toSavedGame(elapsedMillis / 1000))
     }
+
+    private fun localize(message: GameMessage): String {
+        val app = getApplication<Application>()
+
+        return when (message) {
+            GameMessage.SelectCellFirst -> app.getString(R.string.message_select_cell)
+            GameMessage.CellAlreadyFilled -> app.getString(R.string.message_cell_filled)
+            GameMessage.EraseNumberFirst -> app.getString(R.string.message_erase_first)
+            is GameMessage.NoteAdded -> app.getString(R.string.message_note_added, message.number)
+            is GameMessage.NoteRemoved -> app.getString(R.string.message_note_removed, message.number)
+            GameMessage.Correct -> app.getString(R.string.message_correct)
+            is GameMessage.WrongNumber -> app.getString(
+                R.string.message_wrong_number,
+                message.mistakes,
+            )
+            GameMessage.CellCleared -> app.getString(R.string.message_cell_cleared)
+            GameMessage.MoveUndone -> app.getString(R.string.message_move_undone)
+            GameMessage.BoardAlreadyCorrect -> app.getString(R.string.message_board_correct)
+            is GameMessage.Hint -> app.getString(
+                R.string.message_hint,
+                message.number,
+                message.row,
+                message.col,
+            )
+            GameMessage.CannotEraseGiven -> app.getString(R.string.message_cannot_erase)
+            GameMessage.NotesEnabled -> app.getString(R.string.message_notes_enabled)
+            GameMessage.NotesDisabled -> app.getString(R.string.message_notes_disabled)
+            GameMessage.Solved -> app.getString(R.string.message_solved)
+        }
+    }
+
+    private fun Difficulty.labelRes(): Int = when (this) {
+        Difficulty.EASY -> R.string.difficulty_easy
+        Difficulty.MEDIUM -> R.string.difficulty_medium
+        Difficulty.HARD -> R.string.difficulty_hard
+        Difficulty.EXPERT -> R.string.difficulty_expert
+    }
+
+    private fun currentLocaleTag(): String =
+        getApplication<Application>().resources.configuration.locales[0].toLanguageTag()
 
     override fun onCleared() {
         if (!uiState.loading && !uiState.won) {

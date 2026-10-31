@@ -24,7 +24,7 @@ class SudokuGenerator(private val random: Random = Random.Default) {
             }
         }
 
-        return checkNotNull(best) { "Не удалось сгенерировать поле" }
+        return checkNotNull(best) { "Failed to generate a puzzle" }
     }
 
     fun generateSolved(): IntArray {

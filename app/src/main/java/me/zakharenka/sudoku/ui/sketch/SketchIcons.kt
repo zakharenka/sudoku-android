@@ -30,6 +30,7 @@ enum class SketchIcon {
     SETTINGS,
     CLOCK,
     CLOSE,
+    LANGUAGE,
 }
 
 @Composable
@@ -219,6 +220,22 @@ fun SketchIcon(
             SketchIcon.CLOSE -> {
                 line(-0.2f, -0.2f, 0.2f, 0.2f, 47)
                 line(-0.2f, 0.2f, 0.2f, -0.2f, 48)
+            }
+
+            SketchIcon.LANGUAGE -> {
+                circle(0.28f, 49)
+                sketchOval(
+                    center = point(0f, 0f),
+                    radiusX = 0.13f * side,
+                    radiusY = 0.28f * side,
+                    color = tint,
+                    strokeWidth = stroke,
+                    seed = 50,
+                    wobble = 0.5f,
+                )
+                line(-0.27f, 0f, 0.27f, 0f, 51)
+                line(-0.24f, -0.13f, 0.24f, -0.13f, 52, stroke * 0.8f)
+                line(-0.24f, 0.13f, 0.24f, 0.13f, 53, stroke * 0.8f)
             }
         }
     }

@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -29,11 +31,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.GameUiState
+import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
 import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.formatTime
-import me.zakharenka.sudoku.game.pluralMistakes
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOCK
@@ -79,7 +81,7 @@ fun DifficultySelector(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = difficulty.label,
+                        text = stringResource(difficulty.labelRes()),
                         color = if (active) colors.accent else colors.ink,
                         fontSize = 15.sp,
                         fontFamily = HandFont,
@@ -87,7 +89,7 @@ fun DifficultySelector(
                         maxLines = 1,
                     )
                     Text(
-                        text = difficulty.note,
+                        text = stringResource(difficulty.noteRes()),
                         color = if (active) colors.accentSoft else colors.inkSoft,
                         fontSize = 10.sp,
                         fontFamily = HandFont,
@@ -127,7 +129,7 @@ fun NewGameButton(
                 modifier = Modifier.size(18.dp),
             )
             Text(
-                text = "Новая игра",
+                text = stringResource(R.string.new_game),
                 color = colors.inkSoft,
                 fontSize = 16.sp,
                 fontFamily = HandFont,
@@ -146,6 +148,9 @@ fun Hud(
     onTogglePause: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
+    val pauseDescription = stringResource(
+        if (paused) R.string.action_resume else R.string.action_pause,
+    )
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -166,7 +171,7 @@ fun Hud(
                     )
                 },
                 value = mistakes.toString(),
-                description = "$mistakes ${pluralMistakes(mistakes)}",
+                description = pluralStringResource(R.plurals.mistakes, mistakes, mistakes),
                 seed = 300,
             )
         }
@@ -175,9 +180,7 @@ fun Hud(
             onClick = onTogglePause,
             modifier = Modifier
                 .size(48.dp)
-                .semantics {
-                    contentDescription = if (paused) "Продолжить" else "Пауза"
-                },
+                .semantics { contentDescription = pauseDescription },
             enabled = enabled,
             fill = colors.paperSunken,
             border = colors.accent,
@@ -204,7 +207,10 @@ fun Hud(
                     )
                 },
                 value = formatTime(elapsedSeconds),
-                description = "Время: ${formatTime(elapsedSeconds)}",
+                description = stringResource(
+                    R.string.timer_content_description,
+                    formatTime(elapsedSeconds),
+                ),
                 seed = 302,
             )
         }
@@ -272,19 +278,18 @@ fun NumberPad(
         for (number in 1..9) {
             val remaining = (9 - counts[number]).coerceAtLeast(0)
             val complete = remaining == 0
+            val description = if (complete) {
+                stringResource(R.string.number_complete, number)
+            } else {
+                stringResource(R.string.number_remaining, number, remaining)
+            }
 
             SketchButton(
                 onClick = { onNumber(number) },
                 modifier = Modifier
                     .weight(1f)
                     .height(54.dp)
-                    .semantics {
-                        contentDescription = if (complete) {
-                            "Цифра $number, все расставлены"
-                        } else {
-                            "Цифра $number, осталось $remaining"
-                        }
-                    },
+                    .semantics { contentDescription = description },
                 enabled = enabled && !complete,
                 fill = colors.paperSunken,
                 border = colors.gridLine,
@@ -331,7 +336,7 @@ fun ActionRow(
     ) {
         ActionButton(
             icon = UNDO,
-            label = "Отменить",
+            label = stringResource(R.string.action_undo),
             enabled = !locked && state.canUndo,
             modifier = Modifier.weight(1f),
             seed = 500,
@@ -339,7 +344,7 @@ fun ActionRow(
         )
         ActionButton(
             icon = ERASE,
-            label = "Стереть",
+            label = stringResource(R.string.action_erase),
             enabled = !locked && state.canErase,
             modifier = Modifier.weight(1f),
             seed = 501,
@@ -347,7 +352,7 @@ fun ActionRow(
         )
         ActionButton(
             icon = NOTES,
-            label = "Заметки",
+            label = stringResource(R.string.action_notes),
             enabled = !locked,
             active = state.notesMode,
             modifier = Modifier.weight(1f),
@@ -356,7 +361,7 @@ fun ActionRow(
         )
         ActionButton(
             icon = HINT,
-            label = "Подсказка",
+            label = stringResource(R.string.action_hint),
             enabled = !locked,
             modifier = Modifier.weight(1f),
             seed = 503,
@@ -448,7 +453,7 @@ fun LoadingOverlay() {
         )
         Spacer(Modifier.height(14.dp))
         Text(
-            text = "Генерация поля…",
+            text = stringResource(R.string.loading_generating),
             color = colors.inkSoft,
             fontSize = 17.sp,
             fontFamily = HandFont,
@@ -462,7 +467,7 @@ fun PauseOverlay(onResume: () -> Unit) {
 
     BoardOverlay {
         Text(
-            text = "Пауза",
+            text = stringResource(R.string.pause_title),
             color = colors.ink,
             fontSize = 32.sp,
             fontFamily = HandFont,
@@ -470,14 +475,14 @@ fun PauseOverlay(onResume: () -> Unit) {
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            text = "Таймер остановлен",
+            text = stringResource(R.string.pause_subtitle),
             color = colors.inkSoft,
             fontSize = 14.sp,
             fontFamily = HandFont,
         )
         Spacer(Modifier.height(18.dp))
         OverlayButton(
-            text = "Продолжить",
+            text = stringResource(R.string.action_resume),
             primary = true,
             seed = 600,
             onClick = onResume,
@@ -502,7 +507,7 @@ fun WinOverlay(
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            text = "Решено!",
+            text = stringResource(R.string.win_title),
             color = colors.success,
             fontSize = 34.sp,
             fontFamily = HandFont,
@@ -520,7 +525,7 @@ fun WinOverlay(
         if (isNewRecord) {
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Новый рекорд!",
+                text = stringResource(R.string.win_new_record),
                 color = colors.accent,
                 fontSize = 15.sp,
                 fontFamily = HandFont,
@@ -530,13 +535,13 @@ fun WinOverlay(
         Spacer(Modifier.height(18.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OverlayButton(
-                text = "Новая игра",
+                text = stringResource(R.string.new_game),
                 primary = true,
                 seed = 601,
                 onClick = onNewGame,
             )
             OverlayButton(
-                text = "Закрыть",
+                text = stringResource(R.string.win_close),
                 primary = false,
                 seed = 602,
                 onClick = onDismiss,
@@ -591,4 +596,18 @@ fun OverlayButton(
             fontWeight = FontWeight.Bold,
         )
     }
+}
+
+private fun Difficulty.labelRes(): Int = when (this) {
+    Difficulty.EASY -> R.string.difficulty_easy
+    Difficulty.MEDIUM -> R.string.difficulty_medium
+    Difficulty.HARD -> R.string.difficulty_hard
+    Difficulty.EXPERT -> R.string.difficulty_expert
+}
+
+private fun Difficulty.noteRes(): Int = when (this) {
+    Difficulty.EASY -> R.string.difficulty_easy_note
+    Difficulty.MEDIUM -> R.string.difficulty_medium_note
+    Difficulty.HARD -> R.string.difficulty_hard_note
+    Difficulty.EXPERT -> R.string.difficulty_expert_note
 }

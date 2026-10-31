@@ -14,14 +14,3 @@ fun formatTime(seconds: Long): String {
         String.format(Locale.ROOT, "%02d:%02d", minutes, rest)
     }
 }
-
-fun pluralMistakes(count: Int): String {
-    val mod10 = count % 10
-    val mod100 = count % 100
-
-    return when {
-        mod10 == 1 && mod100 != 11 -> "ошибка"
-        mod10 in 2..4 && (mod100 < 12 || mod100 > 14) -> "ошибки"
-        else -> "ошибок"
-    }
-}
