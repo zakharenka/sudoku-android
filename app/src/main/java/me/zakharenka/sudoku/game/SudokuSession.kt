@@ -262,6 +262,23 @@ class SudokuSession(
         return false
     }
 
+    fun toSavedGame(elapsedSeconds: Long): SavedGame = SavedGame(
+        difficulty = difficulty,
+        solution = solution.copyOf(),
+        puzzle = IntArray(CELLS) { index ->
+            if (cells[index].given) cells[index].value else 0
+        },
+        values = IntArray(CELLS) { cells[it].value },
+        givens = BooleanArray(CELLS) { cells[it].given },
+        errors = BooleanArray(CELLS) { cells[it].error },
+        notes = Array(CELLS) { cells[it].notes },
+        selected = selected,
+        notesMode = notesMode,
+        mistakes = mistakes,
+        elapsedSeconds = elapsedSeconds.coerceAtLeast(0),
+        won = won,
+    )
+
     private fun snapshot(indices: List<Int>): HistoryEntry = HistoryEntry(
         mistakes = mistakes,
         changes = indices.map { index -> CellChange(index, cells[index]) },
@@ -278,12 +295,47 @@ class SudokuSession(
         }
     }
 
-    private companion object {
+    companion object {
         const val SIZE = 9
         const val CELLS = SIZE * SIZE
-        const val MAX_HISTORY = 200
+        private const val MAX_HISTORY = 200
 
-        val PEERS: Array<IntArray> = Array(CELLS) { index ->
+        fun restore(saved: SavedGame): SudokuSession {
+            require(saved.solution.size == CELLS)
+            require(saved.puzzle.size == CELLS)
+            require(saved.values.size == CELLS)
+            require(saved.givens.size == CELLS)
+            require(saved.errors.size == CELLS)
+            require(saved.notes.size == CELLS)
+
+            val session = SudokuSession(
+                difficulty = saved.difficulty,
+                solution = saved.solution.copyOf(),
+                puzzle = saved.puzzle.copyOf(),
+                notesMode = saved.notesMode,
+            )
+
+            for (index in 0 until CELLS) {
+                val value = saved.values[index]
+                require(value in 0..SIZE)
+
+                session.cells[index] = Cell(
+                    value = value,
+                    given = saved.givens[index],
+                    error = saved.errors[index],
+                    notes = saved.notes[index].filter { it in 1..SIZE }.toSet(),
+                )
+            }
+
+            session.selected = saved.selected?.takeIf { it in 0 until CELLS }
+                ?: session.cells.indexOfFirst { it.value == 0 }.takeIf { it >= 0 }
+            session.mistakes = saved.mistakes.coerceAtLeast(0)
+            session.won = saved.won
+
+            return session
+        }
+
+        private val PEERS: Array<IntArray> = Array(CELLS) { index ->
             val row = index / SIZE
             val col = index % SIZE
             val peers = linkedSetOf<Int>()

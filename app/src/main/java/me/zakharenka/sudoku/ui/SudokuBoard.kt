@@ -1,6 +1,6 @@
 package me.zakharenka.sudoku.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -18,29 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.game.Cell
-import me.zakharenka.sudoku.ui.theme.Accent
-import me.zakharenka.sudoku.ui.theme.AccentSoft
-import me.zakharenka.sudoku.ui.theme.Danger
-import me.zakharenka.sudoku.ui.theme.Line
-import me.zakharenka.sudoku.ui.theme.LineStrong
-import me.zakharenka.sudoku.ui.theme.TextMuted
-import me.zakharenka.sudoku.ui.theme.TextPrimary
-import me.zakharenka.sudoku.ui.theme.Violet
+import me.zakharenka.sudoku.ui.sketch.sketchFill
+import me.zakharenka.sudoku.ui.sketch.sketchLine
+import me.zakharenka.sudoku.ui.sketch.sketchRect
+import me.zakharenka.sudoku.ui.theme.HandFont
+import me.zakharenka.sudoku.ui.theme.SudokuTheme
 
 private val EmptyCells = List(81) { Cell() }
 
@@ -52,6 +46,7 @@ fun SudokuBoard(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = SudokuTheme.colors
     val displayCells = if (cells.size == 81) cells else EmptyCells
     val selectedValue = selectedIndex?.let { displayCells.getOrNull(it)?.value } ?: 0
 
@@ -64,14 +59,13 @@ fun SudokuBoard(
                     repeat(9) { col ->
                         val index = row * 9 + col
                         val cell = displayCells[index]
-                        val isSelected = selectedIndex == index
 
                         SudokuCell(
                             cell = cell,
                             row = row,
                             col = col,
                             cellSize = cellSize,
-                            selected = isSelected,
+                            selected = selectedIndex == index,
                             peer = selectedIndex != null &&
                                 selectedIndex != index &&
                                 arePeers(selectedIndex, index),
@@ -86,6 +80,50 @@ fun SudokuBoard(
                         )
                     }
                 }
+            }
+        }
+
+        Canvas(Modifier.fillMaxSize()) {
+            val cellPx = size.width / 9f
+
+            for (index in 1..8) {
+                val thick = index % 3 == 0
+                val color = if (thick) colors.gridLineStrong else colors.gridLine
+                val width = if (thick) 2.dp.toPx() else 1.dp.toPx()
+                val offset = index * cellPx
+
+                sketchLine(
+                    start = Offset(offset, 0f),
+                    end = Offset(offset, size.height),
+                    color = color,
+                    strokeWidth = width,
+                    seed = 1_000 + index,
+                    wobble = 1.dp.toPx(),
+                )
+                sketchLine(
+                    start = Offset(0f, offset),
+                    end = Offset(size.width, offset),
+                    color = color,
+                    strokeWidth = width,
+                    seed = 2_000 + index,
+                    wobble = 1.dp.toPx(),
+                )
+            }
+
+            if (selectedIndex != null && selectedIndex in 0..80) {
+                val row = selectedIndex / 9
+                val col = selectedIndex % 9
+                val cell = displayCells[selectedIndex]
+                val inset = 1.5.dp.toPx()
+
+                sketchRect(
+                    topLeft = Offset(col * cellPx + inset, row * cellPx + inset),
+                    size = Size(cellPx - inset * 2f, cellPx - inset * 2f),
+                    color = if (cell.error) colors.danger else colors.accent,
+                    strokeWidth = 2.dp.toPx(),
+                    seed = 3_000 + selectedIndex,
+                    wobble = 1.dp.toPx(),
+                )
             }
         }
     }
@@ -104,61 +142,37 @@ private fun SudokuCell(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val background = when {
-        selected && cell.error -> Danger.copy(alpha = 0.18f)
-        selected -> Accent.copy(alpha = 0.20f)
-        cell.error -> Danger.copy(alpha = 0.14f)
-        same -> Violet.copy(alpha = 0.15f)
-        peer -> Accent.copy(alpha = 0.07f)
-        (row / 3 + col / 3) % 2 == 1 -> Color(0xFF0D1626)
-        else -> Color(0xFF0B1220)
+    val colors = SudokuTheme.colors
+    val wash = when {
+        selected && cell.error -> colors.dangerWash
+        selected -> colors.accentWash
+        cell.error -> colors.dangerWash
+        same -> colors.highlight
+        peer -> colors.accentWash.copy(alpha = 0.45f)
+        else -> androidx.compose.ui.graphics.Color.Transparent
     }
 
     val textColor = when {
-        cell.error -> Danger
-        selected -> Color(0xFFF0FDFF)
-        same -> Color(0xFFDDD6FE)
-        cell.given -> TextPrimary
-        else -> AccentSoft
+        cell.error -> colors.danger
+        selected -> colors.ink
+        same -> colors.ink
+        cell.given -> colors.ink
+        else -> colors.accent
     }
 
-    val fontSize = with(LocalDensity.current) { (cellSize * 0.46f).toSp() }
+    val fontSize = with(LocalDensity.current) { (cellSize * 0.5f).toSp() }
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(
         modifier = modifier
-            .background(background)
             .drawBehind {
-                val thin = 1.dp.toPx()
-                val thick = 2.dp.toPx()
-
-                if (col < 8) {
-                    val thickLine = col % 3 == 2
-                    val width = if (thickLine) thick else thin
-                    drawRect(
-                        color = if (thickLine) LineStrong else Line,
-                        topLeft = Offset(size.width - width, 0f),
-                        size = Size(width, size.height),
-                    )
-                }
-
-                if (row < 8) {
-                    val thickLine = row % 3 == 2
-                    val height = if (thickLine) thick else thin
-                    drawRect(
-                        color = if (thickLine) LineStrong else Line,
-                        topLeft = Offset(0f, size.height - height),
-                        size = Size(size.width, height),
-                    )
-                }
-
-                if (selected) {
-                    val stroke = 2.dp.toPx()
-                    drawRect(
-                        color = if (cell.error) Danger else Accent,
-                        topLeft = Offset(stroke / 2f, stroke / 2f),
-                        size = Size(size.width - stroke, size.height - stroke),
-                        style = Stroke(width = stroke),
+                if (wash.alpha > 0f) {
+                    sketchFill(
+                        topLeft = Offset(0f, 0f),
+                        size = Size(size.width, size.height),
+                        color = wash,
+                        seed = 5_000 + row * 9 + col,
+                        wobble = 1.dp.toPx(),
                     )
                 }
             }
@@ -181,7 +195,7 @@ private fun SudokuCell(
                     text = cell.value.toString(),
                     color = textColor,
                     fontSize = fontSize,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     lineHeight = fontSize,
                 )
@@ -202,7 +216,8 @@ private fun NotesGrid(
     notes: Set<Int>,
     cellSize: Dp,
 ) {
-    val fontSize = with(LocalDensity.current) { (cellSize * 0.18f).toSp() }
+    val colors = SudokuTheme.colors
+    val fontSize = with(LocalDensity.current) { (cellSize * 0.2f).toSp() }
     val padding = cellSize * 0.04f
 
     Column(
@@ -214,6 +229,7 @@ private fun NotesGrid(
             Row(Modifier.weight(1f)) {
                 repeat(3) { col ->
                     val number = row * 3 + col + 1
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -223,10 +239,10 @@ private fun NotesGrid(
                         if (number in notes) {
                             Text(
                                 text = number.toString(),
-                                color = TextMuted.copy(alpha = 0.92f),
+                                color = colors.inkSoft,
                                 fontSize = fontSize,
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = HandFont,
+                                fontWeight = FontWeight.Normal,
                                 lineHeight = fontSize,
                                 textAlign = TextAlign.Center,
                             )

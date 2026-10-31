@@ -112,4 +112,39 @@ class SudokuSessionTest {
 
         assertEquals(1, session.remaining(5))
     }
+
+    @Test
+    fun savedGameRoundTripRestoresBoardAndState() {
+        val session = SudokuSession(Difficulty.HARD, solution, puzzleWithBlanks(0, 1, 2))
+
+        session.select(0)
+        session.enter(solution[0])
+
+        session.select(1)
+        session.toggleNotes()
+        session.enter(4)
+        session.toggleNotes()
+
+        val wrong = if (solution[2] == 9) 8 else 9
+        session.select(2)
+        session.enter(wrong)
+        session.toggleNotes()
+
+        val saved = session.toSavedGame(elapsedSeconds = 123)
+        val restored = SudokuSession.restore(saved)
+
+        assertEquals(123, saved.elapsedSeconds)
+        assertEquals(session.selected, restored.selected)
+        assertEquals(session.mistakes, restored.mistakes)
+        assertEquals(session.notesMode, restored.notesMode)
+        assertEquals(session.won, restored.won)
+        assertFalse(restored.canUndo)
+
+        for (index in 0 until SudokuSession.CELLS) {
+            assertEquals(session.cells[index].value, restored.cells[index].value)
+            assertEquals(session.cells[index].given, restored.cells[index].given)
+            assertEquals(session.cells[index].error, restored.cells[index].error)
+            assertEquals(session.cells[index].notes, restored.cells[index].notes)
+        }
+    }
 }

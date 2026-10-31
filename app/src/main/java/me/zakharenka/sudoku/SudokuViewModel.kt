@@ -14,9 +14,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zakharenka.sudoku.data.RecordsStore
+import me.zakharenka.sudoku.data.SavedGameStore
+import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
 import me.zakharenka.sudoku.game.MoveOutcome
+import me.zakharenka.sudoku.game.SavedGame
 import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.SudokuGenerator
 import me.zakharenka.sudoku.game.SudokuSession
@@ -43,6 +46,7 @@ data class GameUiState(
 
 class SudokuViewModel(application: Application) : AndroidViewModel(application) {
     private val records = RecordsStore(application)
+    private val savedGames = SavedGameStore(application)
     private val generator = SudokuGenerator()
 
     private var session: SudokuSession? = null
@@ -53,6 +57,9 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private var bestTimes = records.loadBestTimes()
     private var notesMode = records.notesMode
 
+    var themeMode by mutableStateOf(records.themeMode)
+        private set
+
     var uiState by mutableStateOf(
         GameUiState(
             notesMode = notesMode,
@@ -62,12 +69,27 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         private set
 
     init {
-        newGame(Difficulty.EASY)
+        val saved = savedGames.load()
+        if (saved == null || !restoreSavedGame(saved)) {
+            newGame(Difficulty.EASY)
+        }
+    }
+
+    fun updateThemeMode(mode: ThemeMode) {
+        themeMode = mode
+        records.themeMode = mode
+    }
+
+    fun clearBestTimes() {
+        records.clearBestTimes()
+        bestTimes = records.loadBestTimes()
+        uiState = uiState.copy(bestTimes = bestTimes)
     }
 
     fun newGame(difficulty: Difficulty = uiState.difficulty) {
         generationJob?.cancel()
         stopTimer()
+        savedGames.clear()
         session = null
         elapsedMillis = 0
         timerStartedAt = 0
@@ -236,8 +258,13 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun onAppBackgrounded() {
-        if (!uiState.loading && !uiState.won && !uiState.paused) {
-            pause()
+        if (!uiState.loading && !uiState.won) {
+            if (!uiState.paused) {
+                pause()
+            }
+            saveCurrentGame()
+        } else {
+            saveCurrentGame()
         }
     }
 
@@ -257,6 +284,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun finishWin(session: SudokuSession) {
         stopTimer()
+        savedGames.clear()
 
         val seconds = elapsedMillis / 1000
         val isRecord = records.saveBestTime(session.difficulty, seconds)
@@ -338,7 +366,63 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         uiState = uiState.copy(elapsedSeconds = elapsedMillis / 1000)
     }
 
+    private fun restoreSavedGame(saved: SavedGame): Boolean {
+        if (saved.won) {
+            savedGames.clear()
+            return false
+        }
+
+        val restored = runCatching { SudokuSession.restore(saved) }.getOrNull()
+        if (restored == null) {
+            savedGames.clear()
+            return false
+        }
+
+        session = restored
+        notesMode = restored.notesMode
+        records.notesMode = notesMode
+        elapsedMillis = saved.elapsedSeconds * 1000
+        timerStartedAt = 0
+
+        uiState = uiState.copy(
+            difficulty = restored.difficulty,
+            cells = restored.cells.toList(),
+            selectedIndex = restored.selected,
+            notesMode = restored.notesMode,
+            mistakes = restored.mistakes,
+            elapsedSeconds = saved.elapsedSeconds,
+            paused = true,
+            won = false,
+            loading = false,
+            status = "Игра восстановлена. Нажмите «Продолжить».",
+            statusKind = StatusKind.NEUTRAL,
+            bestTimes = bestTimes,
+            isNewRecord = false,
+            canUndo = false,
+            canErase = restored.canErase,
+            gameId = uiState.gameId + 1,
+        )
+
+        return true
+    }
+
+    private fun saveCurrentGame() {
+        val current = session
+
+        if (current == null || current.won || uiState.loading) {
+            savedGames.clear()
+            return
+        }
+
+        savedGames.save(current.toSavedGame(elapsedMillis / 1000))
+    }
+
     override fun onCleared() {
+        if (!uiState.loading && !uiState.won) {
+            stopTimer()
+            saveCurrentGame()
+        }
+
         generationJob?.cancel()
         timerJob?.cancel()
     }

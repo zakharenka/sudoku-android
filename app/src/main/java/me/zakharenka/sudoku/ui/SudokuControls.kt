@@ -1,13 +1,11 @@
 package me.zakharenka.sudoku.ui
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,48 +15,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.GameUiState
-import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
 import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.formatTime
 import me.zakharenka.sudoku.game.pluralMistakes
-import me.zakharenka.sudoku.ui.theme.Accent
-import me.zakharenka.sudoku.ui.theme.AccentSoft
-import me.zakharenka.sudoku.ui.theme.Amber
-import me.zakharenka.sudoku.ui.theme.Danger
-import me.zakharenka.sudoku.ui.theme.Line
-import me.zakharenka.sudoku.ui.theme.LineStrong
-import me.zakharenka.sudoku.ui.theme.PanelDeep
-import me.zakharenka.sudoku.ui.theme.Success
-import me.zakharenka.sudoku.ui.theme.TextMuted
-import me.zakharenka.sudoku.ui.theme.TextPrimary
+import me.zakharenka.sudoku.ui.sketch.SketchButton
+import me.zakharenka.sudoku.ui.sketch.SketchIcon
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOCK
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.ERASE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.HINT
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.NOTES
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.PAUSE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.PLAY
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.REFRESH
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.TROPHY
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.UNDO
+import me.zakharenka.sudoku.ui.sketch.SketchSpinner
+import me.zakharenka.sudoku.ui.sketch.SketchSurface
+import me.zakharenka.sudoku.ui.theme.HandFont
+import me.zakharenka.sudoku.ui.theme.SudokuTheme
 
 @Composable
 fun DifficultySelector(
@@ -66,59 +56,44 @@ fun DifficultySelector(
     enabled: Boolean,
     onSelect: (Difficulty) -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(PanelDeep.copy(alpha = 0.55f))
-            .border(1.dp, Line, RoundedCornerShape(16.dp))
-            .padding(3.dp)
-            .selectableGroup(),
-    ) {
-        Difficulty.entries.forEach { difficulty ->
-            val active = difficulty == selected
-            val shape = RoundedCornerShape(13.dp)
+    val colors = SudokuTheme.colors
 
-            Column(
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Difficulty.entries.forEachIndexed { index, difficulty ->
+            val active = difficulty == selected
+
+            SketchButton(
+                onClick = { onSelect(difficulty) },
                 modifier = Modifier
                     .weight(1f)
-                    .clip(shape)
-                    .then(
-                        if (active) {
-                            Modifier
-                                .background(Accent.copy(alpha = 0.10f))
-                                .border(1.dp, Accent.copy(alpha = 0.35f), shape)
-                        } else {
-                            Modifier
-                        },
-                    )
-                    .selectable(
-                        selected = active,
-                        enabled = enabled,
-                        role = Role.Tab,
-                        onClick = { onSelect(difficulty) },
-                    )
-                    .padding(vertical = 7.dp, horizontal = 2.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .height(58.dp),
+                enabled = enabled,
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                active = active,
+                seed = 100 + index,
+                contentPadding = PaddingValues(horizontal = 2.dp, vertical = 6.dp),
             ) {
-                Text(
-                    text = difficulty.label,
-                    color = if (active) AccentSoft else TextMuted,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                )
-                Text(
-                    text = difficulty.note,
-                    color = if (active) {
-                        Accent.copy(alpha = 0.8f)
-                    } else {
-                        TextMuted.copy(alpha = 0.55f)
-                    },
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = difficulty.label,
+                        color = if (active) colors.accent else colors.ink,
+                        fontSize = 15.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = difficulty.note,
+                        color = if (active) colors.accentSoft else colors.inkSoft,
+                        fontSize = 10.sp,
+                        fontFamily = HandFont,
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
@@ -129,33 +104,36 @@ fun NewGameButton(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val colors = SudokuTheme.colors
 
-    Row(
+    SketchButton(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(44.dp)
-            .clip(shape)
-            .background(PanelDeep.copy(alpha = 0.5f))
-            .border(1.dp, LineStrong, shape)
-            .clickable(enabled = enabled, onClick = onClick)
-            .alpha(if (enabled) 1f else 0.55f),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+            .height(46.dp),
+        enabled = enabled,
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        seed = 200,
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_refresh),
-            contentDescription = null,
-            tint = TextMuted,
-            modifier = Modifier.size(17.dp),
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(
-            text = "Новая игра",
-            color = TextMuted,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            SketchIcon(
+                icon = REFRESH,
+                tint = colors.inkSoft,
+                modifier = Modifier.size(18.dp),
+            )
+            Text(
+                text = "Новая игра",
+                color = colors.inkSoft,
+                fontSize = 16.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            )
+        }
     }
 }
 
@@ -167,6 +145,8 @@ fun Hud(
     enabled: Boolean,
     onTogglePause: () -> Unit,
 ) {
+    val colors = SudokuTheme.colors
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -179,21 +159,37 @@ fun Hud(
                 icon = {
                     Text(
                         text = "×",
-                        color = Danger,
-                        fontSize = 22.sp,
+                        color = colors.danger,
+                        fontSize = 26.sp,
+                        fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                     )
                 },
                 value = mistakes.toString(),
                 description = "$mistakes ${pluralMistakes(mistakes)}",
+                seed = 300,
             )
         }
 
-        PauseButton(
-            paused = paused,
-            enabled = enabled,
+        SketchButton(
             onClick = onTogglePause,
-        )
+            modifier = Modifier
+                .size(48.dp)
+                .semantics {
+                    contentDescription = if (paused) "Продолжить" else "Пауза"
+                },
+            enabled = enabled,
+            fill = colors.paperSunken,
+            border = colors.accent,
+            seed = 301,
+            contentPadding = PaddingValues(0.dp),
+        ) {
+            SketchIcon(
+                icon = if (paused) PLAY else PAUSE,
+                tint = colors.accent,
+                modifier = Modifier.size(20.dp),
+            )
+        }
 
         Box(
             modifier = Modifier.weight(1f),
@@ -201,15 +197,15 @@ fun Hud(
         ) {
             HudStat(
                 icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_clock),
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(16.dp),
+                    SketchIcon(
+                        icon = CLOCK,
+                        tint = colors.inkSoft,
+                        modifier = Modifier.size(18.dp),
                     )
                 },
                 value = formatTime(elapsedSeconds),
                 description = "Время: ${formatTime(elapsedSeconds)}",
+                seed = 302,
             )
         }
     }
@@ -220,62 +216,35 @@ private fun HudStat(
     icon: @Composable () -> Unit,
     value: String,
     description: String,
+    seed: Int,
 ) {
-    Row(
+    val colors = SudokuTheme.colors
+
+    SketchSurface(
         modifier = Modifier
-            .height(44.dp)
+            .height(46.dp)
             .widthIn(min = 104.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(PanelDeep)
-            .border(1.dp, Line, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp)
             .semantics { contentDescription = description },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        seed = seed,
+        shadow = colors.shadow,
+        contentPadding = PaddingValues(horizontal = 10.dp),
     ) {
-        icon()
-        Text(
-            text = value,
-            color = AccentSoft,
-            fontSize = 19.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = 1.sp,
-        )
-    }
-}
-
-@Composable
-private fun PauseButton(
-    paused: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(14.dp)
-
-    Box(
-        modifier = Modifier
-            .size(46.dp)
-            .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Accent.copy(alpha = 0.16f),
-                        Accent.copy(alpha = 0.05f),
-                    ),
-                ),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            icon()
+            Text(
+                text = value,
+                color = colors.accent,
+                fontSize = 20.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp,
             )
-            .border(1.dp, Accent.copy(alpha = 0.38f), shape)
-            .clickable(enabled = enabled, onClick = onClick)
-            .alpha(if (enabled) 1f else 0.35f),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(if (paused) R.drawable.ic_play else R.drawable.ic_pause),
-            contentDescription = if (paused) "Продолжить" else "Пауза",
-            tint = AccentSoft,
-            modifier = Modifier.size(18.dp),
-        )
+        }
     }
 }
 
@@ -285,6 +254,7 @@ fun NumberPad(
     enabled: Boolean,
     onNumber: (Int) -> Unit,
 ) {
+    val colors = SudokuTheme.colors
     val counts = remember(cells) {
         val result = IntArray(10)
         cells.forEach { cell ->
@@ -301,70 +271,47 @@ fun NumberPad(
     ) {
         for (number in 1..9) {
             val remaining = (9 - counts[number]).coerceAtLeast(0)
+            val complete = remaining == 0
 
-            PadButton(
-                number = number,
-                remaining = remaining,
-                enabled = enabled && remaining > 0,
-                modifier = Modifier.weight(1f),
+            SketchButton(
                 onClick = { onNumber(number) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun PadButton(
-    number: Int,
-    remaining: Int,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(10.dp)
-    val complete = remaining == 0
-
-    Box(
-        modifier = modifier
-            .height(50.dp)
-            .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF1E2939),
-                        Color(0xFF0F172A),
-                    ),
-                ),
-            )
-            .border(1.dp, Line, shape)
-            .clickable(enabled = enabled, onClick = onClick)
-            .alpha(if (complete) 0.42f else 1f)
-            .semantics {
-                contentDescription = if (complete) {
-                    "Цифра $number, все расставлены"
-                } else {
-                    "Цифра $number, осталось $remaining"
+                modifier = Modifier
+                    .weight(1f)
+                    .height(54.dp)
+                    .semantics {
+                        contentDescription = if (complete) {
+                            "Цифра $number, все расставлены"
+                        } else {
+                            "Цифра $number, осталось $remaining"
+                        }
+                    },
+                enabled = enabled && !complete,
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                seed = 400 + number,
+                contentPadding = PaddingValues(2.dp),
+            ) {
+                Box(Modifier.fillMaxSize()) {
+                    Text(
+                        text = number.toString(),
+                        color = colors.accent,
+                        fontSize = 23.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                    Text(
+                        text = remaining.toString(),
+                        color = colors.inkSoft,
+                        fontSize = 10.sp,
+                        fontFamily = HandFont,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 2.dp, end = 4.dp),
+                    )
                 }
-            },
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = number.toString(),
-            color = AccentSoft,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-        )
-        Text(
-            text = remaining.toString(),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 3.dp, end = 5.dp),
-            color = TextMuted,
-            fontSize = 9.sp,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Monospace,
-        )
+            }
+        }
     }
 }
 
@@ -383,32 +330,36 @@ fun ActionRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         ActionButton(
-            icon = R.drawable.ic_undo,
+            icon = UNDO,
             label = "Отменить",
             enabled = !locked && state.canUndo,
             modifier = Modifier.weight(1f),
+            seed = 500,
             onClick = onUndo,
         )
         ActionButton(
-            icon = R.drawable.ic_erase,
+            icon = ERASE,
             label = "Стереть",
             enabled = !locked && state.canErase,
             modifier = Modifier.weight(1f),
+            seed = 501,
             onClick = onErase,
         )
         ActionButton(
-            icon = R.drawable.ic_notes,
+            icon = NOTES,
             label = "Заметки",
             enabled = !locked,
             active = state.notesMode,
             modifier = Modifier.weight(1f),
+            seed = 502,
             onClick = onNotes,
         )
         ActionButton(
-            icon = R.drawable.ic_hint,
+            icon = HINT,
             label = "Подсказка",
             enabled = !locked,
             modifier = Modifier.weight(1f),
+            seed = 503,
             onClick = onHint,
         )
     }
@@ -416,42 +367,46 @@ fun ActionRow(
 
 @Composable
 private fun ActionButton(
-    @DrawableRes icon: Int,
+    icon: SketchIcon,
     label: String,
     enabled: Boolean,
     modifier: Modifier = Modifier,
     active: Boolean = false,
+    seed: Int,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(10.dp)
-    val contentColor = if (active) Color(0xFFCFFAFE) else TextMuted
+    val colors = SudokuTheme.colors
+    val contentColor = if (active) colors.accent else colors.inkSoft
 
-    Column(
-        modifier = modifier
-            .height(58.dp)
-            .clip(shape)
-            .background(if (active) Accent.copy(alpha = 0.13f) else PanelDeep.copy(alpha = 0.40f))
-            .border(1.dp, if (active) Accent.copy(alpha = 0.42f) else Line, shape)
-            .clickable(enabled = enabled, onClick = onClick)
-            .alpha(if (enabled) 1f else 0.35f)
-            .padding(vertical = 7.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    SketchButton(
+        onClick = onClick,
+        modifier = modifier.height(64.dp),
+        enabled = enabled,
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        active = active,
+        seed = seed,
+        contentPadding = PaddingValues(vertical = 6.dp, horizontal = 2.dp),
     ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = if (active) AccentSoft else contentColor,
-            modifier = Modifier.size(18.dp),
-        )
-        Spacer(Modifier.height(3.dp))
-        Text(
-            text = label,
-            color = contentColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            SketchIcon(
+                icon = icon,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.height(3.dp))
+            Text(
+                text = label,
+                color = contentColor,
+                fontSize = 12.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
     }
 }
 
@@ -460,6 +415,8 @@ fun StatusText(
     status: String,
     kind: StatusKind,
 ) {
+    val colors = SudokuTheme.colors
+
     Text(
         text = status,
         modifier = Modifier
@@ -467,12 +424,13 @@ fun StatusText(
             .padding(top = 10.dp, bottom = 2.dp)
             .semantics { liveRegion = LiveRegionMode.Polite },
         color = when (kind) {
-            StatusKind.ERROR -> Danger
-            StatusKind.SUCCESS -> Success
-            StatusKind.NEUTRAL -> TextMuted
+            StatusKind.ERROR -> colors.danger
+            StatusKind.SUCCESS -> colors.success
+            StatusKind.NEUTRAL -> colors.inkSoft
         },
-        fontSize = 13.sp,
-        fontWeight = if (kind == StatusKind.SUCCESS) FontWeight.Bold else FontWeight.Medium,
+        fontSize = 15.sp,
+        fontFamily = HandFont,
+        fontWeight = if (kind == StatusKind.SUCCESS) FontWeight.Bold else FontWeight.Normal,
         textAlign = TextAlign.Center,
         minLines = 1,
         maxLines = 2,
@@ -481,35 +439,47 @@ fun StatusText(
 
 @Composable
 fun LoadingOverlay() {
+    val colors = SudokuTheme.colors
+
     BoardOverlay {
-        CircularProgressIndicator(
-            color = Accent,
-            strokeWidth = 3.dp,
-            modifier = Modifier.size(36.dp),
+        SketchSpinner(
+            color = colors.accent,
+            modifier = Modifier.size(40.dp),
         )
         Spacer(Modifier.height(14.dp))
         Text(
             text = "Генерация поля…",
-            color = TextMuted,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
+            color = colors.inkSoft,
+            fontSize = 17.sp,
+            fontFamily = HandFont,
         )
     }
 }
 
 @Composable
 fun PauseOverlay(onResume: () -> Unit) {
+    val colors = SudokuTheme.colors
+
     BoardOverlay {
         Text(
             text = "Пауза",
-            color = AccentSoft,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold,
+            color = colors.ink,
+            fontSize = 32.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = "Таймер остановлен",
+            color = colors.inkSoft,
+            fontSize = 14.sp,
+            fontFamily = HandFont,
+        )
+        Spacer(Modifier.height(18.dp))
         OverlayButton(
             text = "Продолжить",
             primary = true,
+            seed = 600,
             onClick = onResume,
         )
     }
@@ -522,35 +492,38 @@ fun WinOverlay(
     onNewGame: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val colors = SudokuTheme.colors
+
     BoardOverlay {
-        Icon(
-            painter = painterResource(R.drawable.ic_trophy),
-            contentDescription = null,
-            tint = Amber,
-            modifier = Modifier.size(36.dp),
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = "Решено!",
-            color = Success,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.ExtraBold,
+        SketchIcon(
+            icon = TROPHY,
+            tint = colors.accent,
+            modifier = Modifier.size(46.dp),
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            text = formatTime(elapsedSeconds),
-            color = TextPrimary,
-            fontSize = 20.sp,
+            text = "Решено!",
+            color = colors.success,
+            fontSize = 34.sp,
+            fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = 1.sp,
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = formatTime(elapsedSeconds),
+            color = colors.ink,
+            fontSize = 24.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp,
         )
         if (isNewRecord) {
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = "Новый рекорд!",
-                color = Amber,
-                fontSize = 13.sp,
+                color = colors.accent,
+                fontSize = 15.sp,
+                fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -559,11 +532,13 @@ fun WinOverlay(
             OverlayButton(
                 text = "Новая игра",
                 primary = true,
+                seed = 601,
                 onClick = onNewGame,
             )
             OverlayButton(
                 text = "Закрыть",
                 primary = false,
+                seed = 602,
                 onClick = onDismiss,
             )
         }
@@ -572,10 +547,12 @@ fun WinOverlay(
 
 @Composable
 private fun BoardOverlay(content: @Composable ColumnScope.() -> Unit) {
+    val colors = SudokuTheme.colors
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070B14)),
+            .background(colors.paper),
         contentAlignment = Alignment.Center,
     ) {
         Column(
@@ -590,24 +567,27 @@ private fun BoardOverlay(content: @Composable ColumnScope.() -> Unit) {
 fun OverlayButton(
     text: String,
     primary: Boolean,
+    seed: Int,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(10.dp)
+    val colors = SudokuTheme.colors
 
-    Box(
+    SketchButton(
+        onClick = onClick,
         modifier = Modifier
             .height(44.dp)
-            .clip(shape)
-            .background(if (primary) Accent.copy(alpha = 0.18f) else PanelDeep.copy(alpha = 0.5f))
-            .border(1.dp, if (primary) Accent.copy(alpha = 0.5f) else Line, shape)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp),
-        contentAlignment = Alignment.Center,
+            .widthIn(min = 120.dp),
+        fill = if (primary) colors.accentWash else colors.paperSunken,
+        border = if (primary) colors.accent else colors.gridLine,
+        active = primary,
+        seed = seed,
+        contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
         Text(
             text = text,
-            color = if (primary) Color(0xFFCFFAFE) else TextMuted,
-            fontSize = 13.sp,
+            color = if (primary) colors.accent else colors.inkSoft,
+            fontSize = 16.sp,
+            fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
         )
     }

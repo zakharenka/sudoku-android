@@ -1,16 +1,12 @@
 package me.zakharenka.sudoku.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -25,54 +21,58 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.zakharenka.sudoku.GameUiState
-import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.SudokuViewModel
+import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Difficulty
+import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.formatTime
-import me.zakharenka.sudoku.ui.theme.Accent
-import me.zakharenka.sudoku.ui.theme.AccentSoft
-import me.zakharenka.sudoku.ui.theme.Background
-import me.zakharenka.sudoku.ui.theme.Line
-import me.zakharenka.sudoku.ui.theme.LineStrong
-import me.zakharenka.sudoku.ui.theme.PanelBottom
-import me.zakharenka.sudoku.ui.theme.PanelDeep
-import me.zakharenka.sudoku.ui.theme.PanelTop
-import me.zakharenka.sudoku.ui.theme.TextMuted
-import me.zakharenka.sudoku.ui.theme.TextPrimary
-import me.zakharenka.sudoku.ui.theme.Violet
+import me.zakharenka.sudoku.ui.sketch.SketchButton
+import me.zakharenka.sudoku.ui.sketch.SketchIcon
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.INFO
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.SETTINGS
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.TROPHY
+import me.zakharenka.sudoku.ui.sketch.SketchSurface
+import me.zakharenka.sudoku.ui.sketch.paperTexture
+import me.zakharenka.sudoku.ui.sketch.sketchFill
+import me.zakharenka.sudoku.ui.sketch.sketchLine
+import me.zakharenka.sudoku.ui.sketch.sketchOval
+import me.zakharenka.sudoku.ui.sketch.sketchRect
+import me.zakharenka.sudoku.ui.theme.HandFont
+import me.zakharenka.sudoku.ui.theme.SudokuTheme
 
 @Composable
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
+    val colors = SudokuTheme.colors
     val state = viewModel.uiState
 
     var showRecords by rememberSaveable { mutableStateOf(false) }
     var showRules by rememberSaveable { mutableStateOf(false) }
+    var showSettings by rememberSaveable { mutableStateOf(false) }
     var dismissedGameId by rememberSaveable { mutableStateOf<Long?>(null) }
     val winDismissed = dismissedGameId == state.gameId
 
@@ -84,20 +84,14 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
         dismissedGameId = state.gameId
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Background,
-                        Color(0xFF0A0F1B),
-                        Background,
-                    ),
-                ),
-            ),
-    ) {
-        BackgroundGlow()
+    Box(Modifier.fillMaxSize()) {
+        Canvas(Modifier.fillMaxSize()) {
+            paperTexture(
+                base = colors.paper,
+                speckle = colors.paperSpeckle,
+                seed = 7,
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -110,6 +104,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             Header(
                 onRules = { showRules = true },
                 onRecords = { showRecords = true },
+                onSettings = { showSettings = true },
             )
 
             Spacer(Modifier.height(10.dp))
@@ -133,6 +128,23 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     if (showRules) {
         RulesDialog(onDismiss = { showRules = false })
     }
+
+    if (showSettings) {
+        SettingsDialog(
+            themeMode = viewModel.themeMode,
+            onThemeModeChange = viewModel::updateThemeMode,
+            onRules = {
+                showSettings = false
+                showRules = true
+            },
+            onRecords = {
+                showSettings = false
+                showRecords = true
+            },
+            onResetRecords = viewModel::clearBestTimes,
+            onDismiss = { showSettings = false },
+        )
+    }
 }
 
 @Composable
@@ -142,86 +154,78 @@ private fun GamePanel(
     onDismissWin: () -> Unit,
     viewModel: SudokuViewModel,
 ) {
-    val panelShape = RoundedCornerShape(24.dp)
+    val colors = SudokuTheme.colors
 
-    Column(
+    SketchSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .widthIn(max = 620.dp)
-            .shadow(
-                elevation = 24.dp,
-                shape = panelShape,
-                ambientColor = Color.Black.copy(alpha = 0.45f),
-                spotColor = Color.Black.copy(alpha = 0.55f),
-            )
-            .clip(panelShape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        PanelTop,
-                        PanelBottom,
-                    ),
-                ),
-            )
-            .border(1.dp, Line, panelShape)
-            .padding(8.dp),
+            .widthIn(max = 620.dp),
+        fill = colors.paperAlt,
+        border = colors.inkSoft,
+        strokeWidth = 1.6.dp,
+        seed = 10,
+        shadow = colors.shadow,
+        contentPadding = PaddingValues(10.dp),
+        contentAlignment = Alignment.TopStart,
     ) {
-        DifficultySelector(
-            selected = state.difficulty,
-            enabled = !state.loading,
-            onSelect = viewModel::selectDifficulty,
-        )
+        Column(Modifier.fillMaxWidth()) {
+            DifficultySelector(
+                selected = state.difficulty,
+                enabled = !state.loading,
+                onSelect = viewModel::selectDifficulty,
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-        NewGameButton(
-            enabled = !state.loading,
-            onClick = { viewModel.newGame() },
-        )
+            NewGameButton(
+                enabled = !state.loading,
+                onClick = { viewModel.newGame() },
+            )
 
-        Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(10.dp))
 
-        Hud(
-            mistakes = state.mistakes,
-            elapsedSeconds = state.elapsedSeconds,
-            paused = state.paused,
-            enabled = !state.loading && !state.won,
-            onTogglePause = viewModel::togglePause,
-        )
+            Hud(
+                mistakes = state.mistakes,
+                elapsedSeconds = state.elapsedSeconds,
+                paused = state.paused,
+                enabled = !state.loading && !state.won,
+                onTogglePause = viewModel::togglePause,
+            )
 
-        Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(10.dp))
 
-        BoardBox(
-            state = state,
-            winDismissed = winDismissed,
-            onDismissWin = onDismissWin,
-            onSelect = viewModel::select,
-            onResume = viewModel::resume,
-            onNewGame = { viewModel.newGame() },
-        )
+            BoardBox(
+                state = state,
+                winDismissed = winDismissed,
+                onDismissWin = onDismissWin,
+                onSelect = viewModel::select,
+                onResume = viewModel::resume,
+                onNewGame = { viewModel.newGame() },
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-        NumberPad(
-            cells = state.cells,
-            enabled = !state.loading && !state.paused && !state.won,
-            onNumber = viewModel::enter,
-        )
+            NumberPad(
+                cells = state.cells,
+                enabled = !state.loading && !state.paused && !state.won,
+                onNumber = viewModel::enter,
+            )
 
-        Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(8.dp))
 
-        ActionRow(
-            state = state,
-            onUndo = viewModel::undo,
-            onErase = viewModel::erase,
-            onNotes = viewModel::toggleNotes,
-            onHint = viewModel::hint,
-        )
+            ActionRow(
+                state = state,
+                onUndo = viewModel::undo,
+                onErase = viewModel::erase,
+                onNotes = viewModel::toggleNotes,
+                onHint = viewModel::hint,
+            )
 
-        StatusText(
-            status = state.status,
-            kind = state.statusKind,
-        )
+            StatusText(
+                status = state.status,
+                kind = state.statusKind,
+            )
+        }
     }
 }
 
@@ -234,34 +238,40 @@ private fun BoardBox(
     onResume: () -> Unit,
     onNewGame: () -> Unit,
 ) {
-    val boardShape = RoundedCornerShape(12.dp)
+    val colors = SudokuTheme.colors
 
-    Box(
+    SketchSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
-            .clip(boardShape)
-            .background(Color(0xFF070B14))
-            .border(2.dp, LineStrong, boardShape),
+            .aspectRatio(1f),
+        fill = colors.paperAlt,
+        border = colors.gridLineStrong,
+        strokeWidth = 2.dp,
+        seed = 20,
+        shadow = colors.shadow,
+        contentPadding = PaddingValues(4.dp),
+        contentAlignment = Alignment.TopStart,
     ) {
-        SudokuBoard(
-            cells = state.cells,
-            selectedIndex = state.selectedIndex,
-            enabled = !state.loading && !state.paused && !state.won,
-            onSelect = onSelect,
-        )
-
-        when {
-            state.loading -> LoadingOverlay()
-
-            state.paused -> PauseOverlay(onResume = onResume)
-
-            state.won && !winDismissed -> WinOverlay(
-                elapsedSeconds = state.elapsedSeconds,
-                isNewRecord = state.isNewRecord,
-                onNewGame = onNewGame,
-                onDismiss = onDismissWin,
+        Box(Modifier.fillMaxSize()) {
+            SudokuBoard(
+                cells = state.cells,
+                selectedIndex = state.selectedIndex,
+                enabled = !state.loading && !state.paused && !state.won,
+                onSelect = onSelect,
             )
+
+            when {
+                state.loading -> LoadingOverlay()
+
+                state.paused -> PauseOverlay(onResume = onResume)
+
+                state.won && !winDismissed -> WinOverlay(
+                    elapsedSeconds = state.elapsedSeconds,
+                    isNewRecord = state.isNewRecord,
+                    onNewGame = onNewGame,
+                    onDismiss = onDismissWin,
+                )
+            }
         }
     }
 }
@@ -270,137 +280,236 @@ private fun BoardBox(
 private fun Header(
     onRules: () -> Unit,
     onRecords: () -> Unit,
+    onSettings: () -> Unit,
 ) {
+    val colors = SudokuTheme.colors
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 620.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        SudokuLogo(52.dp)
+        SketchLogo(52.dp)
 
         Spacer(Modifier.width(12.dp))
 
         Column(Modifier.weight(1f)) {
             Text(
                 text = "Судоку",
-                color = TextPrimary,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-0.5).sp,
-                lineHeight = 32.sp,
+                color = colors.ink,
+                fontSize = 34.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 36.sp,
             )
             Text(
                 text = "Логика без спешки",
-                color = TextMuted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.2.sp,
+                color = colors.inkSoft,
+                fontSize = 14.sp,
+                fontFamily = HandFont,
             )
         }
 
         HeaderIconButton(
-            icon = R.drawable.ic_info,
+            icon = INFO,
             description = "Правила",
+            seed = 700,
             onClick = onRules,
         )
 
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(4.dp))
 
         HeaderIconButton(
-            icon = R.drawable.ic_trophy,
+            icon = TROPHY,
             description = "Рекорды",
+            seed = 701,
             onClick = onRecords,
+        )
+
+        Spacer(Modifier.width(4.dp))
+
+        HeaderIconButton(
+            icon = SETTINGS,
+            description = "Настройки",
+            seed = 702,
+            onClick = onSettings,
         )
     }
 }
 
 @Composable
 private fun HeaderIconButton(
-    @DrawableRes icon: Int,
+    icon: SketchIcon,
     description: String,
+    seed: Int,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val colors = SudokuTheme.colors
 
-    Box(
+    SketchButton(
+        onClick = onClick,
         modifier = Modifier
             .size(40.dp)
-            .clip(shape)
-            .background(PanelDeep.copy(alpha = 0.6f))
-            .border(1.dp, Line, shape)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
+            .semantics { contentDescription = description },
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        seed = seed,
+        contentPadding = PaddingValues(0.dp),
     ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = description,
-            tint = TextMuted,
-            modifier = Modifier.size(19.dp),
+        SketchIcon(
+            icon = icon,
+            tint = colors.inkSoft,
+            modifier = Modifier.size(20.dp),
         )
     }
 }
 
 @Composable
-private fun SudokuLogo(size: Dp) {
-    val shape = RoundedCornerShape(size * 0.25f)
-    val dark = isSystemInDarkTheme()
-    val background = if (dark) {
-        R.drawable.ic_launcher_background_dark
-    } else {
-        R.drawable.ic_launcher_background
-    }
-    val foreground = if (dark) {
-        R.drawable.ic_launcher_foreground_dark
-    } else {
-        R.drawable.ic_launcher_foreground
-    }
+private fun SketchLogo(size: Dp) {
+    val colors = SudokuTheme.colors
 
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(shape),
-        contentAlignment = Alignment.Center,
+    SketchSurface(
+        modifier = Modifier.size(size),
+        fill = colors.accentWash,
+        border = colors.ink,
+        strokeWidth = 1.6.dp,
+        seed = 710,
+        shadow = colors.shadow,
+        contentPadding = PaddingValues(0.dp),
     ) {
-        Image(
-            painter = painterResource(background),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Image(
-            painter = painterResource(foreground),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp),
+        ) {
+            val cell = this.size.width / 3f
+
+            for (index in 1..2) {
+                val offset = index * cell
+                sketchLine(
+                    start = Offset(offset, 0f),
+                    end = Offset(offset, this.size.height),
+                    color = colors.ink,
+                    strokeWidth = 1.dp.toPx(),
+                    seed = 720 + index,
+                    wobble = 0.7.dp.toPx(),
+                )
+                sketchLine(
+                    start = Offset(0f, offset),
+                    end = Offset(this.size.width, offset),
+                    color = colors.ink,
+                    strokeWidth = 1.dp.toPx(),
+                    seed = 730 + index,
+                    wobble = 0.7.dp.toPx(),
+                )
+            }
+
+            sketchFill(
+                topLeft = Offset(cell, cell),
+                size = Size(cell, cell),
+                color = colors.paperAlt,
+                seed = 740,
+                wobble = 0.8.dp.toPx(),
+            )
+            sketchRect(
+                topLeft = Offset(cell, cell),
+                size = Size(cell, cell),
+                color = colors.ink,
+                strokeWidth = 1.2.dp.toPx(),
+                seed = 741,
+                wobble = 0.7.dp.toPx(),
+            )
+        }
+
+        Text(
+            text = "9",
+            color = colors.ink,
+            fontSize = 22.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }
 
 @Composable
-private fun BackgroundGlow() {
-    Canvas(Modifier.fillMaxSize()) {
-        val cyanCenter = Offset(size.width * 0.12f, size.height * 0.04f)
-        val cyanRadius = size.width * 0.9f
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(Accent.copy(alpha = 0.10f), Color.Transparent),
-                center = cyanCenter,
-                radius = cyanRadius,
-            ),
-            radius = cyanRadius,
-            center = cyanCenter,
-        )
+private fun SketchDialog(
+    onDismiss: () -> Unit,
+    seed: Int,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val colors = SudokuTheme.colors
 
-        val violetCenter = Offset(size.width * 0.95f, size.height * 0.30f)
-        val violetRadius = size.width * 0.8f
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(Violet.copy(alpha = 0.08f), Color.Transparent),
-                center = violetCenter,
-                radius = violetRadius,
-            ),
-            radius = violetRadius,
-            center = violetCenter,
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            SketchSurface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 520.dp),
+                fill = colors.paperAlt,
+                border = colors.ink,
+                strokeWidth = 2.dp,
+                seed = seed,
+                shadow = colors.shadow,
+                contentPadding = PaddingValues(18.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    content = content,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogHeader(
+    title: String,
+    seed: Int,
+    onDismiss: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = title,
+            color = colors.ink,
+            fontSize = 28.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f),
         )
+        SketchButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .size(40.dp)
+                .semantics { contentDescription = "Закрыть" },
+            fill = colors.paperSunken,
+            border = colors.gridLine,
+            seed = seed,
+            contentPadding = PaddingValues(0.dp),
+        ) {
+            SketchIcon(
+                icon = CLOSE,
+                tint = colors.inkSoft,
+                modifier = Modifier.size(18.dp),
+            )
+        }
     }
 }
 
@@ -409,133 +518,383 @@ private fun RecordsDialog(
     bestTimes: Map<Difficulty, Long?>,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = PanelTop,
-        titleContentColor = TextPrimary,
-        textContentColor = TextMuted,
-        shape = RoundedCornerShape(20.dp),
-        title = {
-            Text(
-                text = "Лучшие результаты",
-                fontWeight = FontWeight.Bold,
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Difficulty.entries.forEach { difficulty ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = difficulty.label,
-                            color = TextMuted,
-                            fontSize = 14.sp,
-                        )
-                        Text(
-                            text = bestTimes[difficulty]?.let(::formatTime) ?: "—",
-                            color = AccentSoft,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                        )
-                    }
-                }
+    val colors = SudokuTheme.colors
 
-                Spacer(Modifier.height(2.dp))
+    SketchDialog(onDismiss = onDismiss, seed = 800) {
+        DialogHeader(
+            title = "Лучшие результаты",
+            seed = 801,
+            onDismiss = onDismiss,
+        )
 
+        Spacer(Modifier.height(12.dp))
+
+        Difficulty.entries.forEach { difficulty ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
-                    text = "Рекорды хранятся только на этом устройстве.",
-                    color = TextMuted.copy(alpha = 0.7f),
-                    fontSize = 11.sp,
+                    text = difficulty.label,
+                    color = colors.inkSoft,
+                    fontSize = 18.sp,
+                    fontFamily = HandFont,
                 )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Закрыть",
-                    color = Accent,
+                    text = bestTimes[difficulty]?.let(::formatTime) ?: "—",
+                    color = colors.accent,
+                    fontSize = 20.sp,
+                    fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
             }
-        },
-    )
+            Spacer(Modifier.height(8.dp))
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        Text(
+            text = "Рекорды хранятся только на этом устройстве.",
+            color = colors.inkSoft,
+            fontSize = 13.sp,
+            fontFamily = HandFont,
+        )
+    }
 }
 
 @Composable
 private fun RulesDialog(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = PanelTop,
-        titleContentColor = TextPrimary,
-        textContentColor = TextMuted,
-        shape = RoundedCornerShape(20.dp),
-        title = {
-            Text(
-                text = "Как играть",
-                fontWeight = FontWeight.Bold,
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                RuleRow("1–9", "вписать цифру в выбранную клетку")
-                RuleRow("Заметки", "записывать возможные варианты в пустой клетке")
-                RuleRow("Пауза", "остановить таймер и скрыть поле")
-                RuleRow("Подсказка", "открыть правильную цифру")
+    val colors = SudokuTheme.colors
 
-                Spacer(Modifier.height(2.dp))
+    SketchDialog(onDismiss = onDismiss, seed = 810) {
+        DialogHeader(
+            title = "Как играть",
+            seed = 811,
+            onDismiss = onDismiss,
+        )
 
-                Text(
-                    text = "В каждой строке, каждом столбце и каждом блоке 3 × 3 цифры от 1 до 9 должны встречаться ровно один раз. Ошибки подсвечиваются красным.",
-                    color = TextMuted,
-                    fontSize = 12.sp,
-                    lineHeight = 18.sp,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "Понятно",
-                    color = Accent,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        },
-    )
+        Spacer(Modifier.height(12.dp))
+
+        RuleLine("1–9 — вписать цифру в выбранную клетку")
+        RuleLine("Заметки — записывать возможные варианты в пустой клетке")
+        RuleLine("Пауза — остановить таймер и скрыть поле")
+        RuleLine("Подсказка — открыть правильную цифру")
+
+        Spacer(Modifier.height(10.dp))
+
+        Text(
+            text = "В каждой строке, каждом столбце и каждом блоке 3 × 3 цифры от 1 до 9 должны встречаться ровно один раз. Ошибки подсвечиваются красным.",
+            color = colors.inkSoft,
+            fontSize = 15.sp,
+            fontFamily = HandFont,
+            lineHeight = 21.sp,
+        )
+    }
 }
 
 @Composable
-private fun RuleRow(key: String, text: String) {
-    Row(verticalAlignment = Alignment.Top) {
-        Box(
+private fun RuleLine(text: String) {
+    val colors = SudokuTheme.colors
+
+    Row(Modifier.padding(vertical = 3.dp)) {
+        Text(
+            text = "•",
+            color = colors.accent,
+            fontSize = 18.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = text,
+            color = colors.ink,
+            fontSize = 16.sp,
+            fontFamily = HandFont,
+            lineHeight = 21.sp,
+        )
+    }
+}
+
+@Composable
+private fun SettingsDialog(
+    themeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit,
+    onRules: () -> Unit,
+    onRecords: () -> Unit,
+    onResetRecords: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+    var confirmReset by remember { mutableStateOf(false) }
+    var resetDone by remember { mutableStateOf(false) }
+
+    SketchDialog(onDismiss = onDismiss, seed = 820) {
+        DialogHeader(
+            title = "Настройки",
+            seed = 821,
+            onDismiss = onDismiss,
+        )
+
+        SectionLabel("Тема")
+
+        ThemeMode.entries.forEachIndexed { index, mode ->
+            val active = themeMode == mode
+
+            SketchButton(
+                onClick = { onThemeModeChange(mode) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                active = active,
+                seed = 830 + index,
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ThemeRadio(active = active)
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        text = mode.label,
+                        color = if (active) colors.accent else colors.ink,
+                        fontSize = 17.sp,
+                        fontFamily = HandFont,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(6.dp))
+        }
+
+        SectionLabel("Игра")
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            SettingsActionButton(
+                icon = INFO,
+                label = "Как играть",
+                seed = 840,
+                modifier = Modifier.weight(1f),
+                onClick = onRules,
+            )
+            SettingsActionButton(
+                icon = TROPHY,
+                label = "Рекорды",
+                seed = 841,
+                modifier = Modifier.weight(1f),
+                onClick = onRecords,
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        SketchButton(
+            onClick = {
+                confirmReset = true
+                resetDone = false
+            },
             modifier = Modifier
-                .widthIn(min = 76.dp)
-                .clip(RoundedCornerShape(7.dp))
-                .background(PanelDeep)
-                .border(1.dp, Line, RoundedCornerShape(7.dp))
-                .padding(horizontal = 8.dp, vertical = 3.dp),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .height(46.dp),
+            fill = colors.dangerWash.copy(alpha = 0.55f),
+            border = colors.danger.copy(alpha = 0.6f),
+            seed = 842,
+            contentPadding = PaddingValues(horizontal = 12.dp),
         ) {
             Text(
-                text = key,
-                color = TextPrimary,
-                fontSize = 11.sp,
+                text = "Сбросить рекорды",
+                color = colors.danger,
+                fontSize = 16.sp,
+                fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
             )
         }
 
-        Spacer(Modifier.width(10.dp))
+        if (confirmReset) {
+            Spacer(Modifier.height(8.dp))
+
+            SketchSurface(
+                modifier = Modifier.fillMaxWidth(),
+                fill = colors.dangerWash,
+                border = colors.danger,
+                strokeWidth = 1.6.dp,
+                seed = 843,
+                contentPadding = PaddingValues(12.dp),
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Сбросить все рекорды?",
+                        color = colors.danger,
+                        fontSize = 16.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SketchButton(
+                            onClick = {
+                                onResetRecords()
+                                confirmReset = false
+                                resetDone = true
+                            },
+                            modifier = Modifier.height(40.dp),
+                            fill = colors.dangerWash,
+                            border = colors.danger,
+                            seed = 844,
+                            contentPadding = PaddingValues(horizontal = 14.dp),
+                        ) {
+                            Text(
+                                text = "Да",
+                                color = colors.danger,
+                                fontSize = 15.sp,
+                                fontFamily = HandFont,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                        SketchButton(
+                            onClick = { confirmReset = false },
+                            modifier = Modifier.height(40.dp),
+                            fill = colors.paperSunken,
+                            border = colors.gridLine,
+                            seed = 845,
+                            contentPadding = PaddingValues(horizontal = 14.dp),
+                        ) {
+                            Text(
+                                text = "Отмена",
+                                color = colors.inkSoft,
+                                fontSize = 15.sp,
+                                fontFamily = HandFont,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (resetDone) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Рекорды сброшены.",
+                color = colors.success,
+                fontSize = 15.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        SectionLabel("О приложении")
 
         Text(
-            text = text,
-            color = TextMuted,
+            text = "Судоку 9×9 · версия 1.0",
+            color = colors.inkSoft,
+            fontSize = 15.sp,
+            fontFamily = HandFont,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "Рекорды и текущая игра хранятся только на этом устройстве.",
+            color = colors.inkSoft,
             fontSize = 13.sp,
+            fontFamily = HandFont,
             lineHeight = 18.sp,
-            modifier = Modifier.weight(1f),
         )
     }
 }
+
+@Composable
+private fun SectionLabel(text: String) {
+    val colors = SudokuTheme.colors
+
+    Text(
+        text = text,
+        color = colors.inkSoft,
+        fontSize = 13.sp,
+        fontFamily = HandFont,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(top = 16.dp, bottom = 6.dp),
+    )
+}
+
+@Composable
+private fun ThemeRadio(active: Boolean) {
+    val colors = SudokuTheme.colors
+
+    Canvas(Modifier.size(20.dp)) {
+        val stroke = 1.5.dp.toPx()
+        sketchOval(
+            center = Offset(size.width / 2f, size.height / 2f),
+            radiusX = size.width / 2f - stroke,
+            radiusY = size.height / 2f - stroke,
+            color = if (active) colors.accent else colors.inkSoft,
+            strokeWidth = stroke,
+            seed = if (active) 900 else 901,
+            wobble = 0.5f,
+        )
+
+        if (active) {
+            drawCircle(
+                color = colors.accent,
+                radius = size.width * 0.2f,
+                center = Offset(size.width / 2f, size.height / 2f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsActionButton(
+    icon: SketchIcon,
+    label: String,
+    seed: Int,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+
+    SketchButton(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        seed = seed,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            SketchIcon(
+                icon = icon,
+                tint = colors.inkSoft,
+                modifier = Modifier.size(18.dp),
+            )
+            Text(
+                text = label,
+                color = colors.ink,
+                fontSize = 14.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+private val ThemeMode.label: String
+    get() = when (this) {
+        ThemeMode.SYSTEM -> "Как в системе"
+        ThemeMode.LIGHT -> "Светлая"
+        ThemeMode.DARK -> "Тёмная"
+    }

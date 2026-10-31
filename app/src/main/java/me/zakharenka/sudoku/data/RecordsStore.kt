@@ -27,10 +27,24 @@ class RecordsStore(context: Context) {
         return true
     }
 
+    fun clearBestTimes() {
+        preferences.edit {
+            Difficulty.entries.forEach { difficulty ->
+                remove(bestKey(difficulty))
+            }
+        }
+    }
+
     var notesMode: Boolean
         get() = preferences.getBoolean(NOTES_MODE_KEY, false)
         set(value) {
             preferences.edit { putBoolean(NOTES_MODE_KEY, value) }
+        }
+
+    var themeMode: ThemeMode
+        get() = ThemeMode.fromKey(preferences.getString(THEME_MODE_KEY, null))
+        set(value) {
+            preferences.edit { putString(THEME_MODE_KEY, value.key) }
         }
 
     private fun bestKey(difficulty: Difficulty): String = "best:${difficulty.key}"
@@ -38,5 +52,6 @@ class RecordsStore(context: Context) {
     private companion object {
         const val PREFERENCES = "sudoku"
         const val NOTES_MODE_KEY = "notes_mode"
+        const val THEME_MODE_KEY = "theme_mode"
     }
 }
