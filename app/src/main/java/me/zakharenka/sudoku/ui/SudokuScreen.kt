@@ -639,11 +639,9 @@ private fun SettingsDialog(
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val currentLocale = configuration.locales[0]
-    val currentLanguage = if (currentLocale.language == "ru") {
-        stringResource(R.string.language_russian)
-    } else {
-        stringResource(R.string.language_english)
-    }
+    val currentLanguage = currentLocale
+        .getDisplayLanguage(currentLocale)
+        .replaceFirstChar { it.titlecase(currentLocale) }
     var confirmReset by remember { mutableStateOf(false) }
     var resetDone by remember { mutableStateOf(false) }
 

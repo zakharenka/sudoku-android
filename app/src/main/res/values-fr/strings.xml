@@ -1,0 +1,99 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Sudoku</string>
+
+    <string name="difficulty_easy">Facile</string>
+    <string name="difficulty_easy_note">échauffement</string>
+    <string name="difficulty_medium">Moyen</string>
+    <string name="difficulty_medium_note">équilibre</string>
+    <string name="difficulty_hard">Difficile</string>
+    <string name="difficulty_hard_note">défi</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_expert_note">maximum</string>
+
+    <string name="new_game">Nouvelle partie</string>
+    <string name="new_game_confirm">Commencer une nouvelle partie ? La progression actuelle sera perdue.</string>
+    <string name="new_game_start">Commencer</string>
+    <string name="new_game_cancel">Annuler</string>
+    <string name="action_undo">Défaire</string>
+    <string name="action_erase">Effacer</string>
+    <string name="action_notes">Notes</string>
+    <string name="action_hint">Indice</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Reprendre</string>
+    <string name="header_rules">Règles</string>
+    <string name="header_records">Records</string>
+    <string name="header_settings">Paramètres</string>
+
+    <string name="timer_content_description">Temps : %1$s</string>
+    <string name="number_remaining" tools:ignore="PluralsCandidate">Chiffre %1$d, %2$d restants</string>
+    <string name="number_complete">Chiffre %1$d, tous placés</string>
+
+    <string name="cell_empty">Ligne %1$d, colonne %2$d, vide</string>
+    <string name="cell_value">Ligne %1$d, colonne %2$d, chiffre %3$d</string>
+    <string name="cell_given">Ligne %1$d, colonne %2$d, indice, chiffre %3$d</string>
+    <string name="cell_error">Ligne %1$d, colonne %2$d, erreur, chiffre %3$d</string>
+    <string name="cell_notes">Ligne %1$d, colonne %2$d, notes %3$s</string>
+
+    <string name="status_initial">Choisissez une case et saisissez un chiffre</string>
+    <string name="status_generating">Génération d\'une grille…</string>
+    <string name="status_generation_failed">Impossible de créer une grille. Réessayez.</string>
+    <string name="status_new_game">Nouvelle partie : %1$s. Indices : %2$d</string>
+    <string name="status_restored">Partie restaurée. Appuyez sur « Reprendre ».</string>
+    <string name="status_paused">En pause</string>
+    <string name="status_resumed">Reprise</string>
+    <string name="status_new_record">Résolu ! Nouveau record : %1$s</string>
+    <string name="status_solved">Résolu ! Temps : %1$s</string>
+
+    <string name="message_select_cell">Choisissez d\'abord une case</string>
+    <string name="message_cell_filled">Cette case est déjà remplie</string>
+    <string name="message_erase_first">Effacez le chiffre avant d\'ajouter une note</string>
+    <string name="message_note_added" tools:ignore="PluralsCandidate">Note %1$d ajoutée</string>
+    <string name="message_note_removed" tools:ignore="PluralsCandidate">Note %1$d supprimée</string>
+    <string name="message_correct">Correct</string>
+    <string name="message_wrong_number">Chiffre incorrect. Erreurs : %1$d.</string>
+    <string name="message_cell_cleared">Case effacée</string>
+    <string name="message_move_undone">Coup annulé</string>
+    <string name="message_board_correct">La grille est déjà correcte</string>
+    <string name="message_hint">Indice : %1$d — ligne %2$d, colonne %3$d</string>
+    <string name="message_cannot_erase">Cette case ne peut pas être effacée</string>
+    <string name="message_notes_enabled">Notes activées</string>
+    <string name="message_notes_disabled">Notes désactivées</string>
+    <string name="message_solved">Résolu !</string>
+
+    <string name="pause_title">En pause</string>
+    <string name="pause_subtitle">Chronomètre arrêté</string>
+    <string name="loading_generating">Génération d\'une grille…</string>
+    <string name="win_title">Résolu !</string>
+    <string name="win_new_record">Nouveau record !</string>
+    <string name="win_close">Fermer</string>
+
+    <string name="dialog_close">Fermer</string>
+    <string name="records_title">Meilleurs résultats</string>
+    <string name="records_solved_level">Résolus : %1$d</string>
+    <string name="records_note">Les records sont enregistrés uniquement sur cet appareil.</string>
+    <string name="rules_title">Comment jouer</string>
+    <string name="rules_1">1–9 : saisissez un chiffre dans la case sélectionnée</string>
+    <string name="rules_2">Notes : notez les candidats possibles dans une case vide</string>
+    <string name="rules_3">Pause : arrêtez le chronomètre et masquez la grille</string>
+    <string name="rules_4">Indice : révélez le chiffre correct</string>
+    <string name="rules_text">Chaque ligne, colonne et bloc 3×3 doit contenir les chiffres de 1 à 9 exactement une fois. Les erreurs sont surlignées en rouge.</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_theme">Thème</string>
+    <string name="theme_system">Suivre le système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_current">Langue actuelle : %1$s</string>
+    <string name="settings_language_note">La langue de l\'application se modifie dans les paramètres système.</string>
+    <string name="settings_language_open">Modifier dans le système</string>
+    <string name="settings_game">Jeu</string>
+    <string name="settings_reset_records">Réinitialiser les records</string>
+    <string name="settings_reset_confirm">Réinitialiser tous les records ?</string>
+    <string name="settings_reset_yes">Oui</string>
+    <string name="settings_reset_cancel">Annuler</string>
+    <string name="settings_reset_done">Records réinitialisés.</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_about_version">Sudoku 9×9 · version 1.0</string>
+    <string name="settings_about_storage">Les records et la partie en cours sont enregistrés uniquement sur cet appareil.</string>
+</resources>

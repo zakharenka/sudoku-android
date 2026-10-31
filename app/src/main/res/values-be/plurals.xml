@@ -1,0 +1,8 @@
+<resources>
+    <plurals name="mistakes">
+        <item quantity="one">%d памылка</item>
+        <item quantity="few">%d памылкі</item>
+        <item quantity="many">%d памылак</item>
+        <item quantity="other">%d памылкі</item>
+    </plurals>
+</resources>

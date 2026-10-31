@@ -1,0 +1,99 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Судоку</string>
+
+    <string name="difficulty_easy">Легко</string>
+    <string name="difficulty_easy_note">розминка</string>
+    <string name="difficulty_medium">Середньо</string>
+    <string name="difficulty_medium_note">баланс</string>
+    <string name="difficulty_hard">Складно</string>
+    <string name="difficulty_hard_note">виклик</string>
+    <string name="difficulty_expert">Експерт</string>
+    <string name="difficulty_expert_note">максимум</string>
+
+    <string name="new_game">Нова гра</string>
+    <string name="new_game_confirm">Почати нову гру? Поточний прогрес буде втрачено.</string>
+    <string name="new_game_start">Почати</string>
+    <string name="new_game_cancel">Скасувати</string>
+    <string name="action_undo">Скасувати</string>
+    <string name="action_erase">Стерти</string>
+    <string name="action_notes">Нотатки</string>
+    <string name="action_hint">Підказка</string>
+    <string name="action_pause">Пауза</string>
+    <string name="action_resume">Продовжити</string>
+    <string name="header_rules">Правила</string>
+    <string name="header_records">Рекорди</string>
+    <string name="header_settings">Налаштування</string>
+
+    <string name="timer_content_description">Час: %1$s</string>
+    <string name="number_remaining" tools:ignore="PluralsCandidate">Цифра %1$d, залишилося %2$d</string>
+    <string name="number_complete">Цифра %1$d, усі розставлені</string>
+
+    <string name="cell_empty">Рядок %1$d, стовпець %2$d, порожньо</string>
+    <string name="cell_value">Рядок %1$d, стовпець %2$d, цифра %3$d</string>
+    <string name="cell_given">Рядок %1$d, стовпець %2$d, підказка, цифра %3$d</string>
+    <string name="cell_error">Рядок %1$d, стовпець %2$d, помилка, цифра %3$d</string>
+    <string name="cell_notes">Рядок %1$d, стовпець %2$d, нотатки %3$s</string>
+
+    <string name="status_initial">Виберіть клітинку та введіть цифру</string>
+    <string name="status_generating">Генерація поля…</string>
+    <string name="status_generation_failed">Не вдалося створити поле. Спробуйте ще раз.</string>
+    <string name="status_new_game">Нова гра: %1$s. Підказок: %2$d</string>
+    <string name="status_restored">Гру відновлено. Натисніть «Продовжити».</string>
+    <string name="status_paused">Пауза</string>
+    <string name="status_resumed">Продовжуємо</string>
+    <string name="status_new_record">Розв\'язано! Новий рекорд: %1$s</string>
+    <string name="status_solved">Розв\'язано! Час: %1$s</string>
+
+    <string name="message_select_cell">Спочатку виберіть клітинку</string>
+    <string name="message_cell_filled">Ця клітинка вже заповнена</string>
+    <string name="message_erase_first">Спершу сотріть цифру, щоб додати нотатку</string>
+    <string name="message_note_added" tools:ignore="PluralsCandidate">Нотатку %1$d додано</string>
+    <string name="message_note_removed" tools:ignore="PluralsCandidate">Нотатку %1$d прибрано</string>
+    <string name="message_correct">Правильно</string>
+    <string name="message_wrong_number">Неправильна цифра. Помилок: %1$d.</string>
+    <string name="message_cell_cleared">Клітинку очищено</string>
+    <string name="message_move_undone">Хід скасовано</string>
+    <string name="message_board_correct">Поле вже заповнене правильно</string>
+    <string name="message_hint">Підказка: %1$d — рядок %2$d, стовпець %3$d</string>
+    <string name="message_cannot_erase">Цю клітинку не можна стерти</string>
+    <string name="message_notes_enabled">Нотатки ввімкнено</string>
+    <string name="message_notes_disabled">Нотатки вимкнено</string>
+    <string name="message_solved">Розв\'язано!</string>
+
+    <string name="pause_title">Пауза</string>
+    <string name="pause_subtitle">Час зупинено</string>
+    <string name="loading_generating">Генерація поля…</string>
+    <string name="win_title">Розв\'язано!</string>
+    <string name="win_new_record">Новий рекорд!</string>
+    <string name="win_close">Закрити</string>
+
+    <string name="dialog_close">Закрити</string>
+    <string name="records_title">Найкращі результати</string>
+    <string name="records_solved_level">Розв\'язано: %1$d</string>
+    <string name="records_note">Рекорди зберігаються лише на цьому пристрої.</string>
+    <string name="rules_title">Як грати</string>
+    <string name="rules_1">1–9 — введіть цифру у вибраній клітинці</string>
+    <string name="rules_2">Нотатки — записуйте можливі варіанти в порожній клітинці</string>
+    <string name="rules_3">Пауза — зупиніть час і сховайте поле</string>
+    <string name="rules_4">Підказка — відкрийте правильну цифру</string>
+    <string name="rules_text">Кожен рядок, стовпець і блок 3×3 має містити цифри від 1 до 9 рівно один раз. Помилки виділяються червоним.</string>
+
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_theme">Тема</string>
+    <string name="theme_system">Як у системі</string>
+    <string name="theme_light">Світла</string>
+    <string name="theme_dark">Темна</string>
+    <string name="settings_language">Мова</string>
+    <string name="settings_language_current">Поточна мова: %1$s</string>
+    <string name="settings_language_note">Мова застосунку змінюється в системних налаштуваннях.</string>
+    <string name="settings_language_open">Змінити в системі</string>
+    <string name="settings_game">Гра</string>
+    <string name="settings_reset_records">Скинути рекорди</string>
+    <string name="settings_reset_confirm">Скинути всі рекорди?</string>
+    <string name="settings_reset_yes">Так</string>
+    <string name="settings_reset_cancel">Скасувати</string>
+    <string name="settings_reset_done">Рекорди скинуто.</string>
+    <string name="settings_about">Про застосунок</string>
+    <string name="settings_about_version">Судоку 9×9 · версія 1.0</string>
+    <string name="settings_about_storage">Рекорди та поточна гра зберігаються лише на цьому пристрої.</string>
+</resources>

@@ -1,0 +1,99 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Sudoku</string>
+
+    <string name="difficulty_easy">Facile</string>
+    <string name="difficulty_easy_note">riscaldamento</string>
+    <string name="difficulty_medium">Medio</string>
+    <string name="difficulty_medium_note">equilibrio</string>
+    <string name="difficulty_hard">Difficile</string>
+    <string name="difficulty_hard_note">sfida</string>
+    <string name="difficulty_expert">Esperto</string>
+    <string name="difficulty_expert_note">massimo</string>
+
+    <string name="new_game">Nuova partita</string>
+    <string name="new_game_confirm">Iniziare una nuova partita? I progressi attuali andranno persi.</string>
+    <string name="new_game_start">Inizia</string>
+    <string name="new_game_cancel">Annulla</string>
+    <string name="action_undo">Annulla</string>
+    <string name="action_erase">Cancella</string>
+    <string name="action_notes">Note</string>
+    <string name="action_hint">Indizio</string>
+    <string name="action_pause">Pausa</string>
+    <string name="action_resume">Riprendi</string>
+    <string name="header_rules">Regole</string>
+    <string name="header_records">Record</string>
+    <string name="header_settings">Impostazioni</string>
+
+    <string name="timer_content_description">Tempo: %1$s</string>
+    <string name="number_remaining" tools:ignore="PluralsCandidate">Cifra %1$d, ne restano %2$d</string>
+    <string name="number_complete">Cifra %1$d, tutte inserite</string>
+
+    <string name="cell_empty">Riga %1$d, colonna %2$d, vuota</string>
+    <string name="cell_value">Riga %1$d, colonna %2$d, cifra %3$d</string>
+    <string name="cell_given">Riga %1$d, colonna %2$d, indizio, cifra %3$d</string>
+    <string name="cell_error">Riga %1$d, colonna %2$d, errore, cifra %3$d</string>
+    <string name="cell_notes">Riga %1$d, colonna %2$d, note %3$s</string>
+
+    <string name="status_initial">Scegli una cella e inserisci una cifra</string>
+    <string name="status_generating">Generazione della griglia…</string>
+    <string name="status_generation_failed">Impossibile creare la griglia. Riprova.</string>
+    <string name="status_new_game">Nuova partita: %1$s. Indizi: %2$d</string>
+    <string name="status_restored">Partita ripristinata. Tocca «Riprendi».</string>
+    <string name="status_paused">In pausa</string>
+    <string name="status_resumed">Ripresa</string>
+    <string name="status_new_record">Risolto! Nuovo record: %1$s</string>
+    <string name="status_solved">Risolto! Tempo: %1$s</string>
+
+    <string name="message_select_cell">Scegli prima una cella</string>
+    <string name="message_cell_filled">Questa cella è già compilata</string>
+    <string name="message_erase_first">Cancella la cifra prima di aggiungere una nota</string>
+    <string name="message_note_added" tools:ignore="PluralsCandidate">Nota %1$d aggiunta</string>
+    <string name="message_note_removed" tools:ignore="PluralsCandidate">Nota %1$d rimossa</string>
+    <string name="message_correct">Corretto</string>
+    <string name="message_wrong_number">Cifra errata. Errori: %1$d.</string>
+    <string name="message_cell_cleared">Cella cancellata</string>
+    <string name="message_move_undone">Mossa annullata</string>
+    <string name="message_board_correct">La griglia è già corretta</string>
+    <string name="message_hint">Indizio: %1$d — riga %2$d, colonna %3$d</string>
+    <string name="message_cannot_erase">Questa cella non può essere cancellata</string>
+    <string name="message_notes_enabled">Note attivate</string>
+    <string name="message_notes_disabled">Note disattivate</string>
+    <string name="message_solved">Risolto!</string>
+
+    <string name="pause_title">In pausa</string>
+    <string name="pause_subtitle">Tempo fermato</string>
+    <string name="loading_generating">Generazione della griglia…</string>
+    <string name="win_title">Risolto!</string>
+    <string name="win_new_record">Nuovo record!</string>
+    <string name="win_close">Chiudi</string>
+
+    <string name="dialog_close">Chiudi</string>
+    <string name="records_title">Migliori risultati</string>
+    <string name="records_solved_level">Risolti: %1$d</string>
+    <string name="records_note">I record sono salvati solo su questo dispositivo.</string>
+    <string name="rules_title">Come giocare</string>
+    <string name="rules_1">1–9: inserisci una cifra nella cella selezionata</string>
+    <string name="rules_2">Note: scrivi i possibili candidati in una cella vuota</string>
+    <string name="rules_3">Pausa: ferma il tempo e nascondi la griglia</string>
+    <string name="rules_4">Indizio: rivela la cifra corretta</string>
+    <string name="rules_text">Ogni riga, colonna e blocco 3×3 deve contenere le cifre da 1 a 9 esattamente una volta. Gli errori sono evidenziati in rosso.</string>
+
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_system">Segui il sistema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="settings_language">Lingua</string>
+    <string name="settings_language_current">Lingua attuale: %1$s</string>
+    <string name="settings_language_note">La lingua dell\'app si cambia nelle impostazioni di sistema.</string>
+    <string name="settings_language_open">Cambia nelle impostazioni di sistema</string>
+    <string name="settings_game">Gioco</string>
+    <string name="settings_reset_records">Reimposta i record</string>
+    <string name="settings_reset_confirm">Reimpostare tutti i record?</string>
+    <string name="settings_reset_yes">Sì</string>
+    <string name="settings_reset_cancel">Annulla</string>
+    <string name="settings_reset_done">Record reimpostati.</string>
+    <string name="settings_about">Informazioni</string>
+    <string name="settings_about_version">Sudoku 9×9 · versione 1.0</string>
+    <string name="settings_about_storage">I record e la partita attuale sono salvati solo su questo dispositivo.</string>
+</resources>

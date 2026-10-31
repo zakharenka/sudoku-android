@@ -1,0 +1,99 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Sudoku</string>
+
+    <string name="difficulty_easy">Leicht</string>
+    <string name="difficulty_easy_note">Aufwärmen</string>
+    <string name="difficulty_medium">Mittel</string>
+    <string name="difficulty_medium_note">Balance</string>
+    <string name="difficulty_hard">Schwer</string>
+    <string name="difficulty_hard_note">Herausforderung</string>
+    <string name="difficulty_expert">Experte</string>
+    <string name="difficulty_expert_note">Maximum</string>
+
+    <string name="new_game">Neues Spiel</string>
+    <string name="new_game_confirm">Neues Spiel starten? Der aktuelle Fortschritt geht verloren.</string>
+    <string name="new_game_start">Starten</string>
+    <string name="new_game_cancel">Abbrechen</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="action_erase">Löschen</string>
+    <string name="action_notes">Notizen</string>
+    <string name="action_hint">Tipp</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Fortsetzen</string>
+    <string name="header_rules">Regeln</string>
+    <string name="header_records">Rekorde</string>
+    <string name="header_settings">Einstellungen</string>
+
+    <string name="timer_content_description">Zeit: %1$s</string>
+    <string name="number_remaining" tools:ignore="PluralsCandidate">Ziffer %1$d, noch %2$d</string>
+    <string name="number_complete">Ziffer %1$d, alle platziert</string>
+
+    <string name="cell_empty">Zeile %1$d, Spalte %2$d, leer</string>
+    <string name="cell_value">Zeile %1$d, Spalte %2$d, Ziffer %3$d</string>
+    <string name="cell_given">Zeile %1$d, Spalte %2$d, Vorgabe, Ziffer %3$d</string>
+    <string name="cell_error">Zeile %1$d, Spalte %2$d, Fehler, Ziffer %3$d</string>
+    <string name="cell_notes">Zeile %1$d, Spalte %2$d, Notizen %3$s</string>
+
+    <string name="status_initial">Wähle eine Zelle und gib eine Ziffer ein</string>
+    <string name="status_generating">Rätsel wird erstellt…</string>
+    <string name="status_generation_failed">Das Rätsel konnte nicht erstellt werden. Versuche es erneut.</string>
+    <string name="status_new_game">Neues Spiel: %1$s. Vorgaben: %2$d</string>
+    <string name="status_restored">Spiel wiederhergestellt. Tippe auf „Fortsetzen“.</string>
+    <string name="status_paused">Pausiert</string>
+    <string name="status_resumed">Wird fortgesetzt</string>
+    <string name="status_new_record">Gelöst! Neuer Rekord: %1$s</string>
+    <string name="status_solved">Gelöst! Zeit: %1$s</string>
+
+    <string name="message_select_cell">Wähle zuerst eine Zelle</string>
+    <string name="message_cell_filled">Diese Zelle ist bereits ausgefüllt</string>
+    <string name="message_erase_first">Lösche die Ziffer, bevor du eine Notiz hinzufügst</string>
+    <string name="message_note_added" tools:ignore="PluralsCandidate">Notiz %1$d hinzugefügt</string>
+    <string name="message_note_removed" tools:ignore="PluralsCandidate">Notiz %1$d entfernt</string>
+    <string name="message_correct">Richtig</string>
+    <string name="message_wrong_number">Falsche Ziffer. Fehler: %1$d.</string>
+    <string name="message_cell_cleared">Zelle geleert</string>
+    <string name="message_move_undone">Zug rückgängig gemacht</string>
+    <string name="message_board_correct">Das Spielfeld ist bereits korrekt</string>
+    <string name="message_hint">Tipp: %1$d — Zeile %2$d, Spalte %3$d</string>
+    <string name="message_cannot_erase">Diese Zelle kann nicht gelöscht werden</string>
+    <string name="message_notes_enabled">Notizen aktiviert</string>
+    <string name="message_notes_disabled">Notizen deaktiviert</string>
+    <string name="message_solved">Gelöst!</string>
+
+    <string name="pause_title">Pausiert</string>
+    <string name="pause_subtitle">Zeit angehalten</string>
+    <string name="loading_generating">Rätsel wird erstellt…</string>
+    <string name="win_title">Gelöst!</string>
+    <string name="win_new_record">Neuer Rekord!</string>
+    <string name="win_close">Schließen</string>
+
+    <string name="dialog_close">Schließen</string>
+    <string name="records_title">Bestleistungen</string>
+    <string name="records_solved_level">Gelöst: %1$d</string>
+    <string name="records_note">Rekorde werden nur auf diesem Gerät gespeichert.</string>
+    <string name="rules_title">Spielanleitung</string>
+    <string name="rules_1">1–9: Gib eine Ziffer in die ausgewählte Zelle ein</string>
+    <string name="rules_2">Notizen: Schreibe mögliche Kandidaten in eine leere Zelle</string>
+    <string name="rules_3">Pause: Halte die Zeit an und blende das Spielfeld aus</string>
+    <string name="rules_4">Tipp: Zeige die richtige Ziffer an</string>
+    <string name="rules_text">Jede Zeile, jede Spalte und jeder 3×3-Block muss die Ziffern 1 bis 9 genau einmal enthalten. Fehler werden rot markiert.</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_theme">Design</string>
+    <string name="theme_system">Systemeinstellung</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_language_current">Aktuelle Sprache: %1$s</string>
+    <string name="settings_language_note">Die App-Sprache wird in den Systemeinstellungen geändert.</string>
+    <string name="settings_language_open">In den Systemeinstellungen ändern</string>
+    <string name="settings_game">Spiel</string>
+    <string name="settings_reset_records">Rekorde zurücksetzen</string>
+    <string name="settings_reset_confirm">Alle Rekorde zurücksetzen?</string>
+    <string name="settings_reset_yes">Ja</string>
+    <string name="settings_reset_cancel">Abbrechen</string>
+    <string name="settings_reset_done">Rekorde zurückgesetzt.</string>
+    <string name="settings_about">Über</string>
+    <string name="settings_about_version">Sudoku 9×9 · Version 1.0</string>
+    <string name="settings_about_storage">Rekorde und das aktuelle Spiel werden nur auf diesem Gerät gespeichert.</string>
+</resources>

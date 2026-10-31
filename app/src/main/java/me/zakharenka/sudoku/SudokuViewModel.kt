@@ -169,8 +169,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 session = newSession
                 uiState = uiState.copy(loading = false)
                 val app = getApplication<Application>()
-                val appLocale = app.resources.configuration.locales[0]
-                val label = app.getString(difficulty.labelRes()).lowercase(appLocale)
+                val label = app.getString(difficulty.labelRes())
                 refresh(
                     status = app.getString(
                         R.string.status_new_game,

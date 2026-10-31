@@ -87,8 +87,6 @@
     <string name="settings_language_current">Current language: %1$s</string>
     <string name="settings_language_note">The app language is changed in the system settings.</string>
     <string name="settings_language_open">Change in system</string>
-    <string name="language_russian">Русский</string>
-    <string name="language_english">English</string>
     <string name="settings_game">Game</string>
     <string name="settings_reset_records">Reset records</string>
     <string name="settings_reset_confirm">Reset all records?</string>

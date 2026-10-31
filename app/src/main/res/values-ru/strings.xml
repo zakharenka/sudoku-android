@@ -87,8 +87,6 @@
     <string name="settings_language_current">Текущий язык: %1$s</string>
     <string name="settings_language_note">Язык приложения меняется в системных настройках.</string>
     <string name="settings_language_open">Изменить в системе</string>
-    <string name="language_russian">Русский</string>
-    <string name="language_english">English</string>
     <string name="settings_game">Игра</string>
     <string name="settings_reset_records">Сбросить рекорды</string>
     <string name="settings_reset_confirm">Сбросить все рекорды?</string>

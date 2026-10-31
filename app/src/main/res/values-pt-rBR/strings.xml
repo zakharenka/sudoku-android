@@ -1,0 +1,99 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Sudoku</string>
+
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_easy_note">aquecimento</string>
+    <string name="difficulty_medium">Médio</string>
+    <string name="difficulty_medium_note">equilíbrio</string>
+    <string name="difficulty_hard">Difícil</string>
+    <string name="difficulty_hard_note">desafio</string>
+    <string name="difficulty_expert">Especialista</string>
+    <string name="difficulty_expert_note">máximo</string>
+
+    <string name="new_game">Nova partida</string>
+    <string name="new_game_confirm">Começar uma nova partida? O progresso atual será perdido.</string>
+    <string name="new_game_start">Começar</string>
+    <string name="new_game_cancel">Cancelar</string>
+    <string name="action_undo">Desfazer</string>
+    <string name="action_erase">Apagar</string>
+    <string name="action_notes">Notas</string>
+    <string name="action_hint">Dica</string>
+    <string name="action_pause">Pausa</string>
+    <string name="action_resume">Continuar</string>
+    <string name="header_rules">Regras</string>
+    <string name="header_records">Recordes</string>
+    <string name="header_settings">Configurações</string>
+
+    <string name="timer_content_description">Tempo: %1$s</string>
+    <string name="number_remaining" tools:ignore="PluralsCandidate">Dígito %1$d, faltam %2$d</string>
+    <string name="number_complete">Dígito %1$d, todos colocados</string>
+
+    <string name="cell_empty">Linha %1$d, coluna %2$d, vazia</string>
+    <string name="cell_value">Linha %1$d, coluna %2$d, dígito %3$d</string>
+    <string name="cell_given">Linha %1$d, coluna %2$d, pista, dígito %3$d</string>
+    <string name="cell_error">Linha %1$d, coluna %2$d, erro, dígito %3$d</string>
+    <string name="cell_notes">Linha %1$d, coluna %2$d, notas %3$s</string>
+
+    <string name="status_initial">Escolha uma célula e insira um dígito</string>
+    <string name="status_generating">Gerando um sudoku…</string>
+    <string name="status_generation_failed">Não foi possível criar o sudoku. Tente novamente.</string>
+    <string name="status_new_game">Nova partida: %1$s. Pistas: %2$d</string>
+    <string name="status_restored">Partida restaurada. Toque em «Continuar».</string>
+    <string name="status_paused">Em pausa</string>
+    <string name="status_resumed">Continuando</string>
+    <string name="status_new_record">Resolvido! Novo recorde: %1$s</string>
+    <string name="status_solved">Resolvido! Tempo: %1$s</string>
+
+    <string name="message_select_cell">Escolha uma célula primeiro</string>
+    <string name="message_cell_filled">Esta célula já está preenchida</string>
+    <string name="message_erase_first">Apague o dígito antes de adicionar uma nota</string>
+    <string name="message_note_added" tools:ignore="PluralsCandidate">Nota %1$d adicionada</string>
+    <string name="message_note_removed" tools:ignore="PluralsCandidate">Nota %1$d removida</string>
+    <string name="message_correct">Correto</string>
+    <string name="message_wrong_number">Dígito incorreto. Erros: %1$d.</string>
+    <string name="message_cell_cleared">Célula apagada</string>
+    <string name="message_move_undone">Jogada desfeita</string>
+    <string name="message_board_correct">O tabuleiro já está correto</string>
+    <string name="message_hint">Dica: %1$d — linha %2$d, coluna %3$d</string>
+    <string name="message_cannot_erase">Esta célula não pode ser apagada</string>
+    <string name="message_notes_enabled">Notas ativadas</string>
+    <string name="message_notes_disabled">Notas desativadas</string>
+    <string name="message_solved">Resolvido!</string>
+
+    <string name="pause_title">Em pausa</string>
+    <string name="pause_subtitle">Tempo parado</string>
+    <string name="loading_generating">Gerando um sudoku…</string>
+    <string name="win_title">Resolvido!</string>
+    <string name="win_new_record">Novo recorde!</string>
+    <string name="win_close">Fechar</string>
+
+    <string name="dialog_close">Fechar</string>
+    <string name="records_title">Melhores resultados</string>
+    <string name="records_solved_level">Resolvidos: %1$d</string>
+    <string name="records_note">Os recordes são salvos apenas neste dispositivo.</string>
+    <string name="rules_title">Como jogar</string>
+    <string name="rules_1">1–9: insira um dígito na célula selecionada</string>
+    <string name="rules_2">Notas: escreva os candidatos possíveis em uma célula vazia</string>
+    <string name="rules_3">Pausa: pare o tempo e oculte o tabuleiro</string>
+    <string name="rules_4">Dica: revele o dígito correto</string>
+    <string name="rules_text">Cada linha, coluna e bloco 3×3 deve conter os dígitos de 1 a 9 exatamente uma vez. Os erros são destacados em vermelho.</string>
+
+    <string name="settings_title">Configurações</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_system">Seguir o sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_current">Idioma atual: %1$s</string>
+    <string name="settings_language_note">O idioma do aplicativo é alterado nas configurações do sistema.</string>
+    <string name="settings_language_open">Alterar no sistema</string>
+    <string name="settings_game">Jogo</string>
+    <string name="settings_reset_records">Redefinir recordes</string>
+    <string name="settings_reset_confirm">Redefinir todos os recordes?</string>
+    <string name="settings_reset_yes">Sim</string>
+    <string name="settings_reset_cancel">Cancelar</string>
+    <string name="settings_reset_done">Recordes redefinidos.</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_about_version">Sudoku 9×9 · versão 1.0</string>
+    <string name="settings_about_storage">Os recordes e a partida atual são salvos apenas neste dispositivo.</string>
+</resources>

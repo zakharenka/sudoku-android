@@ -119,10 +119,15 @@ SudokuScreen
 
 ### Локализация
 
-- Все пользовательские строки — только в ресурсах:
-  `values/strings.xml` (английский по умолчанию) и
-  `values-ru/strings.xml` (русский).
+- Поддерживаемые языки: `en` (по умолчанию), `ru`, `es`, `pt-BR`, `fr`,
+  `de`, `it`, `uk`, `be`.
+- Все пользовательские строки — только в ресурсах `values*/strings.xml`;
+  формы множественного числа — в `values*/plurals.xml`.
+- При добавлении языка обновляй `locales_config.xml`, `README.md` и
+  `docs/languages.md`.
 - Множественное число — через `plurals.xml` и `pluralStringResource`.
+  Для русского, украинского и белорусского нужны категории
+  `one`/`few`/`many`/`other`, для арабского — шесть категорий CLDR.
 - Не хардкодь текст в Compose-коде, включая `contentDescription`.
 - Статусы и сообщения игры локализуются в ViewModel через `GameMessage`;
   `game/` не должен знать о ресурсах Android.
@@ -226,3 +231,4 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 | `ui/sketch/Sketch.kt` | рисованные поверхности, кнопки, линии, текстура |
 | `ui/theme/Theme.kt` | светлая и тёмная палитры |
 | `res/values*/strings.xml` | локализованные строки |
+| `docs/languages.md` | текущие языки и план следующих волн |

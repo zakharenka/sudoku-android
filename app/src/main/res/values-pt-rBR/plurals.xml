@@ -1,0 +1,7 @@
+<resources>
+    <plurals name="mistakes">
+        <item quantity="one">%d erro</item>
+        <item quantity="many">%d erros</item>
+        <item quantity="other">%d erros</item>
+    </plurals>
+</resources>
