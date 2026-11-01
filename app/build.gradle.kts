@@ -30,7 +30,8 @@ android {
         release {
             optimization {
                 enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+                // Do not add packageScope here: it caused an IllegalAccessError
+                // in the release build (Kotlin collections / androidx.startup).
             }
         }
     }

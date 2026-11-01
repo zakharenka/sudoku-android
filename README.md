@@ -49,7 +49,7 @@
 Версия задаётся в одном месте — в `gradle.properties`:
 
 ```properties
-app.version=1.0.0
+app.version=1.0.1
 ```
 
 `app/build.gradle.kts` использует это значение как `versionName` и вычисляет
@@ -59,7 +59,7 @@ app.version=1.0.0
 major * 1_000_000 + minor * 1_000 + patch
 ```
 
-Для `1.0.0` это `versionCode = 1000000`. Версии следуют семантическому
+Для `1.0.1` это `versionCode = 1000001`. Версии следуют семантическому
 версионированию `MAJOR.MINOR.PATCH`; релизные версии отмечаются git-тегами.
 
 ## Сборка

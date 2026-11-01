@@ -50,7 +50,7 @@ adb shell am start -n me.zakharenka.sudoku/.MainActivity
   `major * 1_000_000 + minor * 1_000 + patch`.
 - Не хардкодь версию в строках интерфейса: используй
   `BuildConfig.VERSION_NAME`.
-- Релизные версии отмечаются аннотированным git-тегом, например `1.0.0`.
+- Релизные версии отмечаются аннотированным git-тегом, например `1.0.1`.
 - Для Google Play собирай `./gradlew :app:bundleRelease`; AAB в
   `app/build/outputs/bundle/release/` нужно подписать upload-ключом.
 - Публикационный пакет складывается в `store_out/`. Папка в `.gitignore`
