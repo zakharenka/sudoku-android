@@ -1,203 +1,206 @@
-# Языки приложения
+# App languages
 
-Документ описывает текущую локализацию и план добавления новых языков.
+This document describes the current localization and the plan for adding new
+languages.
 
-## Текущее состояние
+## Current state
 
-В приложении девять языков. Все они подключены к нативному экрану
-«Язык приложения» Android через `app/src/main/res/xml/locales_config.xml`.
+The app ships nine languages. All of them are connected to the native Android
+"App language" screen through
+`app/src/main/res/xml/locales_config.xml`.
 
-| Язык | Код | Папка ресурсов | Статус |
+| Language | Code | Resource folder | Status |
 | --- | --- | --- | --- |
-| Английский | `en` | `values/` | язык по умолчанию |
-| Русский | `ru` | `values-ru/` | готов |
-| Испанский | `es` | `values-es/` | готов |
-| Португальский (Бразилия) | `pt-BR` | `values-pt-rBR/` | готов |
-| Французский | `fr` | `values-fr/` | готов |
-| Немецкий | `de` | `values-de/` | готов |
-| Итальянский | `it` | `values-it/` | готов |
-| Украинский | `uk` | `values-uk/` | готов |
-| Белорусский | `be` | `values-be/` | готов |
+| English | `en` | `values/` | default language |
+| Russian | `ru` | `values-ru/` | ready |
+| Spanish | `es` | `values-es/` | ready |
+| Portuguese (Brazil) | `pt-BR` | `values-pt-rBR/` | ready |
+| French | `fr` | `values-fr/` | ready |
+| German | `de` | `values-de/` | ready |
+| Italian | `it` | `values-it/` | ready |
+| Ukrainian | `uk` | `values-uk/` | ready |
+| Belarusian | `be` | `values-be/` | ready |
 
-Английский и русский используют шрифт Neucha без ограничений. Новые языки
-первой волны тоже полностью покрываются им: в шрифте есть нужные диакритики
-для испанского, португальского, французского, немецкого и итальянского, а
-также кириллица для украинского и белорусского.
+English and Russian use the Neucha font without restrictions. The new
+first-wave languages are fully covered as well: the font contains the needed
+diacritics for Spanish, Portuguese, French, German and Italian, plus Cyrillic
+for Ukrainian and Belarusian.
 
-## Как выбирать следующие языки
+## How to choose the next languages
 
-Приоритет стоит определять не только по числу носителей, но и по стоимости
-поддержки:
+Priority should be based not only on the number of speakers, but also on the
+cost of maintenance:
 
-1. **Охват аудитории** — сколько людей говорит на языке и насколько велик
-   рынок Android в этих странах.
-2. **Шрифт** — покрывает ли Neucha все нужные символы. Если нет, Android
-   подставит системный шрифт, и скетч-стиль будет выглядеть неровно.
-3. **Письменность и направление** — латиница и кириллица дешевле; CJK,
-   арабский, деванагари и RTL требуют отдельной проверки.
-4. **Множественное число** — в некоторых языках больше категорий, чем
-   `one`/`other`.
-5. **Длина строк** — немецкий и французский тексты длиннее английских;
-   это важно для верхней панели, кнопок действий и диалогов.
-6. **Качество перевода** — игровые термины («заметки», «подсказка»,
-   «сложность») лучше проверять носителем, а не только машинным переводом.
+1. **Audience reach** — how many people speak the language and how large the
+   Android market is in those countries.
+2. **Font** — whether Neucha covers all required characters. If not, Android
+   will fall back to a system font and the sketch style will look uneven.
+3. **Script and direction** — Latin and Cyrillic are cheaper; CJK, Arabic,
+   Devanagari and RTL need separate testing.
+4. **Plural forms** — some languages have more categories than `one`/`other`.
+5. **String length** — German and French texts are longer than English; this
+   matters for the top bar, action buttons and dialogs.
+6. **Translation quality** — game terms ("notes", "hint", "difficulty") are
+   best checked by a native speaker, not only by machine translation.
 
-## Вторая волна
+## Second wave
 
-Это языки, которые логично добавить следующими. Они популярны, но часть из
-них требует решения по шрифту.
+These are the languages that make sense to add next. They are popular, but some
+of them require a font decision.
 
-| Язык | Код | Аудитория | Сложность | Комментарий |
+| Language | Code | Audience | Difficulty | Comment |
 | --- | --- | --- | --- | --- |
-| Индонезийский | `id` | ~200 млн | низкая | латиница, почти без диакритики; хороший кандидат на раннее добавление |
-| Турецкий | `tr` | ~90 млн | средняя | нужны `ğ`, `ş`, `İ`; в Neucha их нет |
-| Польский | `pl` | ~40 млн | средняя | нужны `ą`, `ć`, `ę`, `ł`, `ń`, `ś`, `ź`, `ż` |
-| Вьетнамский | `vi` | ~100 млн | высокая | много комбинированных диакритик; нужен расширенный шрифт |
-| Чешский | `cs` | ~10 млн | средняя | Latin Extended; проверить длину строк |
-| Словацкий | `sk` | ~5 млн | средняя | Latin Extended |
-| Венгерский | `hu` | ~13 млн | средняя | Latin Extended, долгие гласные |
-| Румынский | `ro` | ~25 млн | средняя | нужны `ș`, `ț` |
-| Нидерландский | `nl` | ~25 млн | низкая | латиница, шрифт подходит |
-| Шведский | `sv` | ~10 млн | низкая | латиница, шрифт подходит |
-| Датский | `da` | ~6 млн | низкая | латиница, шрифт подходит |
-| Норвежский (букмол) | `nb` | ~5 млн | низкая | латиница, шрифт подходит |
-| Финский | `fi` | ~5 млн | низкая | латиница, шрифт подходит |
-| Болгарский | `bg` | ~8 млн | низкая | кириллица, шрифт подходит |
-| Сербский | `sr` | ~9 млн | средняя | кириллица подходит; латиница требует Latin Extended |
-| Греческий | `el` | ~13 млн | высокая | нужен греческий шрифт |
+| Indonesian | `id` | ~200M | low | Latin script, almost no diacritics; a good early candidate |
+| Turkish | `tr` | ~90M | medium | needs `ğ`, `ş`, `İ`; Neucha does not include them |
+| Polish | `pl` | ~40M | medium | needs `ą`, `ć`, `ę`, `ł`, `ń`, `ś`, `ź`, `ż` |
+| Vietnamese | `vi` | ~100M | high | many stacked diacritics; needs an extended font |
+| Czech | `cs` | ~10M | medium | Latin Extended; check string lengths |
+| Slovak | `sk` | ~5M | medium | Latin Extended |
+| Hungarian | `hu` | ~13M | medium | Latin Extended, long vowels |
+| Romanian | `ro` | ~25M | medium | needs `ș`, `ț` |
+| Dutch | `nl` | ~25M | low | Latin script, font fits |
+| Swedish | `sv` | ~10M | low | Latin script, font fits |
+| Danish | `da` | ~6M | low | Latin script, font fits |
+| Norwegian (Bokmål) | `nb` | ~5M | low | Latin script, font fits |
+| Finnish | `fi` | ~5M | low | Latin script, font fits |
+| Bulgarian | `bg` | ~8M | low | Cyrillic, font fits |
+| Serbian | `sr` | ~9M | medium | Cyrillic fits; Latin needs Latin Extended |
+| Greek | `el` | ~13M | high | needs a Greek font |
 
-### Рекомендуемый порядок второй волны
+### Recommended second-wave order
 
-1. **Индонезийский (`id`)** — максимальный охват при минимальной работе.
-2. **Турецкий (`tr`)** и **польский (`pl`)** — крупные рынки, но сначала
-   нужно решить вопрос с Latin Extended.
-3. **Вьетнамский (`vi`)** — большой рынок, но самый сложный из-за диакритик.
-4. **Нидерландский, шведский, чешский, венгерский, румынский** — добавлять
-   по мере появления качественного перевода.
+1. **Indonesian (`id`)** — maximum reach with minimal work.
+2. **Turkish (`tr`)** and **Polish (`pl`)** — large markets, but the Latin
+   Extended question must be solved first.
+3. **Vietnamese (`vi`)** — a large market, but the hardest one because of the
+   diacritics.
+4. **Dutch, Swedish, Czech, Hungarian, Romanian** — add them as good
+   translations become available.
 
-## Третья волна
+## Third wave
 
-Эти языки дают самый большой охват, но требуют отдельной работы над шрифтами,
-вёрсткой и переводом. Их не стоит добавлять «между делом».
+These languages offer the largest reach but require dedicated work on fonts,
+layout and translation. They should not be added "on the side".
 
-| Язык | Код | Аудитория | Что нужно |
+| Language | Code | Audience | What is needed |
 | --- | --- | --- | --- |
-| Китайский упрощённый | `zh-CN` | ~1,1 млрд | CJK-шрифт, проверка длины строк, перевод |
-| Китайский традиционный | `zh-TW` | ~30 млн | отдельный CJK-шрифт и перевод |
-| Японский | `ja` | ~125 млн | CJK-шрифт; судоку особенно популярно в Японии |
-| Корейский | `ko` | ~80 млн | Hangul-шрифт |
-| Арабский | `ar` | ~400 млн | арабский шрифт, RTL, категории множественного числа |
-| Хинди | `hi` | ~600 млн | шрифт Devanagari |
-| Бенгальский | `bn` | ~300 млн | бенгальский шрифт |
-| Персидский | `fa` | ~100 млн | арабская письменность и RTL |
-| Урду | `ur` | ~70 млн | арабская письменность и RTL |
-| Тайский | `th` | ~70 млн | тайский шрифт |
-| Иврит | `he` | ~10 млн | RTL и шрифт иврита |
+| Simplified Chinese | `zh-CN` | ~1.1B | CJK font, string-length review, translation |
+| Traditional Chinese | `zh-TW` | ~30M | separate CJK font and translation |
+| Japanese | `ja` | ~125M | CJK font; Sudoku is especially popular in Japan |
+| Korean | `ko` | ~80M | Hangul font |
+| Arabic | `ar` | ~400M | Arabic font, RTL, plural categories |
+| Hindi | `hi` | ~600M | Devanagari font |
+| Bengali | `bn` | ~300M | Bengali font |
+| Persian | `fa` | ~100M | Arabic script and RTL |
+| Urdu | `ur` | ~70M | Arabic script and RTL |
+| Thai | `th` | ~70M | Thai font |
+| Hebrew | `he` | ~10M | RTL and Hebrew font |
 
-### Рекомендуемый порядок третьей волны
+### Recommended third-wave order
 
-1. **Китайский упрощённый (`zh-CN`)** — самый большой рынок.
-2. **Японский (`ja`)** — сильная связь с судоку и лояльная аудитория.
-3. **Корейский (`ko`)** — завершает крупнейшие рынки Восточной Азии.
-4. **Арабский (`ar`)** — большой охват, но требует полноценной проверки RTL.
-5. **Хинди (`hi`)** — большой рынок, нужен шрифт Devanagari.
+1. **Simplified Chinese (`zh-CN`)** — the largest market.
+2. **Japanese (`ja`)** — a strong connection to Sudoku and a loyal audience.
+3. **Korean (`ko`)** — completes the largest East Asian markets.
+4. **Arabic (`ar`)** — large reach, but requires a full RTL review.
+5. **Hindi (`hi`)** — a large market; the Devanagari font is required.
 
-## Шрифты и письменность
+## Fonts and scripts
 
-Neucha — рукописный шрифт с базовой латиницей, кириллицей и основными
-диакритиками. По текущему файлу `app/src/main/res/font/neucha.ttf`:
+Neucha is a handwritten font with basic Latin, Cyrillic and common diacritics.
+Based on the current `app/src/main/res/font/neucha.ttf`:
 
-- полностью подходят: английский, русский, испанский, португальский,
-  французский, немецкий, итальянский, украинский, белорусский;
-- отсутствует полный Latin Extended: польские `ą`, `ć`, `ę`, `ł`, `ń`, `ś`,
-  `ź`, `ż`, турецкие `ğ`, `ş`, `İ`, вьетнамские комбинированные диакритики;
-- отсутствуют CJK, арабская письменность, деванагари, бенгальский, тайский,
-  иврит и полноценный греческий.
+- fully supported: English, Russian, Spanish, Portuguese, French, German,
+  Italian, Ukrainian, Belarusian;
+- full Latin Extended is missing: Polish `ą`, `ć`, `ę`, `ł`, `ń`, `ś`, `ź`,
+  `ż`, Turkish `ğ`, `ş`, `İ`, and Vietnamese stacked diacritics;
+- CJK, Arabic script, Devanagari, Bengali, Thai, Hebrew and full Greek are
+  missing.
 
-Варианты для следующих волн:
+Options for the next waves:
 
-1. **Оставить системный fallback.** Быстро, но отдельные буквы будут
-   выглядеть другим шрифтом. Для турецкого и польского это может быть
-   приемлемо, для вьетнамского — уже заметно.
-2. **Найти рукописный шрифт с Latin Extended.** Лучший вариант для второй
-   волны: сохранит единый стиль для турецкого, польского, чешского,
-   венгерского и румынского.
-3. **Подключить отдельные шрифты для письменностей.** Для CJK, арабского,
-   деванагари и тайского нужны свои шрифты с лицензией, допускающей
-   распространение в приложении. Предпочтительны SIL OFL или аналогичные
-   свободные лицензии.
+1. **Keep the system fallback.** Fast, but some letters will look like a
+   different font. This may be acceptable for Turkish and Polish, but it is
+   already noticeable for Vietnamese.
+2. **Find a handwritten font with Latin Extended.** The best option for the
+   second wave: it keeps a consistent style for Turkish, Polish, Czech,
+   Hungarian and Romanian.
+3. **Add separate fonts for other scripts.** CJK, Arabic, Devanagari and Thai
+   need their own fonts with a license that allows distribution inside the
+   app. SIL OFL or similar free licenses are preferred.
 
-При добавлении шрифта проверяй не только наличие букв, но и начертания
-цифр: в судоку цифры — основной контент, и они должны оставаться
-разборчивыми в светлой и тёмной темах.
+When adding a font, check not only the letters but also the digit shapes: in
+Sudoku the digits are the main content, and they must stay legible in both
+light and dark themes.
 
 ## RTL
 
-В манифесте уже включён `android:supportsRtl="true"`, но для арабского,
-персидского, урду и иврита этого недостаточно. Нужно проверить:
+`android:supportsRtl="true"` is already set in the manifest, but that is not
+enough for Arabic, Persian, Urdu and Hebrew. The following must be checked:
 
-- зеркалирование `Row` и горизонтальных отступов;
-- положение кнопок и иконок в верхней панели;
-- рисованные иконки в `SketchIcons.kt`;
-- выравнивание текста в диалогах;
-- то, что сетка судоку и цифры остаются в привычном порядке.
+- mirroring of `Row` and horizontal padding;
+- the position of buttons and icons in the top bar;
+- hand-drawn icons in `SketchIcons.kt`;
+- text alignment in dialogs;
+- that the Sudoku grid and digits keep their usual order.
 
-Для проверки RTL используй псевдолокаль `ar-XB`.
+Use the `ar-XB` pseudolocale to test RTL.
 
-## Множественное число
+## Plurals
 
-Сейчас в приложении есть только плюрализация `mistakes`. При добавлении
-языков нужно проверить категории CLDR:
+The app currently has only the `mistakes` plural. When adding languages, check
+the CLDR categories:
 
-| Языки | Категории |
+| Languages | Categories |
 | --- | --- |
-| Английский, испанский, немецкий, итальянский, португальский | `one`, `other` |
-| Французский | `one`, `other` (особое правило для 0 и 1) |
-| Русский, украинский, белорусский, польский | `one`, `few`, `many`, `other` |
-| Арабский | `zero`, `one`, `two`, `few`, `many`, `other` |
-| Китайский, японский, корейский | `other` |
-| Хинди | `one`, `other` |
+| English, Spanish, German, Italian, Portuguese | `one`, `other` |
+| French | `one`, `other` (special rule for 0 and 1) |
+| Russian, Ukrainian, Belarusian, Polish | `one`, `few`, `many`, `other` |
+| Arabic | `zero`, `one`, `two`, `few`, `many`, `other` |
+| Chinese, Japanese, Korean | `other` |
+| Hindi | `one`, `other` |
 
-Если категория не указана, Android возьмёт `other`; для русского и
-украинского это даст грамматически неверные формы, поэтому `few` и `many`
-обязательны.
+If a category is missing, Android falls back to `other`; for Russian and
+Ukrainian this produces grammatically wrong forms, so `few` and `many` are
+mandatory.
 
-## Чек-лист добавления языка
+## Language addition checklist
 
-1. Создать `app/src/main/res/values-<код>/strings.xml`.
-2. Создать `app/src/main/res/values-<код>/plurals.xml` с нужными категориями.
-3. Перевести все строки, включая `contentDescription`, правила, настройки,
-   статусы, экран победы и паузы.
-4. Сохранить все позиционные параметры (`%1$s`, `%2$d`, `%3$s`).
-5. Добавить локаль в `app/src/main/res/xml/locales_config.xml` в формате
-   BCP 47 (`pt-BR`, `zh-CN`, `ar`).
-6. Проверить длину строк в верхней панели, кнопках действий и диалогах.
-7. Проверить шрифт: нет ли пропущенных глифов и не ломается ли скетч-стиль.
-8. Для RTL-языков проверить зеркалирование интерфейса.
-9. Запустить полную проверку:
+1. Create `app/src/main/res/values-<code>/strings.xml`.
+2. Create `app/src/main/res/values-<code>/plurals.xml` with the required
+   categories.
+3. Translate every string, including `contentDescription`, rules, settings,
+   statuses, the win screen and the pause screen.
+4. Keep all positional parameters (`%1$s`, `%2$d`, `%3$s`).
+5. Add the locale to `app/src/main/res/xml/locales_config.xml` in BCP 47
+   format (`pt-BR`, `zh-CN`, `ar`).
+6. Check string lengths in the top bar, action buttons and dialogs.
+7. Check the font: no missing glyphs and no broken sketch style.
+8. For RTL languages, check interface mirroring.
+9. Run the full check:
 
 ```bash
 ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 ```
 
-10. Проверить язык на эмуляторе:
+10. Check the language on an emulator:
 
 ```bash
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales es
 ```
 
-Сбросить выбор языка приложения:
+Reset the app language selection:
 
 ```bash
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 ```
 
-11. Обновить этот документ, `README.md` и `AGENTS.md`.
+11. Update this document, `README.md` and `AGENTS.md`.
 
-## Псевдолокали для проверки вёрстки
+## Pseudolocales for layout testing
 
-- `en-XA` — удлиняет текст, помогает найти обрезанные кнопки и переносы;
-- `ar-XB` — включает RTL и помогает проверить зеркалирование.
+- `en-XA` — stretches text, helping to find clipped buttons and bad line
+  breaks;
+- `ar-XB` — enables RTL and helps to check mirroring.
 
 ```bash
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales en-XA

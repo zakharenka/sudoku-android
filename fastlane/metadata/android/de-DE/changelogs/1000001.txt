@@ -1,0 +1,1 @@
+Sudoku 1.0.1: Absturz beim Start behoben und Stabilität verbessert.

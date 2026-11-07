@@ -1,0 +1,43 @@
+# F-Droid build recipe for Sudoku.
+# Copy this file into an fdroiddata checkout as
+# metadata/me.zakharenka.sudoku.yml when opening a merge request.
+# Checklist: docs/fdroid.md
+
+Categories:
+  - Games
+
+License: GPL-3.0-or-later
+
+AuthorName: Aliaksandr Zakharenka
+AuthorEmail: aliaksandr@zakharenka.me
+AuthorWebSite: https://zakharenka.me
+
+WebSite: https://zakharenka.me
+SourceCode: https://github.com/zakharenka/sudoku-android
+IssueTracker: https://github.com/zakharenka/sudoku-android/issues
+Changelog: https://github.com/zakharenka/sudoku-android/releases
+Translation: https://github.com/zakharenka/sudoku-android/blob/master/docs/languages.md
+
+AutoName: Sudoku
+
+RepoType: git
+Repo: https://github.com/zakharenka/sudoku-android.git
+
+Builds:
+  - versionName: 1.0.1
+    versionCode: 1000001
+    commit: 440ed471f09c3641d5ababe80b8964ede3d3b864
+    gradle:
+      - yes
+
+MaintainerNotes: |
+  The app targets SDK 37 and builds with AGP 9.4.1 / Gradle 9.6.
+  A recent F-Droid buildserver is required. Version name and code are
+  derived from app.version in gradle.properties, so UpdateCheckMode is
+  Static: bump the property, tag the release commit and add a new Builds
+  entry manually for every release. Fastlane store texts and graphics are
+  kept in fastlane/metadata/android/.
+
+UpdateCheckMode: Static
+CurrentVersion: 1.0.1
+CurrentVersionCode: 1000001

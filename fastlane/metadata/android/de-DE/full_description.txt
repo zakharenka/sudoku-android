@@ -1,0 +1,19 @@
+Sudoku, handgezeichnet.
+
+Nimm dir eine Pause mit einem klassischen 9×9-Sudoku in warmem, handgezeichnetem Stil: Papiertextur, unregelmäßige Linien und eine Handschrift-Schrift. Keine Eile, kein Lärm — nur du und das Gitter.
+
+FUNKTIONEN
+• Vier Schwierigkeitsgrade: Leicht, Mittel, Schwer und Experte
+• Jedes Rätsel hat genau eine Lösung
+• Notizen, Tipps, Rückgängig und Löschen
+• Timer, Fehlerzähler und Pause
+• Helles, dunkles und System-Design
+• Neun Sprachen: Englisch, Russisch, Spanisch, Portugiesisch (Brasilien), Französisch, Deutsch, Italienisch, Ukrainisch und Belarussisch
+• Beste Zeit und Anzahl gelöster Sudokus pro Schwierigkeitsgrad
+• Das aktuelle Spiel wird automatisch gespeichert und pausiert wiederhergestellt
+• Funktioniert offline
+• Keine Werbung, keine Analyse, kein Konto
+
+Sudoku ist ein kostenloses Spiel von einem unabhängigen Entwickler. Wenn es dir gefällt, hinterlasse eine Bewertung — das hilft sehr.
+
+Datenschutzerklärung: https://zakharenka.me/privacy/android_sudoku_privacy.html

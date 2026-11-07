@@ -1,0 +1,19 @@
+Sudoku dibujado a mano.
+
+Tómate un descanso con un Sudoku 9×9 clásico en un estilo cálido y dibujado a mano: textura de papel, líneas irregulares y una fuente manuscrita. Sin prisas ni ruido: solo tú y la cuadrícula.
+
+CARACTERÍSTICAS
+• Cuatro niveles: Fácil, Medio, Difícil y Experto
+• Cada puzzle tiene una única solución
+• Notas, pistas, deshacer y borrar
+• Temporizador, contador de errores y pausa
+• Temas claro, oscuro y del sistema
+• Nueve idiomas: inglés, ruso, español, portugués (Brasil), francés, alemán, italiano, ucraniano y bielorruso
+• Mejor tiempo y número de sudokus resueltos por nivel
+• La partida actual se guarda automáticamente y se restaura en pausa
+• Funciona sin conexión
+• Sin anuncios, analítica ni cuenta
+
+Sudoku es un juego gratuito de un desarrollador independiente. Si te gusta, deja una reseña: ayuda mucho.
+
+Política de privacidad: https://zakharenka.me/privacy/android_sudoku_privacy.html

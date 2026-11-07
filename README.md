@@ -1,234 +1,285 @@
-# Судоку для Android
+# Sudoku for Android
 
-Классическое судоку 9×9 для Android на Kotlin и Jetpack Compose. Интерфейс
-нарисован вручную в скетч-стиле: бумажный фон, неровные линии, рукописный шрифт
-и квадратная сетка без скруглений. Поддерживаются девять языков: английский,
-русский, испанский, португальский (Бразилия), французский, немецкий,
-итальянский, украинский и белорусский. Язык по умолчанию берётся из системы,
-а меняется через нативные настройки языка приложения Android.
+A classic 9×9 Sudoku for Android built with Kotlin and Jetpack Compose. The
+interface is drawn by hand in a sketch style: paper texture, wobbly lines, a
+handwritten font and a square grid with no rounded corners. Nine languages are
+supported: English, Russian, Spanish, Portuguese (Brazil), French, German,
+Italian, Ukrainian and Belarusian. The default language comes from the system
+and is changed through the native Android app-language settings.
 
-## Возможности
+The app is free software under the GNU General Public License v3.0 or later.
+The source code is hosted on GitHub, and the project ships the metadata needed
+for distribution on F-Droid.
 
-- четыре уровня сложности: «Легко», «Средне», «Сложно», «Эксперт»;
-- генерация поля с единственным решением;
-- заметки в клетках, подсказки, отмена ходов и очистка клетки;
-- таймер, счётчик ошибок и пауза с автопаузой при уходе из приложения;
-- верхняя панель в одну строку: сложность, ошибки и таймер в одном блоке,
-  справа — кнопки паузы и новой игры без подписей;
-- адаптивный интерфейс: на планшетах в альбомной ориентации доска слева,
-  управление справа, в портретной — удобная одна колонка;
-- новая игра через диалог: подтверждение, выбор сложности, кнопки
-  «Начать» и «Отмена»; диалог открывается с кнопки новой игры или с
-  нажатия на текущую сложность;
-- рекорды по каждому уровню: лучшее время и количество разгаданных судоку;
-- девять языков: английский, русский, испанский, португальский (Бразилия),
-  французский, немецкий, итальянский, украинский и белорусский; язык по
-  умолчанию берётся из системы, смена — через нативный экран «Язык приложения»
-  Android;
-- светлая и тёмная темы, а также режим «как в системе»;
-- настройки: выбор темы, переход к системному выбору языка, ссылка на сайт
-  разработчика и сброс рекордов;
-- сохранение текущей игры при выходе: таймер останавливается, при следующем
-  запуске партия восстанавливается на паузе;
-- экран победы с временем и сообщением о новом рекорде;
-- рисованная иконка приложения: светлый и тёмный варианты, а также
-  монохромная иконка с цифрой для тематических иконок Android.
+## Features
 
-## Стек
+- four difficulty levels: Easy, Medium, Hard and Expert;
+- puzzle generation with a single solution;
+- cell notes, hints, undo and clear cell;
+- timer, mistake counter, and pause with auto-pause when leaving the app;
+- single-row top bar: difficulty, mistakes and timer in one block, with
+  unlabelled pause and new-game buttons on the right;
+- adaptive layout: on tablets in landscape the board is on the left and the
+  controls on the right; in portrait it is a comfortable single column;
+- new game through a dialog: confirmation, difficulty selection, and Start and
+  Cancel buttons; the dialog opens from the new-game button or by tapping the
+  current difficulty;
+- records per difficulty: best time and number of solved puzzles;
+- nine languages: English, Russian, Spanish, Portuguese (Brazil), French,
+  German, Italian, Ukrainian and Belarusian; the default language comes from
+  the system and is changed through the native Android "App language" screen;
+- light and dark themes, plus a "follow system" mode;
+- settings: theme selection, a shortcut to the system language picker, a link
+  to the developer website and a records reset;
+- the current game is saved when the app goes to the background: the timer
+  stops and the game is restored on pause the next time it starts;
+- win screen with the time and a new-record message;
+- hand-drawn app icon: light and dark variants, plus a monochrome icon with a
+  digit for Android themed icons.
+
+## Stack
 
 - Kotlin 2.3.21, Jetpack Compose (Material 3), Compose BOM 2026.09.00;
 - AGP 9.4.1, Gradle 9.6, JDK 17+;
 - minSdk 30, targetSdk 37, compileSdk 37;
-- SharedPreferences для рекордов, темы, режима заметок и сохранённой игры;
-- `android:localeConfig` и нативные per-app language settings Android 13+.
+- SharedPreferences for records, theme, notes mode and the saved game;
+- `android:localeConfig` and native Android 13+ per-app language settings.
 
-Приложение не использует сеть, аналитику и не запрашивает разрешений.
+The app does not use the network, does not include analytics and requests no
+permissions.
 
-## Версия
+## Version
 
-Версия задаётся в одном месте — в `gradle.properties`:
+The version is defined in one place — `gradle.properties`:
 
 ```properties
 app.version=1.0.1
 ```
 
-`app/build.gradle.kts` использует это значение как `versionName` и вычисляет
-`versionCode` по схеме:
+`app/build.gradle.kts` uses this value as `versionName` and derives
+`versionCode` with this scheme:
 
 ```text
 major * 1_000_000 + minor * 1_000 + patch
 ```
 
-Для `1.0.1` это `versionCode = 1000001`. Версии следуют семантическому
-версионированию `MAJOR.MINOR.PATCH`; релизные версии отмечаются git-тегами.
+For `1.0.1` this is `versionCode = 1000001`. Versions follow semantic
+versioning `MAJOR.MINOR.PATCH`; release versions are marked with git tags.
 
-## Сборка
+## Building
 
 ```bash
 ./gradlew :app:assembleDebug
 ```
 
-APK появится в `app/build/outputs/apk/debug/app-debug.apk`.
+The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
-Установка на подключённое устройство или эмулятор:
+Installing on a connected device or emulator:
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Релизная сборка (R8, без подписи):
+Release build (R8, unsigned):
 
 ```bash
 ./gradlew :app:assembleRelease
 ```
 
-APK появится в `app/build/outputs/apk/release/app-release-unsigned.apk`.
+The APK is written to `app/build/outputs/apk/release/app-release-unsigned.apk`.
 
-## Публикация
+## Publishing
 
-Пакет для Google Play собирается локально в `store_out/` и не коммитится
-(папка добавлена в `.gitignore`). В нём лежат тексты листинга, иконка,
-feature graphic, скриншоты, ответы для Play Console и AAB.
+### Google Play
+
+The Google Play package is assembled locally in `store_out/` and is not
+committed (the folder is listed in `.gitignore`). It contains the listing
+texts, icon, feature graphic, screenshots, Play Console answers and the AAB.
 
 ```bash
 ./gradlew :app:bundleRelease
 ```
 
-AAB появится в `app/build/outputs/bundle/release/app-release.aab`. Перед
-загрузкой его нужно подписать upload-ключом.
+The AAB is written to `app/build/outputs/bundle/release/app-release.aab`. It
+must be signed with the upload key before it is uploaded.
 
-Документы для Play Console:
+Play Console documents:
 
-- политика конфиденциальности:
+- privacy policy:
   `https://zakharenka.me/privacy/android_sudoku_privacy.html`;
-- условия использования:
+- terms of use:
   `https://zakharenka.me/privacy/android_sudoku_terms.html`.
 
-## Тесты и проверка
+### F-Droid
+
+The F-Droid build recipe is in
+[`metadata/me.zakharenka.sudoku.yml`](metadata/me.zakharenka.sudoku.yml).
+F-Droid builds the app from the tagged source on GitHub, so no signed APK needs
+to be uploaded.
+
+Store texts and graphics for F-Droid live in the standard fastlane layout:
+
+```text
+fastlane/metadata/android/<locale>/
+├── title.txt
+├── short_description.txt
+├── full_description.txt
+├── changelogs/<versionCode>.txt
+└── images/
+```
+
+To submit or update the app in the official F-Droid repository, open a merge
+request against
+[`fdroid/fdroiddata`](https://gitlab.com/fdroid/fdroiddata) with the metadata
+file. See [`docs/fdroid.md`](docs/fdroid.md) for the full checklist.
+
+## Tests and checks
 
 ```bash
 ./gradlew :app:testDebugUnitTest
 ```
 
-Покрыты генератор поля, подсчёт решений, игровые действия (ввод, заметки,
-очистка, отмена, подсказка, победа), сохранение/восстановление партии и
-форматирование времени.
+Covered: the puzzle generator, solution counting, game actions (input, notes,
+clear, undo, hint, victory), game save/restore and time formatting.
 
-Полная проверка перед коммитом:
+Full check before committing:
 
 ```bash
 ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 ```
 
-## Структура
+## Structure
 
 ```text
 app/src/main/java/me/zakharenka/sudoku/
-├── MainActivity.kt          # точка входа, edge-to-edge, сохранение при onStop
-├── SudokuViewModel.kt       # состояние партии, таймер, генерация, сохранение
+├── MainActivity.kt          # entry point, edge-to-edge, save on onStop
+├── SudokuViewModel.kt       # game state, timer, generation, saving
 ├── data/
-│   ├── RecordsStore.kt      # рекорды, счётчики, тема, режим заметок
-│   ├── SavedGameStore.kt    # сохранение и восстановление текущей игры
-│   └── ThemeMode.kt         # системная / светлая / тёмная тема
+│   ├── RecordsStore.kt      # records, counters, theme, notes mode
+│   ├── SavedGameStore.kt    # save and restore the current game
+│   └── ThemeMode.kt         # system / light / dark theme
 ├── game/
-│   ├── Difficulty.kt        # уровни сложности и число подсказок
-│   ├── SavedGame.kt         # снимок партии для хранения
-│   ├── SudokuGenerator.kt   # генерация и решатель
-│   ├── SudokuSession.kt     # правила партии без зависимостей от Android
-│   ├── GameMessage.kt       # структурированные игровые сообщения
-│   └── Formatters.kt        # время и склонение «ошибок»
+│   ├── Difficulty.kt        # difficulty levels and clue count
+│   ├── SavedGame.kt         # game snapshot for storage
+│   ├── SudokuGenerator.kt   # generator and solver
+│   ├── SudokuSession.kt     # game rules with no Android dependencies
+│   ├── GameMessage.kt       # structured game messages
+│   └── Formatters.kt        # time and "mistakes" plural forms
 └── ui/
-    ├── SudokuScreen.kt      # экран, шапка, настройки и диалоги
-    ├── SudokuBoard.kt       # поле 9×9 с рисованной сеткой
-    ├── SudokuControls.kt    # верхняя панель, цифры, действия, оверлеи
+    ├── SudokuScreen.kt      # screen, header, settings and dialogs
+    ├── SudokuBoard.kt       # 9×9 board with a hand-drawn grid
+    ├── SudokuControls.kt    # top bar, digits, actions, overlays
     ├── sketch/
-    │   ├── Sketch.kt        # рисованные линии, панели, кнопки, текстура
-    │   └── SketchIcons.kt   # иконки, нарисованные вручную
+    │   ├── Sketch.kt        # hand-drawn lines, panels, buttons, texture
+    │   └── SketchIcons.kt   # hand-drawn icons
     └── theme/
-        ├── Theme.kt         # светлая и тёмная палитры
-        └── Type.kt          # рукописный шрифт
+        ├── Theme.kt         # light and dark palettes
+        └── Type.kt          # handwritten font
 
-app/src/test/java/me/zakharenka/sudoku/game/   # JUnit-тесты игровой логики
+app/src/test/java/me/zakharenka/sudoku/game/   # JUnit tests for game logic
 
 app/src/main/res/
-├── values/                  # английский (по умолчанию)
-├── values-ru/               # русский
-├── values-es/               # испанский
-├── values-pt-rBR/           # португальский (Бразилия)
-├── values-fr/               # французский
-├── values-de/               # немецкий
-├── values-it/               # итальянский
-├── values-uk/               # украинский
-├── values-be/               # белорусский
-├── xml/locales_config.xml   # языки для нативного выбора языка Android
-├── drawable/                # рисованные иконки приложения
-└── font/neucha.ttf          # рукописный шрифт Neucha
+├── values/                  # English (default)
+├── values-ru/               # Russian
+├── values-es/               # Spanish
+├── values-pt-rBR/           # Portuguese (Brazil)
+├── values-fr/               # French
+├── values-de/               # German
+├── values-it/               # Italian
+├── values-uk/               # Ukrainian
+├── values-be/               # Belarusian
+├── xml/locales_config.xml   # languages for the native Android language picker
+├── drawable/                # hand-drawn app icons
+└── font/neucha.ttf          # Neucha handwritten font
 
+fastlane/metadata/android/   # F-Droid store texts and graphics
+metadata/                    # F-Droid build recipe
 docs/
-└── languages.md             # текущие языки и план следующих волн
+├── fdroid.md                # F-Droid submission checklist
+└── languages.md             # current languages and next translation waves
 ```
 
-В каждой папке `values-*` лежат `strings.xml` и `plurals.xml`.
+Each `values-*` folder contains `strings.xml` and `plurals.xml`.
 
-Игровая логика в `game/` не зависит от Android и покрыта обычными JUnit-тестами.
-UI не хранит правила игры: он только отображает `GameUiState` и отправляет
-действия в `SudokuViewModel`.
+The game logic in `game/` has no Android dependencies and is covered by plain
+JUnit tests. The UI does not hold game rules: it only renders `GameUiState` and
+sends actions to `SudokuViewModel`.
 
-## Как устроена партия
+## How a game works
 
-- `SudokuGenerator` создаёт полное решение и убирает цифры до целевого числа
-  подсказок, проверяя единственность решения.
-- `SudokuSession` хранит клетки, заметки, ошибки, историю ходов и определяет
-  победу. Все правила находятся здесь.
-- `SudokuViewModel` управляет генерацией в фоне, таймером на
-  `SystemClock.elapsedRealtime()`, паузой, сохранением и восстановлением.
-- При уходе из приложения (`onStop`) текущая партия сохраняется, таймер
-  останавливается. При следующем запуске партия восстанавливается на паузе.
-- При победе обновляются лучшее время и счётчик разгаданных судоку для
-  текущего уровня, сохранённая партия удаляется.
+- `SudokuGenerator` creates a complete solution and removes digits down to the
+  target clue count while checking that the solution stays unique.
+- `SudokuSession` stores cells, notes, mistakes and move history, and decides
+  when the game is won. All rules live here.
+- `SudokuViewModel` drives background generation, a timer based on
+  `SystemClock.elapsedRealtime()`, pause, saving and restoring.
+- When the app goes to the background (`onStop`), the current game is saved and
+  the timer stops. On the next launch the game is restored on pause.
+- On victory the best time and solved counter are updated for the current
+  difficulty and the saved game is deleted.
 
-## Хранение данных
+## Data storage
 
-Данные хранятся локально в SharedPreferences.
+Data is stored locally in SharedPreferences.
 
 `sudoku`:
 
-| Ключ | Значение |
+| Key | Value |
 | --- | --- |
-| `best:<difficulty>` | лучшее время в секундах |
-| `solved:<difficulty>` | количество разгаданных судоку |
-| `theme_mode` | `system`, `light` или `dark` |
-| `notes_mode` | включён ли режим заметок |
+| `best:<difficulty>` | best time in seconds |
+| `solved:<difficulty>` | number of solved puzzles |
+| `theme_mode` | `system`, `light` or `dark` |
+| `notes_mode` | whether notes mode is enabled |
 
-`<difficulty>` — это `easy`, `medium`, `hard` или `expert`.
+`<difficulty>` is `easy`, `medium`, `hard` or `expert`.
 
 `sudoku_saved_game`:
 
-| Ключ | Значение |
+| Key | Value |
 | --- | --- |
-| `saved_game` | JSON текущей партии, версия формата 1 |
+| `saved_game` | current game as JSON, format version 1 |
 
-Сброс рекордов удаляет и лучшее время, и счётчики по всем уровням.
+Resetting records deletes both the best times and the counters for every
+difficulty.
 
-## Локализация
+## Localization
 
-- Английский — язык по умолчанию. Сейчас поддерживаются `en`, `ru`, `es`,
-  `pt-BR`, `fr`, `de`, `it`, `uk` и `be`.
-- Все пользовательские строки находятся в `values*/strings.xml`; формы
-  множественного числа — в `plurals.xml`.
-- `locales_config.xml` подключает языки к нативному экрану «Язык приложения».
-- Настройки приложения не содержат собственного выбора языка: кнопка
-  «Изменить в системе» открывает системный экран
-  `android.settings.APP_LOCALE_SETTINGS`.
-- План добавления следующих языков и требования к шрифтам описаны в
-  [`docs/languages.md`](docs/languages.md).
+- English is the default language. The app currently supports `en`, `ru`, `es`,
+  `pt-BR`, `fr`, `de`, `it`, `uk` and `be`.
+- All user-facing strings live in `values*/strings.xml`; plural forms live in
+  `plurals.xml`.
+- `locales_config.xml` connects the languages to the native "App language"
+  screen.
+- The app settings have no language picker of their own: the "Change in
+  system" button opens the system
+  `android.settings.APP_LOCALE_SETTINGS` screen.
+- The plan for adding more languages and the font requirements are described
+  in [`docs/languages.md`](docs/languages.md).
 
-## Шрифт и иконка
+## Font and icon
 
-Для интерфейса используется шрифт **Neucha** (SIL Open Font License 1.1).
-Файл шрифта лежит в `app/src/main/res/font/neucha.ttf`, лицензия —
-в `app/src/main/assets/licenses/Neucha-OFL.txt`.
+The interface uses the **Neucha** font (SIL Open Font License 1.1). The font
+file is `app/src/main/res/font/neucha.ttf` and the license is in
+`app/src/main/assets/licenses/Neucha-OFL.txt`.
 
-Иконка приложения — adaptive icon с рисованными светлым и тёмным вариантами и
-монохромным слоем с цифрой 9. Содержимое уменьшено до 80% относительно центра,
-чтобы сохранить отступы при масках разных форм.
+The app icon is an adaptive icon with hand-drawn light and dark variants and a
+monochrome layer showing the digit 9. The content is scaled to 80% around the
+centre to keep margins under masks of different shapes.
+
+## License
+
+Copyright (C) 2026 Aliaksandr Zakharenka.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+The full text is in [`LICENSE`](LICENSE).
+
+The Neucha font is licensed separately under the SIL Open Font License 1.1; see
+`app/src/main/assets/licenses/Neucha-OFL.txt`.

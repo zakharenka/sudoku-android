@@ -1,0 +1,1 @@
+Sudoku dibujado a mano con notas, pistas, temas y modo sin conexión.

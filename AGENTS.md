@@ -1,267 +1,278 @@
 # AGENTS.md
 
-Инструкции для AI-агентов и разработчиков, работающих с этим репозиторием.
+Instructions for AI agents and developers working with this repository.
 
-## Что это за проект
+## What this project is
 
-Нативное Android-приложение «Судоку» на Kotlin и Jetpack Compose. Это
-самостоятельный проект, а не обёртка над браузерной игрой: WebView, JavaScript
-и игровой движок web-версии здесь не используются.
+A native Android Sudoku app built with Kotlin and Jetpack Compose. It is a
+standalone project, not a wrapper around a browser game: no WebView, JavaScript
+or web game engine is used here.
 
-Стиль интерфейса — рукописный скетч: бумажная текстура, неровные линии,
-квадратная сетка без скруглений, шрифт Neucha. Этот стиль нужно сохранять во
-всех новых экранах и элементах.
+The interface style is a hand-drawn sketch: paper texture, wobbly lines, a
+square grid with no rounded corners, and the Neucha font. Keep this style in
+every new screen and element.
 
-## Быстрые команды
+## Quick commands
 
 ```bash
-# Debug-сборка
+# Debug build
 ./gradlew :app:assembleDebug
 
-# Unit-тесты игровой логики
+# Unit tests for game logic
 ./gradlew :app:testDebugUnitTest
 
 # Android Lint
 ./gradlew :app:lintDebug
 
-# Release-сборка с R8 (без подписи)
+# Release build with R8 (unsigned)
 ./gradlew :app:assembleRelease
 
-# Полная проверка перед коммитом
+# Full check before committing
 ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 ```
 
-Установка на устройство или эмулятор:
+Installing on a device or emulator:
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n me.zakharenka.sudoku/.MainActivity
 ```
 
-Требования: JDK 17+, Android SDK 37, Gradle Wrapper 9.6. `local.properties`
-содержит локальный путь к SDK и не коммитится.
+Requirements: JDK 17+, Android SDK 37, Gradle Wrapper 9.6. `local.properties`
+contains the local SDK path and is not committed.
 
-## Версии и релизы
+## Versions and releases
 
-- Единственный источник версии — `app.version` в `gradle.properties`.
-- Формат строго семантический: `MAJOR.MINOR.PATCH`.
-- `versionName` берётся из `app.version`, а `versionCode` вычисляется в
-  `app/build.gradle.kts` как
+- The single source of the version is `app.version` in `gradle.properties`.
+- The format is strictly semantic: `MAJOR.MINOR.PATCH`.
+- `versionName` comes from `app.version`, and `versionCode` is calculated in
+  `app/build.gradle.kts` as
   `major * 1_000_000 + minor * 1_000 + patch`.
-- Не хардкодь версию в строках интерфейса: используй
+- Do not hardcode the version in interface strings: use
   `BuildConfig.VERSION_NAME`.
-- Релизные версии отмечаются аннотированным git-тегом, например `1.0.1`.
-- Для Google Play собирай `./gradlew :app:bundleRelease`; AAB в
-  `app/build/outputs/bundle/release/` нужно подписать upload-ключом.
-- Публикационный пакет складывается в `store_out/`. Папка в `.gitignore`
-  и не должна попадать в коммиты.
+- Release versions are marked with an annotated git tag, for example `1.0.1`.
+- For Google Play, build `./gradlew :app:bundleRelease`; the AAB in
+  `app/build/outputs/bundle/release/` must be signed with the upload key.
+- The publishing package is assembled in `store_out/`. The folder is in
+  `.gitignore` and must not be committed.
+- F-Droid builds from tagged source. The build recipe is
+  `metadata/me.zakharenka.sudoku.yml`; the source repository must stay public.
+  After a release, update the `Builds` entry and `CurrentVersion` /
+  `CurrentVersionCode` as described in `docs/fdroid.md`.
 
-## Архитектура
+## Architecture
 
 ```text
 MainActivity
   └── SudokuViewModel (GameUiState)
-        ├── SudokuSession      — правила партии, история, победа
-        ├── SudokuGenerator    — генерация поля с единственным решением
-        ├── RecordsStore       — рекорды, счётчики, тема, заметки
-        └── SavedGameStore     — сохранение/восстановление партии
+        ├── SudokuSession      — game rules, history, victory
+        ├── SudokuGenerator    — puzzle generation with a single solution
+        ├── RecordsStore       — records, counters, theme, notes
+        └── SavedGameStore     — save and restore the current game
 
 SudokuScreen
-  ├── SudokuBoard            — отрисовка поля 9×9
-  ├── SudokuControls         — верхняя панель, цифры, действия, оверлеи
-  └── sketch/                — рисованные поверхности, кнопки, иконки
+  ├── SudokuBoard            — 9×9 board rendering
+  ├── SudokuControls         — top bar, digits, actions, overlays
+  └── sketch/                — hand-drawn surfaces, buttons, icons
 ```
 
-Правила разделения:
+Separation rules:
 
-- `game/` — чистый Kotlin без импортов Android. Здесь находятся все правила,
-  генерация, сообщения и форматирование. Этот код обязан оставаться
-  тестируемым обычными JUnit-тестами.
-- `data/` — хранение в SharedPreferences. Не содержит правил игры.
-- `SudokuViewModel` — единственное место, где соединяются правила, таймер,
-  генерация в фоне и сохранение.
-- `ui/` — только отображение `GameUiState` и отправка действий в ViewModel.
-  UI не должен вычислять допустимость хода, победу или ошибки.
+- `game/` — pure Kotlin with no Android imports. All rules, generation,
+  messages and formatting live here. This code must remain testable with plain
+  JUnit tests.
+- `data/` — SharedPreferences storage. It contains no game rules.
+- `SudokuViewModel` — the only place where rules, the timer, background
+  generation and persistence meet.
+- `ui/` — only renders `GameUiState` and sends actions to the ViewModel. The UI
+  must not compute move legality, victory or mistakes.
 
-## Обязательные инварианты
+## Required invariants
 
-### Новая игра
+### New game
 
-- Кнопка новой игры (иконка справа в верхней панели) открывает диалог.
-- Нажатие на **текущую сложность** в верхней панели тоже открывает этот диалог.
-- В диалоге нажатие на уровень сложности только **выбирает** его.
-- Игра начинается только по кнопке **Start / Начать**.
-- «Отмена» закрывает диалог без изменений.
-- В диалоге должно быть предупреждение, что текущий прогресс будет потерян.
-- Не возвращать немедленный старт игры по нажатию на строку сложности.
+- The new-game button (the rightmost icon in the top bar) opens a dialog.
+- Tapping the **current difficulty** in the top bar also opens this dialog.
+- In the dialog, tapping a difficulty only **selects** it.
+- The game starts only with the **Start** button.
+- "Cancel" closes the dialog without changes.
+- The dialog must warn that the current progress will be lost.
+- Do not bring back starting a game immediately when a difficulty row is
+  tapped.
 
-### Верхняя панель и шапка
+### Top bar and header
 
-- Шапка в одну строку: рисованная иконка и название приложения.
-- Слогана «Logic without rush» / «Логика без спешки» быть не должно.
-- Верхняя панель игры — одна строка:
-  - слева единый блок: сложность, ошибки, таймер;
-  - справа две квадратные кнопки без подписей: пауза и новая игра.
-- У иконочных кнопок обязательны `contentDescription` из строковых ресурсов.
+- The header is one row: a hand-drawn icon and the app name.
+- There must be no "Logic without rush" slogan.
+- The in-game top bar is one row:
+  - on the left, one block: difficulty, mistakes, timer;
+  - on the right, two square unlabelled buttons: pause and new game.
+- Icon buttons must have a `contentDescription` from string resources.
 
-### Настройки
+### Settings
 
-- В настройках только тема, язык, сброс рекордов, «О приложении» и ссылка на
-  сайт разработчика `https://zakharenka.me`.
-- «Правила» и «Рекорды» находятся в шапке и не дублируются в настройках.
-- Язык меняется только через нативный экран Android
-  (`android.settings.APP_LOCALE_SETTINGS`), без собственного выбора языка.
+- Settings contain only the theme, language, records reset, "About" and a link
+  to the developer website `https://zakharenka.me`.
+- "Rules" and "Records" live in the header and are not duplicated in settings.
+- The language is changed only through the native Android screen
+  (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
 
-### Рекорды
+### Records
 
-- Лучшее время хранится отдельно для каждого уровня.
-- Количество разгаданных судоку хранится отдельно для каждого уровня
+- The best time is stored separately for each difficulty.
+- The number of solved puzzles is stored separately for each difficulty
   (`solved:easy`, `solved:medium`, `solved:hard`, `solved:expert`).
-- В «Лучших результатах» под каждым уровнем показывается
-  `Solved: N` / `Разгадано: N`.
-- Счётчик увеличивается ровно один раз при победе.
-- Сброс рекордов очищает и лучшее время, и счётчики по всем уровням.
+- "Best results" shows `Solved: N` under each difficulty.
+- The counter increases exactly once on victory.
+- Resetting records clears both the best times and the counters for all
+  difficulties.
 
-### Сохранение партии
+### Game persistence
 
-- При уходе из приложения (`MainActivity.onStop`, кроме смены конфигурации)
-  вызывается `onAppBackgrounded()`: игра ставится на паузу и сохраняется.
-- При следующем запуске партия восстанавливается **на паузе**, таймер не идёт.
-- Побеждённая или отсутствующая партия не сохраняется.
-- Формат `SavedGameStore` версионирован. При изменении формата увеличь
-  `VERSION` и обеспечь корректный отказ от несовместимых данных.
-- Валидируй размеры массивов и значения при загрузке; повреждённые данные
-  должны приводить к новой игре, а не к падению.
+- When the app goes to the background (`MainActivity.onStop`, except for a
+  configuration change), `onAppBackgrounded()` is called: the game is paused
+  and saved.
+- On the next launch the game is restored **on pause**; the timer is not
+  running.
+- A won or missing game is not saved.
+- The `SavedGameStore` format is versioned. When the format changes, increase
+  `VERSION` and ensure incompatible data is rejected correctly.
+- Validate array sizes and values on load; corrupted data must lead to a new
+  game, not a crash.
 
-### Локализация
+### Localization
 
-- Поддерживаемые языки: `en` (по умолчанию), `ru`, `es`, `pt-BR`, `fr`,
-  `de`, `it`, `uk`, `be`.
-- Все пользовательские строки — только в ресурсах `values*/strings.xml`;
-  формы множественного числа — в `values*/plurals.xml`.
-- При добавлении языка обновляй `locales_config.xml`, `README.md` и
+- Supported languages: `en` (default), `ru`, `es`, `pt-BR`, `fr`, `de`, `it`,
+  `uk`, `be`.
+- All user-facing strings must be in `values*/strings.xml`; plural forms in
+  `values*/plurals.xml`.
+- When adding a language, update `locales_config.xml`, `README.md` and
   `docs/languages.md`.
-- Множественное число — через `plurals.xml` и `pluralStringResource`.
-  Для русского, украинского и белорусского нужны категории
-  `one`/`few`/`many`/`other`, для арабского — шесть категорий CLDR.
-- Не хардкодь текст в Compose-коде, включая `contentDescription`.
-- Статусы и сообщения игры локализуются в ViewModel через `GameMessage`;
-  `game/` не должен знать о ресурсах Android.
-- При смене языка `MainActivity` вызывает `viewModel.onLocaleChanged()`,
-  чтобы обновить текущий статус.
+- Use `plurals.xml` and `pluralStringResource` for plurals. Russian, Ukrainian
+  and Belarusian need the `one`/`few`/`many`/`other` categories; Arabic needs
+  all six CLDR categories.
+- Do not hardcode text in Compose code, including `contentDescription`.
+- Game statuses and messages are localized in the ViewModel through
+  `GameMessage`; `game/` must not know about Android resources.
+- When the language changes, `MainActivity` calls
+  `viewModel.onLocaleChanged()` to refresh the current status.
 
-### Планшеты
+### Tablets
 
-- При ширине от `900.dp` используется двухколоночный layout: доска слева,
-  цифровая клавиатура, действия и статус справа.
-- Уже `900.dp` — одна центрированная колонка (телефоны и портретные планшеты).
-- Панель ограничена `1120.dp` на широких экранах и `720.dp` в компактном
-  режиме.
-- Размер доски в широком режиме ограничивается шириной, высотой и максимумом
+- At widths of `900.dp` and above, use the two-column layout: board on the
+  left, keypad, actions and status on the right.
+- Below `900.dp` — a single centred column (phones and portrait tablets).
+- The panel is capped at `1120.dp` on wide screens and `720.dp` in compact
+  mode.
+- In wide mode the board size is limited by width, height and a maximum of
   `760.dp`: `min(760.dp, availableWidth * 0.56, availableHeight - 160.dp)`,
-  чтобы нижний ряд не обрезался на 7-дюймовых планшетах в альбомной
-  ориентации.
-- Проверяй изменения на `Medium_Tablet` в портретной и альбомной ориентации.
+  so the bottom row is not clipped on 7-inch tablets in landscape.
+- Test changes on `Medium_Tablet` in portrait and landscape.
 
-### Тема и стиль
+### Theme and style
 
-- Используй `SudokuTheme.colors` и `HandFont`, а не цвета Material по умолчанию.
-- Для панелей, кнопок, линий и оверлеев используй помощники из
-  `ui/sketch/Sketch.kt`; для иконок — `ui/sketch/SketchIcons.kt`.
-- Не добавляй скругления углов, градиенты и «глянцевые» элементы, выбивающиеся
-  из скетч-стиля.
-- Новые иконки рисуй в том же рукописном стиле, а не подключай Material Icons.
+- Use `SudokuTheme.colors` and `HandFont`, not default Material colours.
+- For panels, buttons, lines and overlays, use the helpers in
+  `ui/sketch/Sketch.kt`; for icons, use `ui/sketch/SketchIcons.kt`.
+- Do not add rounded corners, gradients or "glossy" elements that break the
+  sketch style.
+- Draw new icons in the same hand-drawn style; do not use Material Icons.
 
-### Иконка приложения
+### App icon
 
-- Иконка адаптивная: светлый, тёмный и монохромный слои.
-- Содержимое foreground уменьшено до 80% вокруг центра
-  (`scaleX`/`scaleY` = 0.8, `pivotX`/`pivotY` = 54), чтобы маски не обрезали
-  рисунок. Не убирай этот отступ без визуальной проверки.
-- Монохромный слой должен содержать цифру.
+- The icon is adaptive: light, dark and monochrome layers.
+- The foreground content is scaled to 80% around the centre
+  (`scaleX`/`scaleY` = 0.8, `pivotX`/`pivotY` = 54) so masks do not clip the
+  artwork. Do not remove this padding without a visual check.
+- The monochrome layer must contain a digit.
 
-## Хранение данных
+## Data storage
 
 `SharedPreferences`:
 
-| Файл | Ключи |
+| File | Keys |
 | --- | --- |
 | `sudoku` | `best:<difficulty>`, `solved:<difficulty>`, `theme_mode`, `notes_mode` |
-| `sudoku_saved_game` | `saved_game` (JSON, версия 1) |
+| `sudoku_saved_game` | `saved_game` (JSON, version 1) |
 
 `<difficulty>`: `easy`, `medium`, `hard`, `expert`.
-Не переименовывай ключи без миграции: это сломает существующие рекорды.
+Do not rename keys without a migration: it would break existing records.
 
-## Стиль кода
+## Code style
 
-- Kotlin official style, отступ 4 пробела, trailing commas в многострочных
-  списках параметров.
-- Composable-функции — `PascalCase`, обычные — `camelCase`.
-- Состояние диалогов храни в `rememberSaveable`, чтобы оно переживало
-  пересоздание Activity.
-- Предпочитай небольшие функции и существующие помощники новым абстракциям.
-- Не добавляй зависимости без необходимости. Сейчас в проекте только
-  Compose, lifecycle, core-ktx и тестовые библиотеки.
-- Не меняй `applicationId` и `namespace` (`me.zakharenka.sudoku`).
-- Не коммить `local.properties`, `build/`, `.gradle/`, `.cxx/` и прочие
-  артефакты сборки.
+- Kotlin official style, 4-space indentation, trailing commas in multiline
+  parameter lists.
+- Composable functions use `PascalCase`; regular functions use `camelCase`.
+- Keep dialog state in `rememberSaveable` so it survives Activity recreation.
+- Prefer small functions and existing helpers over new abstractions.
+- Do not add dependencies without need. The project currently uses only
+  Compose, lifecycle, core-ktx and test libraries.
+- Do not change `applicationId` or `namespace` (`me.zakharenka.sudoku`).
+- Do not commit `local.properties`, `build/`, `.gradle/`, `.cxx/` or other
+  build artifacts.
 
-## Тесты
+## Tests
 
-- Unit-тесты лежат в `app/src/test/java/me/zakharenka/sudoku/game/`.
-- При изменении правил, генератора, сохранения или форматирования добавляй
-  или обновляй тесты.
-- UI-тестов сейчас нет; не добавляй instrumentation-тесты без необходимости.
-- Перед завершением задачи запускай полную проверку:
+- Unit tests live in `app/src/test/java/me/zakharenka/sudoku/game/`.
+- When changing rules, the generator, persistence or formatting, add or update
+  tests.
+- There are no UI tests yet; do not add instrumentation tests unless necessary.
+- Before completing a task, run the full check:
 
 ```bash
 ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 ```
 
-Предупреждения Lint о доступных обновлениях Gradle/AGP/зависимостей —
-ожидаемые, они не являются ошибками.
+Lint warnings about available Gradle/AGP/dependency updates are expected and
+are not errors.
 
 ## Git
 
-- Сообщения коммитов — в стиле Conventional Commits, на английском,
-  в повелительном наклонении: `feat: ...`, `fix: ...`.
-- В теле коммита перечисляй изменения списком.
-- Коммить только по просьбе пользователя. Не делай `amend`, rebase или
-  force-push без явной просьбы.
-- Перед коммитом проверяй `git diff --check` и отсутствие лишних файлов.
-- `store_out/` — локальный пакет для Google Play, он в `.gitignore` и не
-  коммитится.
+- Commit messages follow Conventional Commits, in English, in the imperative
+  mood: `feat: ...`, `fix: ...`.
+- List the changes in the commit body.
+- Commit only when the user asks. Do not amend, rebase or force-push without an
+  explicit request.
+- Before committing, check `git diff --check` and make sure no stray files are
+  included.
+- `store_out/` is a local Google Play package; it is in `.gitignore` and is
+  not committed.
 
-## Эмулятор и визуальная проверка
+## Emulator and visual checks
 
-- Для скриншотов: `adb exec-out screencap -p > /tmp/opencode/screen.png`.
-- Переключение языка приложения:
+- For screenshots: `adb exec-out screencap -p > /tmp/opencode/screen.png`.
+- Switching the app language:
 
 ```bash
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ru
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 ```
 
-- В этом окружении эмулятор иногда падает с `SIGSEGV`/`SIGKILL`. Это проблема
-  окружения, а не приложения. Источник истины — успешные сборка, тесты и Lint;
-  не меняй код приложения, чтобы «обойти» падение эмулятора.
-- Если эмулятор недоступен, визуальную проверку можно отложить, но сборку и
-  тесты запускать обязательно.
+- In this environment the emulator sometimes crashes with
+  `SIGSEGV`/`SIGKILL`. This is an environment problem, not an app problem. The
+  source of truth is a successful build, tests and Lint; do not change app code
+  to "work around" an emulator crash.
+- If the emulator is unavailable, the visual check can be postponed, but the
+  build and tests must still be run.
 
-## Ключевые файлы
+## Key files
 
-| Файл | Ответственность |
+| File | Responsibility |
 | --- | --- |
-| `SudokuViewModel.kt` | состояние, таймер, генерация, сохранение, локализация статусов |
-| `game/SudokuSession.kt` | правила, история, победа, снимок партии |
-| `game/SudokuGenerator.kt` | генерация и подсчёт решений |
-| `data/RecordsStore.kt` | рекорды, счётчики по уровням, тема, заметки |
-| `data/SavedGameStore.kt` | JSON-сохранение текущей партии |
-| `ui/SudokuScreen.kt` | шапка, экран, настройки, правила, рекорды, диалог новой игры |
-| `ui/SudokuControls.kt` | верхняя панель, цифровая клавиатура, действия, оверлеи |
-| `ui/sketch/Sketch.kt` | рисованные поверхности, кнопки, линии, текстура |
-| `ui/theme/Theme.kt` | светлая и тёмная палитры |
-| `res/values*/strings.xml` | локализованные строки |
-| `docs/languages.md` | текущие языки и план следующих волн |
-| `gradle.properties` | версия приложения (`app.version`) |
-| `app/build.gradle.kts` | вычисление `versionCode`, сборка AAB |
+| `SudokuViewModel.kt` | state, timer, generation, persistence, status localization |
+| `game/SudokuSession.kt` | rules, history, victory, game snapshot |
+| `game/SudokuGenerator.kt` | generation and solution counting |
+| `data/RecordsStore.kt` | records, per-difficulty counters, theme, notes |
+| `data/SavedGameStore.kt` | JSON persistence of the current game |
+| `ui/SudokuScreen.kt` | header, screen, settings, rules, records, new-game dialog |
+| `ui/SudokuControls.kt` | top bar, keypad, actions, overlays |
+| `ui/sketch/Sketch.kt` | hand-drawn surfaces, buttons, lines, texture |
+| `ui/theme/Theme.kt` | light and dark palettes |
+| `res/values*/strings.xml` | localized strings |
+| `docs/languages.md` | current languages and next waves |
+| `docs/fdroid.md` | F-Droid submission checklist |
+| `metadata/me.zakharenka.sudoku.yml` | F-Droid build recipe |
+| `fastlane/metadata/android/` | F-Droid store texts and graphics |
+| `gradle.properties` | app version (`app.version`) |
+| `app/build.gradle.kts` | `versionCode` calculation, AAB build |
+| `LICENSE` | GPL-3.0-or-later license text |

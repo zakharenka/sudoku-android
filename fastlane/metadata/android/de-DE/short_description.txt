@@ -1,0 +1,1 @@
+Handgezeichnetes Sudoku mit Notizen, Tipps, Themes und Offline-Modus.

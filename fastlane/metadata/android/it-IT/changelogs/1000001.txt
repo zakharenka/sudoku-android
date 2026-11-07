@@ -1,0 +1,1 @@
+Sudoku 1.0.1: risolto l'arresto anomalo all'avvio e migliorata la stabilità.

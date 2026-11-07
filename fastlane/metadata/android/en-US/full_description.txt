@@ -1,0 +1,19 @@
+Sudoku, drawn by hand.
+
+Take a break with a classic 9×9 Sudoku in a warm, hand-drawn style: paper texture, wobbly lines and a handwritten font. No rush, no noise — just you and the grid.
+
+FEATURES
+• Four difficulty levels: Easy, Medium, Hard and Expert
+• Every puzzle has a single solution
+• Notes, hints, undo and erase
+• Timer, mistake counter and pause
+• Light, dark and system themes
+• Nine languages: English, Russian, Spanish, Portuguese (Brazil), French, German, Italian, Ukrainian and Belarusian
+• Best time and solved puzzle count for each difficulty
+• The current game is saved automatically and restored on pause
+• Works offline
+• No ads, no analytics, no account
+
+Sudoku is a free game made by an independent developer. If you enjoy it, leave a review — it helps a lot.
+
+Privacy policy: https://zakharenka.me/privacy/android_sudoku_privacy.html
