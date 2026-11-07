@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Клетка очищена</string>
     <string name="message_move_undone">Ход отменён</string>
     <string name="message_board_correct">Поле уже заполнено верно</string>
-    <string name="message_hint">Подсказка: %1$d — строка %2$d, столбец %3$d</string>
+    <string name="message_hint">Подсказка: %1$d — строка %2$d, столбец %3$d. Осталось подсказок: %4$d</string>
+    <string name="message_no_hints">Подсказки закончились</string>
     <string name="message_cannot_erase">Эту клетку нельзя стереть</string>
     <string name="message_notes_enabled">Заметки включены</string>
     <string name="message_notes_disabled">Заметки выключены</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9 — вписать цифру в выбранную клетку</string>
     <string name="rules_2">Заметки — записывать возможные варианты в пустой клетке</string>
     <string name="rules_3">Пауза — остановить таймер и скрыть поле</string>
-    <string name="rules_4">Подсказка — открыть правильную цифру</string>
+    <string name="rules_4">Подсказка — открыть правильную цифру (3 на партию)</string>
     <string name="rules_text">В каждой строке, каждом столбце и каждом блоке 3 × 3 цифры от 1 до 9 должны встречаться ровно один раз. Ошибки подсвечиваются красным.</string>
 
     <string name="settings_title">Настройки</string>

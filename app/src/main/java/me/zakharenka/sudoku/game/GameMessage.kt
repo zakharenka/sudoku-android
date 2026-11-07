@@ -11,7 +11,13 @@ sealed interface GameMessage {
     data object CellCleared : GameMessage
     data object MoveUndone : GameMessage
     data object BoardAlreadyCorrect : GameMessage
-    data class Hint(val number: Int, val row: Int, val col: Int) : GameMessage
+    data object NoHintsLeft : GameMessage
+    data class Hint(
+        val number: Int,
+        val row: Int,
+        val col: Int,
+        val hintsLeft: Int,
+    ) : GameMessage
     data object CannotEraseGiven : GameMessage
     data object NotesEnabled : GameMessage
     data object NotesDisabled : GameMessage

@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Célula apagada</string>
     <string name="message_move_undone">Jogada desfeita</string>
     <string name="message_board_correct">O tabuleiro já está correto</string>
-    <string name="message_hint">Dica: %1$d — linha %2$d, coluna %3$d</string>
+    <string name="message_hint">Dica: %1$d — linha %2$d, coluna %3$d. Dicas restantes: %4$d</string>
+    <string name="message_no_hints">Não há mais dicas</string>
     <string name="message_cannot_erase">Esta célula não pode ser apagada</string>
     <string name="message_notes_enabled">Notas ativadas</string>
     <string name="message_notes_disabled">Notas desativadas</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9: insira um dígito na célula selecionada</string>
     <string name="rules_2">Notas: escreva os candidatos possíveis em uma célula vazia</string>
     <string name="rules_3">Pausa: pare o tempo e oculte o tabuleiro</string>
-    <string name="rules_4">Dica: revele o dígito correto</string>
+    <string name="rules_4">Dica — revela o dígito correto (3 por partida)</string>
     <string name="rules_text">Cada linha, coluna e bloco 3×3 deve conter os dígitos de 1 a 9 exatamente uma vez. Os erros são destacados em vermelho.</string>
 
     <string name="settings_title">Configurações</string>

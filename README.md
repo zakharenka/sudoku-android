@@ -15,7 +15,7 @@ for distribution on F-Droid.
 
 - four difficulty levels: Easy, Medium, Hard and Expert;
 - puzzle generation with a single solution;
-- cell notes, hints, undo and clear cell;
+- cell notes, hints (three per game), undo and clear cell;
 - timer, mistake counter, and pause with auto-pause when leaving the app;
 - single-row top bar: difficulty, mistakes and timer in one block, with
   unlabelled pause and new-game buttons on the right;
@@ -140,7 +140,7 @@ file. See [`docs/fdroid.md`](docs/fdroid.md) for the full checklist.
 ```
 
 Covered: the puzzle generator, solution counting, game actions (input, notes,
-clear, undo, hint, victory), game save/restore and time formatting.
+clear, undo, hint limit, victory), game save/restore and time formatting.
 
 Full check before committing:
 
@@ -215,6 +215,8 @@ sends actions to `SudokuViewModel`.
   `SystemClock.elapsedRealtime()`, pause, saving and restoring.
 - When the app goes to the background (`onStop`), the current game is saved and
   the timer stops. On the next launch the game is restored on pause.
+- Each game has three hints. The remaining count is shown on the hint button,
+  persisted with the game and is not refunded by undo.
 - On victory the best time and solved counter are updated for the current
   difficulty and the saved game is deleted.
 
@@ -237,7 +239,7 @@ Data is stored locally in SharedPreferences.
 
 | Key | Value |
 | --- | --- |
-| `saved_game` | current game as JSON, format version 1 |
+| `saved_game` | current game as JSON, format version 2 |
 
 Resetting records deletes both the best times and the counters for every
 difficulty.

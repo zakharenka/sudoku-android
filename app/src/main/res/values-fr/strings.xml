@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Case effacée</string>
     <string name="message_move_undone">Coup annulé</string>
     <string name="message_board_correct">La grille est déjà correcte</string>
-    <string name="message_hint">Indice : %1$d — ligne %2$d, colonne %3$d</string>
+    <string name="message_hint">Indice : %1$d — ligne %2$d, colonne %3$d. Indices restants : %4$d</string>
+    <string name="message_no_hints">Plus d\'indices</string>
     <string name="message_cannot_erase">Cette case ne peut pas être effacée</string>
     <string name="message_notes_enabled">Notes activées</string>
     <string name="message_notes_disabled">Notes désactivées</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9 : saisissez un chiffre dans la case sélectionnée</string>
     <string name="rules_2">Notes : notez les candidats possibles dans une case vide</string>
     <string name="rules_3">Pause : arrêtez le chronomètre et masquez la grille</string>
-    <string name="rules_4">Indice : révélez le chiffre correct</string>
+    <string name="rules_4">Indice — révèle le chiffre correct (3 par partie)</string>
     <string name="rules_text">Chaque ligne, colonne et bloc 3×3 doit contenir les chiffres de 1 à 9 exactement une fois. Les erreurs sont surlignées en rouge.</string>
 
     <string name="settings_title">Paramètres</string>

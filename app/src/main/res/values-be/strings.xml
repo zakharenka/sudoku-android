@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Клетку ачышчана</string>
     <string name="message_move_undone">Ход адменены</string>
     <string name="message_board_correct">Поле ўжо запоўнена правільна</string>
-    <string name="message_hint">Падказка: %1$d — радок %2$d, слупок %3$d</string>
+    <string name="message_hint">Падказка: %1$d — радок %2$d, слупок %3$d. Засталося падказак: %4$d</string>
+    <string name="message_no_hints">Падказкі скончыліся</string>
     <string name="message_cannot_erase">Гэту клетку нельга сцерці</string>
     <string name="message_notes_enabled">Нататкі ўключаны</string>
     <string name="message_notes_disabled">Нататкі выключаны</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9 — увядзіце лічбу ў выбранай клетцы</string>
     <string name="rules_2">Нататкі — запісвайце магчымыя варыянты ў пустой клетцы</string>
     <string name="rules_3">Пауза — спыніце час і схавайце поле</string>
-    <string name="rules_4">Падказка — адкрыйце правільную лічбу</string>
+    <string name="rules_4">Падказка — адкрыць правільную лічбу (3 на партыю)</string>
     <string name="rules_text">Кожны радок, слупок і блок 3×3 павінны змяшчаць лічбы ад 1 да 9 роўна адзін раз. Памылкі выдзяляюцца чырвоным.</string>
 
     <string name="settings_title">Налады</string>

@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Клітинку очищено</string>
     <string name="message_move_undone">Хід скасовано</string>
     <string name="message_board_correct">Поле вже заповнене правильно</string>
-    <string name="message_hint">Підказка: %1$d — рядок %2$d, стовпець %3$d</string>
+    <string name="message_hint">Підказка: %1$d — рядок %2$d, стовпець %3$d. Залишилося підказок: %4$d</string>
+    <string name="message_no_hints">Підказки закінчилися</string>
     <string name="message_cannot_erase">Цю клітинку не можна стерти</string>
     <string name="message_notes_enabled">Нотатки ввімкнено</string>
     <string name="message_notes_disabled">Нотатки вимкнено</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9 — введіть цифру у вибраній клітинці</string>
     <string name="rules_2">Нотатки — записуйте можливі варіанти в порожній клітинці</string>
     <string name="rules_3">Пауза — зупиніть час і сховайте поле</string>
-    <string name="rules_4">Підказка — відкрийте правильну цифру</string>
+    <string name="rules_4">Підказка — відкрити правильну цифру (3 на партію)</string>
     <string name="rules_text">Кожен рядок, стовпець і блок 3×3 має містити цифри від 1 до 9 рівно один раз. Помилки виділяються червоним.</string>
 
     <string name="settings_title">Налаштування</string>

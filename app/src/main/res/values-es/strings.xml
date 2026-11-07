@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Celda borrada</string>
     <string name="message_move_undone">Movimiento deshecho</string>
     <string name="message_board_correct">El tablero ya está correcto</string>
-    <string name="message_hint">Pista: %1$d — fila %2$d, columna %3$d</string>
+    <string name="message_hint">Pista: %1$d — fila %2$d, columna %3$d. Pistas restantes: %4$d</string>
+    <string name="message_no_hints">No quedan pistas</string>
     <string name="message_cannot_erase">Esta celda no se puede borrar</string>
     <string name="message_notes_enabled">Notas activadas</string>
     <string name="message_notes_disabled">Notas desactivadas</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9: introduce un dígito en la celda seleccionada</string>
     <string name="rules_2">Notas: escribe los candidatos posibles en una celda vacía</string>
     <string name="rules_3">Pausa: detén el tiempo y oculta el tablero</string>
-    <string name="rules_4">Pista: revela el dígito correcto</string>
+    <string name="rules_4">Pista: revela el dígito correcto (3 por partida)</string>
     <string name="rules_text">Cada fila, columna y bloque de 3×3 debe contener los dígitos del 1 al 9 exactamente una vez. Los errores se resaltan en rojo.</string>
 
     <string name="settings_title">Ajustes</string>

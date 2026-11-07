@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Cella cancellata</string>
     <string name="message_move_undone">Mossa annullata</string>
     <string name="message_board_correct">La griglia è già corretta</string>
-    <string name="message_hint">Indizio: %1$d — riga %2$d, colonna %3$d</string>
+    <string name="message_hint">Indizio: %1$d — riga %2$d, colonna %3$d. Indizi rimasti: %4$d</string>
+    <string name="message_no_hints">Nessun indizio rimasto</string>
     <string name="message_cannot_erase">Questa cella non può essere cancellata</string>
     <string name="message_notes_enabled">Note attivate</string>
     <string name="message_notes_disabled">Note disattivate</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9: inserisci una cifra nella cella selezionata</string>
     <string name="rules_2">Note: scrivi i possibili candidati in una cella vuota</string>
     <string name="rules_3">Pausa: ferma il tempo e nascondi la griglia</string>
-    <string name="rules_4">Indizio: rivela la cifra corretta</string>
+    <string name="rules_4">Indizio — rivela la cifra corretta (3 per partita)</string>
     <string name="rules_text">Ogni riga, colonna e blocco 3×3 deve contenere le cifre da 1 a 9 esattamente una volta. Gli errori sono evidenziati in rosso.</string>
 
     <string name="settings_title">Impostazioni</string>

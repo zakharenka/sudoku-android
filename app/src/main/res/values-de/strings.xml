@@ -54,7 +54,8 @@
     <string name="message_cell_cleared">Zelle geleert</string>
     <string name="message_move_undone">Zug rückgängig gemacht</string>
     <string name="message_board_correct">Das Spielfeld ist bereits korrekt</string>
-    <string name="message_hint">Tipp: %1$d — Zeile %2$d, Spalte %3$d</string>
+    <string name="message_hint">Tipp: %1$d — Zeile %2$d, Spalte %3$d. Tipps übrig: %4$d</string>
+    <string name="message_no_hints">Keine Tipps mehr übrig</string>
     <string name="message_cannot_erase">Diese Zelle kann nicht gelöscht werden</string>
     <string name="message_notes_enabled">Notizen aktiviert</string>
     <string name="message_notes_disabled">Notizen deaktiviert</string>
@@ -75,7 +76,7 @@
     <string name="rules_1">1–9: Gib eine Ziffer in die ausgewählte Zelle ein</string>
     <string name="rules_2">Notizen: Schreibe mögliche Kandidaten in eine leere Zelle</string>
     <string name="rules_3">Pause: Halte die Zeit an und blende das Spielfeld aus</string>
-    <string name="rules_4">Tipp: Zeige die richtige Ziffer an</string>
+    <string name="rules_4">Tipp — deckt die richtige Ziffer auf (3 pro Spiel)</string>
     <string name="rules_text">Jede Zeile, jede Spalte und jeder 3×3-Block muss die Ziffern 1 bis 9 genau einmal enthalten. Fehler werden rot markiert.</string>
 
     <string name="settings_title">Einstellungen</string>

@@ -28,6 +28,7 @@ class SavedGameStore(context: Context) {
             put("selected", game.selected ?: -1)
             put("notesMode", game.notesMode)
             put("mistakes", game.mistakes)
+            put("hintsUsed", game.hintsUsed)
             put("elapsedSeconds", game.elapsedSeconds)
             put("won", game.won)
         }
@@ -40,7 +41,8 @@ class SavedGameStore(context: Context) {
 
         return runCatching {
             val json = JSONObject(raw)
-            if (json.optInt("version", 0) != VERSION) {
+            val version = json.optInt("version", 0)
+            if (version !in 1..VERSION) {
                 return null
             }
 
@@ -83,6 +85,8 @@ class SavedGameStore(context: Context) {
                 selected = json.optInt("selected", -1).takeIf { it in 0 until SudokuSession.CELLS },
                 notesMode = json.optBoolean("notesMode", false),
                 mistakes = json.optInt("mistakes", 0).coerceAtLeast(0),
+                hintsUsed = json.optInt("hintsUsed", 0)
+                    .coerceIn(0, SudokuSession.MAX_HINTS),
                 elapsedSeconds = json.optLong("elapsedSeconds", 0L).coerceAtLeast(0),
                 won = json.optBoolean("won", false),
             )
@@ -132,6 +136,6 @@ class SavedGameStore(context: Context) {
     private companion object {
         const val PREFERENCES = "sudoku_saved_game"
         const val KEY = "saved_game"
-        const val VERSION = 1
+        const val VERSION = 2
     }
 }

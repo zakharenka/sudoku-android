@@ -309,7 +309,8 @@ fun ActionRow(
         ActionButton(
             icon = HINT,
             label = stringResource(R.string.action_hint),
-            enabled = !locked,
+            enabled = !locked && state.hintsRemaining > 0,
+            badge = state.hintsRemaining.toString(),
             modifier = Modifier.weight(1f),
             seed = 503,
             onClick = onHint,
@@ -324,6 +325,7 @@ private fun ActionButton(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     active: Boolean = false,
+    badge: String? = null,
     seed: Int,
     onClick: () -> Unit,
 ) {
@@ -340,24 +342,39 @@ private fun ActionButton(
         seed = seed,
         contentPadding = PaddingValues(vertical = 6.dp, horizontal = 2.dp),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            SketchIcon(
-                icon = icon,
-                tint = contentColor,
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(Modifier.height(3.dp))
-            Text(
-                text = label,
-                color = contentColor,
-                fontSize = 12.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-            )
+        Box(Modifier.fillMaxSize()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                SketchIcon(
+                    icon = icon,
+                    tint = contentColor,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    text = label,
+                    color = contentColor,
+                    fontSize = 12.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+            }
+            if (badge != null) {
+                Text(
+                    text = badge,
+                    color = contentColor,
+                    fontSize = 10.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 2.dp, end = 4.dp),
+                )
+            }
         }
     }
 }

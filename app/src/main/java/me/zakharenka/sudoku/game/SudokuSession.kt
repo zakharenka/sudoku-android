@@ -55,8 +55,14 @@ class SudokuSession(
     var mistakes: Int = 0
         private set
 
+    var hintsUsed: Int = 0
+        private set
+
     var won: Boolean = false
         private set
+
+    val hintsRemaining: Int
+        get() = MAX_HINTS - hintsUsed
 
     private val history = ArrayDeque<HistoryEntry>()
 
@@ -213,6 +219,10 @@ class SudokuSession(
             return MoveOutcome()
         }
 
+        if (hintsRemaining <= 0) {
+            return MoveOutcome(GameMessage.NoHintsLeft, StatusKind.ERROR)
+        }
+
         val candidates = cells.indices.filter { index ->
             !cells[index].given && cells[index].value != solution[index]
         }
@@ -240,13 +250,14 @@ class SudokuSession(
 
         selected = index
         pushHistory(entry)
+        hintsUsed += 1
         val finished = checkWin()
 
         val row = index / SIZE + 1
         val col = index % SIZE + 1
 
         return MoveOutcome(
-            message = GameMessage.Hint(number, row, col),
+            message = GameMessage.Hint(number, row, col, hintsRemaining),
             kind = StatusKind.SUCCESS,
             changed = true,
             won = finished,
@@ -275,6 +286,7 @@ class SudokuSession(
         selected = selected,
         notesMode = notesMode,
         mistakes = mistakes,
+        hintsUsed = hintsUsed,
         elapsedSeconds = elapsedSeconds.coerceAtLeast(0),
         won = won,
     )
@@ -298,6 +310,7 @@ class SudokuSession(
     companion object {
         const val SIZE = 9
         const val CELLS = SIZE * SIZE
+        const val MAX_HINTS = 3
         private const val MAX_HISTORY = 200
 
         fun restore(saved: SavedGame): SudokuSession {
@@ -330,6 +343,7 @@ class SudokuSession(
             session.selected = saved.selected?.takeIf { it in 0 until CELLS }
                 ?: session.cells.indexOfFirst { it.value == 0 }.takeIf { it >= 0 }
             session.mistakes = saved.mistakes.coerceAtLeast(0)
+            session.hintsUsed = saved.hintsUsed.coerceIn(0, MAX_HINTS)
             session.won = saved.won
 
             return session

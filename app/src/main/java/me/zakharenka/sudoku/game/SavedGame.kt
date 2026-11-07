@@ -11,6 +11,7 @@ data class SavedGame(
     val selected: Int?,
     val notesMode: Boolean,
     val mistakes: Int,
+    val hintsUsed: Int,
     val elapsedSeconds: Long,
     val won: Boolean,
 )

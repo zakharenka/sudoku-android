@@ -32,6 +32,7 @@ data class GameUiState(
     val selectedIndex: Int? = null,
     val notesMode: Boolean = false,
     val mistakes: Int = 0,
+    val hintsRemaining: Int = SudokuSession.MAX_HINTS,
     val elapsedSeconds: Long = 0,
     val paused: Boolean = false,
     val won: Boolean = false,
@@ -137,6 +138,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             selectedIndex = null,
             notesMode = notesMode,
             mistakes = 0,
+            hintsRemaining = SudokuSession.MAX_HINTS,
             elapsedSeconds = 0,
             paused = false,
             won = false,
@@ -352,6 +354,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             selectedIndex = session.selected,
             notesMode = session.notesMode,
             mistakes = session.mistakes,
+            hintsRemaining = session.hintsRemaining,
             won = session.won,
             status = status ?: uiState.status,
             statusKind = kind ?: uiState.statusKind,
@@ -425,6 +428,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             selectedIndex = restored.selected,
             notesMode = restored.notesMode,
             mistakes = restored.mistakes,
+            hintsRemaining = restored.hintsRemaining,
             elapsedSeconds = saved.elapsedSeconds,
             paused = true,
             won = false,
@@ -470,11 +474,13 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             GameMessage.CellCleared -> app.getString(R.string.message_cell_cleared)
             GameMessage.MoveUndone -> app.getString(R.string.message_move_undone)
             GameMessage.BoardAlreadyCorrect -> app.getString(R.string.message_board_correct)
+            GameMessage.NoHintsLeft -> app.getString(R.string.message_no_hints)
             is GameMessage.Hint -> app.getString(
                 R.string.message_hint,
                 message.number,
                 message.row,
                 message.col,
+                message.hintsLeft,
             )
             GameMessage.CannotEraseGiven -> app.getString(R.string.message_cannot_erase)
             GameMessage.NotesEnabled -> app.getString(R.string.message_notes_enabled)

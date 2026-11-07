@@ -94,6 +94,54 @@ class SudokuSessionTest {
         assertTrue(session.cells[0].given)
         assertFalse(session.cells[0].error)
         assertEquals(0, session.mistakes)
+        assertEquals(SudokuSession.MAX_HINTS - 1, session.hintsRemaining)
+    }
+
+    @Test
+    fun hintIsLimitedPerGame() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1, 2, 3))
+
+        repeat(SudokuSession.MAX_HINTS) { index ->
+            session.select(index)
+            assertTrue(session.hint().changed)
+        }
+
+        assertEquals(0, session.hintsRemaining)
+        assertEquals(1, session.cells.count { it.value == 0 })
+
+        val outcome = session.hint()
+
+        assertFalse(outcome.changed)
+        assertEquals(GameMessage.NoHintsLeft, outcome.message)
+        assertEquals(StatusKind.ERROR, outcome.kind)
+        assertEquals(1, session.cells.count { it.value == 0 })
+    }
+
+    @Test
+    fun undoDoesNotRefundAHint() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1))
+
+        session.select(0)
+        session.hint()
+        assertEquals(SudokuSession.MAX_HINTS - 1, session.hintsRemaining)
+
+        session.undo()
+
+        assertEquals(0, session.cells[0].value)
+        assertEquals(SudokuSession.MAX_HINTS - 1, session.hintsRemaining)
+    }
+
+    @Test
+    fun savedGameRemembersUsedHints() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1))
+
+        session.select(0)
+        session.hint()
+
+        val restored = SudokuSession.restore(session.toSavedGame(elapsedSeconds = 10))
+
+        assertEquals(SudokuSession.MAX_HINTS - 1, restored.hintsRemaining)
+        assertEquals(solution[0], restored.cells[0].value)
     }
 
     @Test

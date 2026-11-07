@@ -127,6 +127,15 @@ Separation rules:
 - Resetting records clears both the best times and the counters for all
   difficulties.
 
+### Hints
+
+- Each game has at most `SudokuSession.MAX_HINTS` (3) hints.
+- The remaining count is shown as a badge on the hint button; at zero the
+  button is disabled.
+- `hintsUsed` is persisted in `SavedGame` and restored with the game.
+- Undo does not refund a hint.
+- A new game resets the counter.
+
 ### Game persistence
 
 - When the app goes to the background (`MainActivity.onStop`, except for a
@@ -193,7 +202,7 @@ Separation rules:
 | File | Keys |
 | --- | --- |
 | `sudoku` | `best:<difficulty>`, `solved:<difficulty>`, `theme_mode`, `notes_mode` |
-| `sudoku_saved_game` | `saved_game` (JSON, version 1) |
+| `sudoku_saved_game` | `saved_game` (JSON, version 2) |
 
 `<difficulty>`: `easy`, `medium`, `hard`, `expert`.
 Do not rename keys without a migration: it would break existing records.
