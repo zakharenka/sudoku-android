@@ -218,6 +218,7 @@ fun SketchSurface(
     strokeWidth: Dp = 1.4.dp,
     seed: Int = 0,
     shadow: Color? = null,
+    straight: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentAlignment: Alignment = Alignment.Center,
     content: @Composable BoxScope.() -> Unit,
@@ -227,36 +228,58 @@ fun SketchSurface(
             .drawBehind {
                 val stroke = strokeWidth.toPx()
                 val inset = stroke / 2f
+                val innerSize = Size(size.width - stroke, size.height - stroke)
 
-                if (shadow != null) {
+                if (straight) {
+                    if (shadow != null) {
+                        drawRect(
+                            color = shadow,
+                            topLeft = Offset(3.dp.toPx(), 4.dp.toPx()),
+                            size = Size(size.width - 2.dp.toPx(), size.height - 2.dp.toPx()),
+                        )
+                    }
+                    drawRect(
+                        color = fill,
+                        topLeft = Offset(inset, inset),
+                        size = innerSize,
+                    )
+                    drawRect(
+                        color = border,
+                        topLeft = Offset(inset, inset),
+                        size = innerSize,
+                        style = Stroke(width = stroke),
+                    )
+                } else {
+                    if (shadow != null) {
+                        sketchFill(
+                            topLeft = Offset(3.dp.toPx(), 4.dp.toPx()),
+                            size = Size(
+                                width = size.width - 2.dp.toPx(),
+                                height = size.height - 2.dp.toPx(),
+                            ),
+                            color = shadow,
+                            seed = seed + 100,
+                            wobble = 1.8.dp.toPx(),
+                        )
+                    }
+
                     sketchFill(
-                        topLeft = Offset(3.dp.toPx(), 4.dp.toPx()),
-                        size = Size(
-                            width = size.width - 2.dp.toPx(),
-                            height = size.height - 2.dp.toPx(),
-                        ),
-                        color = shadow,
-                        seed = seed + 100,
-                        wobble = 1.8.dp.toPx(),
+                        topLeft = Offset(inset, inset),
+                        size = innerSize,
+                        color = fill,
+                        seed = seed + 200,
+                        wobble = 1.1.dp.toPx(),
+                    )
+
+                    sketchRect(
+                        topLeft = Offset(inset, inset),
+                        size = innerSize,
+                        color = border,
+                        strokeWidth = stroke,
+                        seed = seed,
+                        wobble = 1.1.dp.toPx(),
                     )
                 }
-
-                sketchFill(
-                    topLeft = Offset(inset, inset),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    color = fill,
-                    seed = seed + 200,
-                    wobble = 1.1.dp.toPx(),
-                )
-
-                sketchRect(
-                    topLeft = Offset(inset, inset),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    color = border,
-                    strokeWidth = stroke,
-                    seed = seed,
-                    wobble = 1.1.dp.toPx(),
-                )
             }
             .padding(contentPadding),
         contentAlignment = contentAlignment,

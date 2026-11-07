@@ -138,6 +138,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     state = state,
                     isWide = isWide,
                     boardMax = wideBoardMax,
+                    straightGrid = viewModel.straightGrid,
                     winDismissed = winDismissed,
                     onDismissWin = { dismissedGameId = state.gameId },
                     onNewGameClick = { showNewGameDialog = true },
@@ -163,6 +164,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
         SettingsDialog(
             themeMode = viewModel.themeMode,
             onThemeModeChange = viewModel::updateThemeMode,
+            straightGrid = viewModel.straightGrid,
+            onStraightGridChange = viewModel::updateStraightGrid,
             onResetRecords = viewModel::clearBestTimes,
             onDismiss = { showSettings = false },
         )
@@ -185,6 +188,7 @@ private fun GamePanel(
     state: GameUiState,
     isWide: Boolean,
     boardMax: Dp,
+    straightGrid: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onNewGameClick: () -> Unit,
@@ -225,6 +229,7 @@ private fun GamePanel(
                 ) {
                     BoardBox(
                         state = state,
+                        straightGrid = straightGrid,
                         winDismissed = winDismissed,
                         onDismissWin = onDismissWin,
                         onSelect = viewModel::select,
@@ -259,6 +264,7 @@ private fun GamePanel(
 
                 BoardBox(
                     state = state,
+                    straightGrid = straightGrid,
                     winDismissed = winDismissed,
                     onDismissWin = onDismissWin,
                     onSelect = viewModel::select,
@@ -316,6 +322,7 @@ private fun GameControls(
 @Composable
 private fun BoardBox(
     state: GameUiState,
+    straightGrid: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onSelect: (Int) -> Unit,
@@ -332,6 +339,7 @@ private fun BoardBox(
         strokeWidth = 2.dp,
         seed = 20,
         shadow = colors.shadow,
+        straight = straightGrid,
         contentPadding = PaddingValues(4.dp),
         contentAlignment = Alignment.TopStart,
     ) {
@@ -339,6 +347,7 @@ private fun BoardBox(
             SudokuBoard(
                 cells = state.cells,
                 selectedIndex = state.selectedIndex,
+                straightGrid = straightGrid,
                 enabled = !state.loading && !state.paused && !state.won,
                 onSelect = onSelect,
             )
@@ -712,6 +721,8 @@ private fun RuleLine(text: String) {
 private fun SettingsDialog(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
+    straightGrid: Boolean,
+    onStraightGridChange: (Boolean) -> Unit,
     onResetRecords: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -766,6 +777,44 @@ private fun SettingsDialog(
 
             Spacer(Modifier.height(6.dp))
         }
+
+        SectionLabel(stringResource(R.string.settings_board))
+
+        SketchButton(
+            onClick = { onStraightGridChange(!straightGrid) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp),
+            fill = colors.paperSunken,
+            border = colors.gridLine,
+            active = straightGrid,
+            seed = 835,
+            contentPadding = PaddingValues(horizontal = 12.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SketchCheck(checked = straightGrid)
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = stringResource(R.string.settings_straight_grid),
+                    color = if (straightGrid) colors.accent else colors.ink,
+                    fontSize = 17.sp,
+                    fontFamily = HandFont,
+                    fontWeight = if (straightGrid) FontWeight.Bold else FontWeight.Normal,
+                )
+            }
+        }
+
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.settings_straight_grid_note),
+            color = colors.inkSoft,
+            fontSize = 13.sp,
+            fontFamily = HandFont,
+            lineHeight = 18.sp,
+        )
 
         SectionLabel(stringResource(R.string.settings_language))
 
@@ -1074,6 +1123,48 @@ private fun SketchRadio(active: Boolean) {
                 color = colors.accent,
                 radius = size.width * 0.2f,
                 center = Offset(size.width / 2f, size.height / 2f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SketchCheck(checked: Boolean) {
+    val colors = SudokuTheme.colors
+
+    Canvas(Modifier.size(20.dp)) {
+        val side = size.minDimension
+        val stroke = 1.5.dp.toPx()
+        val inset = stroke
+
+        sketchRect(
+            topLeft = Offset(inset, inset),
+            size = Size(side - inset * 2f, side - inset * 2f),
+            color = if (checked) colors.accent else colors.inkSoft,
+            strokeWidth = stroke,
+            seed = 905,
+            wobble = 0.5.dp.toPx(),
+            passes = 1,
+        )
+
+        if (checked) {
+            sketchLine(
+                start = Offset(side * 0.22f, side * 0.52f),
+                end = Offset(side * 0.43f, side * 0.75f),
+                color = colors.accent,
+                strokeWidth = stroke,
+                seed = 906,
+                wobble = 0.4.dp.toPx(),
+                passes = 1,
+            )
+            sketchLine(
+                start = Offset(side * 0.43f, side * 0.75f),
+                end = Offset(side * 0.8f, side * 0.25f),
+                color = colors.accent,
+                strokeWidth = stroke,
+                seed = 907,
+                wobble = 0.4.dp.toPx(),
+                passes = 1,
             )
         }
     }

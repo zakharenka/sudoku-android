@@ -84,6 +84,9 @@
     <string name="theme_system">Systemeinstellung</string>
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
+    <string name="settings_board">Spielfeld</string>
+    <string name="settings_straight_grid">Gerade Gitterlinien</string>
+    <string name="settings_straight_grid_note">Nur das 9×9-Spielfeld. Andere Elemente behalten den handgezeichneten Stil.</string>
     <string name="settings_language">Sprache</string>
     <string name="settings_language_current">Aktuelle Sprache: %1$s</string>
     <string name="settings_language_note">Die App-Sprache wird in den Systemeinstellungen geändert.</string>

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -44,6 +45,7 @@ private val EmptyCells = List(81) { Cell() }
 fun SudokuBoard(
     cells: List<Cell>,
     selectedIndex: Int?,
+    straightGrid: Boolean,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -94,22 +96,37 @@ fun SudokuBoard(
                 val width = if (thick) 2.dp.toPx() else 1.dp.toPx()
                 val offset = index * cellPx
 
-                sketchLine(
-                    start = Offset(offset, 0f),
-                    end = Offset(offset, size.height),
-                    color = color,
-                    strokeWidth = width,
-                    seed = 1_000 + index,
-                    wobble = 1.dp.toPx(),
-                )
-                sketchLine(
-                    start = Offset(0f, offset),
-                    end = Offset(size.width, offset),
-                    color = color,
-                    strokeWidth = width,
-                    seed = 2_000 + index,
-                    wobble = 1.dp.toPx(),
-                )
+                if (straightGrid) {
+                    drawLine(
+                        color = color,
+                        start = Offset(offset, 0f),
+                        end = Offset(offset, size.height),
+                        strokeWidth = width,
+                    )
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, offset),
+                        end = Offset(size.width, offset),
+                        strokeWidth = width,
+                    )
+                } else {
+                    sketchLine(
+                        start = Offset(offset, 0f),
+                        end = Offset(offset, size.height),
+                        color = color,
+                        strokeWidth = width,
+                        seed = 1_000 + index,
+                        wobble = 1.dp.toPx(),
+                    )
+                    sketchLine(
+                        start = Offset(0f, offset),
+                        end = Offset(size.width, offset),
+                        color = color,
+                        strokeWidth = width,
+                        seed = 2_000 + index,
+                        wobble = 1.dp.toPx(),
+                    )
+                }
             }
 
             if (selectedIndex != null && selectedIndex in 0..80) {
@@ -117,15 +134,27 @@ fun SudokuBoard(
                 val col = selectedIndex % 9
                 val cell = displayCells[selectedIndex]
                 val inset = 1.5.dp.toPx()
+                val topLeft = Offset(col * cellPx + inset, row * cellPx + inset)
+                val rectSize = Size(cellPx - inset * 2f, cellPx - inset * 2f)
+                val color = if (cell.error) colors.danger else colors.accent
 
-                sketchRect(
-                    topLeft = Offset(col * cellPx + inset, row * cellPx + inset),
-                    size = Size(cellPx - inset * 2f, cellPx - inset * 2f),
-                    color = if (cell.error) colors.danger else colors.accent,
-                    strokeWidth = 2.dp.toPx(),
-                    seed = 3_000 + selectedIndex,
-                    wobble = 1.dp.toPx(),
-                )
+                if (straightGrid) {
+                    drawRect(
+                        color = color,
+                        topLeft = topLeft,
+                        size = rectSize,
+                        style = Stroke(width = 2.dp.toPx()),
+                    )
+                } else {
+                    sketchRect(
+                        topLeft = topLeft,
+                        size = rectSize,
+                        color = color,
+                        strokeWidth = 2.dp.toPx(),
+                        seed = 3_000 + selectedIndex,
+                        wobble = 1.dp.toPx(),
+                    )
+                }
             }
         }
     }

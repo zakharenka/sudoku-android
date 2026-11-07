@@ -84,6 +84,9 @@
     <string name="theme_system">Suivre le système</string>
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
+    <string name="settings_board">Grille</string>
+    <string name="settings_straight_grid">Lignes droites de la grille</string>
+    <string name="settings_straight_grid_note">Seule la grille 9×9. Les autres éléments gardent le style dessiné à la main.</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_current">Langue actuelle : %1$s</string>
     <string name="settings_language_note">La langue de l\'application se modifie dans les paramètres système.</string>

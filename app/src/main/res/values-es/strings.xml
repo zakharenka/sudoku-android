@@ -84,6 +84,9 @@
     <string name="theme_system">Seguir el sistema</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
+    <string name="settings_board">Tablero</string>
+    <string name="settings_straight_grid">Líneas rectas de la cuadrícula</string>
+    <string name="settings_straight_grid_note">Solo el tablero 9×9. El resto conserva el estilo dibujado a mano.</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_current">Idioma actual: %1$s</string>
     <string name="settings_language_note">El idioma de la aplicación se cambia en los ajustes del sistema.</string>

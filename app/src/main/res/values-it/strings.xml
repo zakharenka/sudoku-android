@@ -84,6 +84,9 @@
     <string name="theme_system">Segui il sistema</string>
     <string name="theme_light">Chiaro</string>
     <string name="theme_dark">Scuro</string>
+    <string name="settings_board">Tabellone</string>
+    <string name="settings_straight_grid">Linee dritte della griglia</string>
+    <string name="settings_straight_grid_note">Solo la griglia 9×9. Gli altri elementi mantengono lo stile disegnato a mano.</string>
     <string name="settings_language">Lingua</string>
     <string name="settings_language_current">Lingua attuale: %1$s</string>
     <string name="settings_language_note">La lingua dell\'app si cambia nelle impostazioni di sistema.</string>

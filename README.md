@@ -29,8 +29,10 @@ for distribution on F-Droid.
   German, Italian, Ukrainian and Belarusian; the default language comes from
   the system and is changed through the native Android "App language" screen;
 - light and dark themes, plus a "follow system" mode;
-- settings: theme selection, a shortcut to the system language picker, a link
-  to the developer website and a records reset;
+- settings: theme selection, board line style, a shortcut to the system
+  language picker, a link to the developer website and a records reset;
+- straight grid lines on the 9×9 board by default, with an option to switch
+  back to hand-drawn wobbly lines;
 - the current game is saved when the app goes to the background: the timer
   stops and the game is restored on pause the next time it starts;
 - win screen with the time and a new-record message;
@@ -53,7 +55,7 @@ permissions.
 The version is defined in one place — `gradle.properties`:
 
 ```properties
-app.version=1.0.1
+app.version=1.0.2
 ```
 
 `app/build.gradle.kts` uses this value as `versionName` and derives
@@ -63,7 +65,7 @@ app.version=1.0.1
 major * 1_000_000 + minor * 1_000 + patch
 ```
 
-For `1.0.1` this is `versionCode = 1000001`. Versions follow semantic
+For `1.0.2` this is `versionCode = 1000002`. Versions follow semantic
 versioning `MAJOR.MINOR.PATCH`; release versions are marked with git tags.
 
 ## Building
@@ -232,6 +234,7 @@ Data is stored locally in SharedPreferences.
 | `solved:<difficulty>` | number of solved puzzles |
 | `theme_mode` | `system`, `light` or `dark` |
 | `notes_mode` | whether notes mode is enabled |
+| `straight_grid` | whether the 9×9 board uses straight grid lines (default `true`) |
 
 `<difficulty>` is `easy`, `medium`, `hard` or `expert`.
 

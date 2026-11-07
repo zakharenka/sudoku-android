@@ -1,0 +1,1 @@
+Sudoku 1.0.2: grade reta, limite de dicas e melhorias de estabilidade.

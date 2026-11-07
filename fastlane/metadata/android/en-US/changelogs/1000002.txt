@@ -1,0 +1,1 @@
+Sudoku 1.0.2: straight grid option, limited hints and stability improvements.

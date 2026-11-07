@@ -111,8 +111,11 @@ Separation rules:
 
 ### Settings
 
-- Settings contain only the theme, language, records reset, "About" and a link
-  to the developer website `https://zakharenka.me`.
+- Settings contain only the theme, board line style, language, records reset,
+  "About" and a link to the developer website `https://zakharenka.me`.
+- The 9×9 board uses straight grid lines by default. The settings toggle can
+  switch them back to hand-drawn wobbly lines; this affects only the board, not
+  buttons, panels or icons.
 - "Rules" and "Records" live in the header and are not duplicated in settings.
 - The language is changed only through the native Android screen
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
@@ -201,7 +204,7 @@ Separation rules:
 
 | File | Keys |
 | --- | --- |
-| `sudoku` | `best:<difficulty>`, `solved:<difficulty>`, `theme_mode`, `notes_mode` |
+| `sudoku` | `best:<difficulty>`, `solved:<difficulty>`, `theme_mode`, `notes_mode`, `straight_grid` |
 | `sudoku_saved_game` | `saved_game` (JSON, version 2) |
 
 `<difficulty>`: `easy`, `medium`, `hard`, `expert`.

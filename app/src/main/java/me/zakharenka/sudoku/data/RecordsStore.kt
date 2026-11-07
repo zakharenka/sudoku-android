@@ -63,6 +63,12 @@ class RecordsStore(context: Context) {
             preferences.edit { putString(THEME_MODE_KEY, value.key) }
         }
 
+    var straightGrid: Boolean
+        get() = preferences.getBoolean(STRAIGHT_GRID_KEY, true)
+        set(value) {
+            preferences.edit { putBoolean(STRAIGHT_GRID_KEY, value) }
+        }
+
     private fun bestKey(difficulty: Difficulty): String = "best:${difficulty.key}"
 
     private fun solvedKey(difficulty: Difficulty): String = "solved:${difficulty.key}"
@@ -71,5 +77,6 @@ class RecordsStore(context: Context) {
         const val PREFERENCES = "sudoku"
         const val NOTES_MODE_KEY = "notes_mode"
         const val THEME_MODE_KEY = "theme_mode"
+        const val STRAIGHT_GRID_KEY = "straight_grid"
     }
 }

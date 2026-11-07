@@ -84,6 +84,9 @@
     <string name="theme_system">Seguir o sistema</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Escuro</string>
+    <string name="settings_board">Tabuleiro</string>
+    <string name="settings_straight_grid">Linhas retas da grade</string>
+    <string name="settings_straight_grid_note">Apenas o tabuleiro 9×9. Os demais elementos mantêm o estilo desenhado à mão.</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_current">Idioma atual: %1$s</string>
     <string name="settings_language_note">O idioma do aplicativo é alterado nas configurações do sistema.</string>

@@ -84,6 +84,9 @@
     <string name="theme_system">Як у системі</string>
     <string name="theme_light">Світла</string>
     <string name="theme_dark">Темна</string>
+    <string name="settings_board">Поле</string>
+    <string name="settings_straight_grid">Рівні лінії сітки</string>
+    <string name="settings_straight_grid_note">Лише поле 9×9. Інші елементи залишаються намальованими.</string>
     <string name="settings_language">Мова</string>
     <string name="settings_language_current">Поточна мова: %1$s</string>
     <string name="settings_language_note">Мова застосунку змінюється в системних налаштуваннях.</string>

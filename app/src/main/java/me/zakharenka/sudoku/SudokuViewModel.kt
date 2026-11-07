@@ -65,6 +65,9 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     var themeMode by mutableStateOf(records.themeMode)
         private set
 
+    var straightGrid by mutableStateOf(records.straightGrid)
+        private set
+
     var uiState by mutableStateOf(
         GameUiState(
             notesMode = notesMode,
@@ -112,6 +115,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun updateThemeMode(mode: ThemeMode) {
         themeMode = mode
         records.themeMode = mode
+    }
+
+    fun updateStraightGrid(enabled: Boolean) {
+        straightGrid = enabled
+        records.straightGrid = enabled
     }
 
     fun clearBestTimes() {

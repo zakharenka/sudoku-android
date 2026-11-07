@@ -1,0 +1,1 @@
+Sudoku 1.0.2: griglia dritta, indizi limitati e miglioramenti alla stabilità.

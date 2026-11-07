@@ -84,6 +84,9 @@
     <string name="theme_system">Follow system</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="settings_board">Board</string>
+    <string name="settings_straight_grid">Straight grid lines</string>
+    <string name="settings_straight_grid_note">Only the 9×9 board. Other elements keep the hand-drawn style.</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_current">Current language: %1$s</string>
     <string name="settings_language_note">The app language is changed in the system settings.</string>

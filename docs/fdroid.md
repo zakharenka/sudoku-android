@@ -9,7 +9,7 @@ is uploaded.
 - The source repository is public:
   <https://github.com/zakharenka/sudoku-android>.
 - The source is licensed under GPL-3.0-or-later; see [`LICENSE`](../LICENSE).
-- Every release has an annotated git tag, for example `1.0.1`.
+- Every release has an annotated git tag, for example `1.0.2`.
 - The app contains no ads, tracking, analytics or proprietary dependencies.
 - The published terms of use must not contradict the GPL. In particular, they
   must not forbid copying, modification or redistribution of the source code.
@@ -29,7 +29,7 @@ fastlane/metadata/android/en-US/
 ├── title.txt
 ├── short_description.txt
 ├── full_description.txt
-├── changelogs/1000001.txt
+├── changelogs/1000002.txt
 └── images/
     ├── icon.png
     ├── featureGraphic.png
