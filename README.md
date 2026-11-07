@@ -200,7 +200,10 @@ docs/
 ├── fdroid.md                # F-Droid submission checklist
 ├── languages.md             # current languages and next translation waves
 └── releases/
-    └── 1.0.2.md             # release notes for the current version
+    ├── README.md            # release notes index
+    ├── 1.0.0.md
+    ├── 1.0.1.md
+    └── 1.0.2.md
 ```
 
 Each `values-*` folder contains `strings.xml` and `plurals.xml`.
