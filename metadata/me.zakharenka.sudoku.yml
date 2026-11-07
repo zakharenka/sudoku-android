@@ -18,7 +18,7 @@ Repo: https://github.com/zakharenka/sudoku-android.git
 Builds:
   - versionName: 1.0.2
     versionCode: 1000002
-    commit: 7d430ee09de433388837789c5352209e8d33c6ce
+    commit: 3e9a710775dcb9be561ae120ad7d8d9ac4222dc0
     gradle:
       - yes
 
