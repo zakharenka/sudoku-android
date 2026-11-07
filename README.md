@@ -198,7 +198,9 @@ fastlane/metadata/android/   # F-Droid store texts and graphics
 metadata/                    # F-Droid build recipe
 docs/
 ├── fdroid.md                # F-Droid submission checklist
-└── languages.md             # current languages and next translation waves
+├── languages.md             # current languages and next translation waves
+└── releases/
+    └── 1.0.2.md             # release notes for the current version
 ```
 
 Each `values-*` folder contains `strings.xml` and `plurals.xml`.
