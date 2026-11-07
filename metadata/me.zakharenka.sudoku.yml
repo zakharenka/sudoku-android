@@ -1,22 +1,14 @@
-# F-Droid build recipe for Sudoku.
-# Copy this file into an fdroiddata checkout as
-# metadata/me.zakharenka.sudoku.yml when opening a merge request.
-# Checklist: docs/fdroid.md
-
 Categories:
-  - Games
-
+  - Puzzle Game
 License: GPL-3.0-or-later
-
 AuthorName: Aliaksandr Zakharenka
 AuthorEmail: aliaksandr@zakharenka.me
 AuthorWebSite: https://zakharenka.me
-
 WebSite: https://zakharenka.me
 SourceCode: https://github.com/zakharenka/sudoku-android
 IssueTracker: https://github.com/zakharenka/sudoku-android/issues
-Changelog: https://github.com/zakharenka/sudoku-android/releases
 Translation: https://github.com/zakharenka/sudoku-android/blob/master/docs/languages.md
+Changelog: https://github.com/zakharenka/sudoku-android/releases
 
 AutoName: Sudoku
 
@@ -44,6 +36,7 @@ MaintainerNotes: |
   entry manually for every release. Fastlane store texts and graphics are
   kept in fastlane/metadata/android/.
 
+AutoUpdateMode: None
 UpdateCheckMode: Static
 CurrentVersion: 1.0.2
 CurrentVersionCode: 1000002
