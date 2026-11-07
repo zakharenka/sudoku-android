@@ -30,6 +30,12 @@ Builds:
     gradle:
       - yes
 
+  - versionName: 1.0.2
+    versionCode: 1000002
+    commit: 7d430ee09de433388837789c5352209e8d33c6ce
+    gradle:
+      - yes
+
 MaintainerNotes: |
   The app targets SDK 37 and builds with AGP 9.4.1 / Gradle 9.6.
   A recent F-Droid buildserver is required. Version name and code are
@@ -39,5 +45,5 @@ MaintainerNotes: |
   kept in fastlane/metadata/android/.
 
 UpdateCheckMode: Static
-CurrentVersion: 1.0.1
-CurrentVersionCode: 1000001
+CurrentVersion: 1.0.2
+CurrentVersionCode: 1000002
