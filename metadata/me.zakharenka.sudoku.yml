@@ -23,16 +23,6 @@ Builds:
     gradle:
       - yes
 
-MaintainerNotes: |
-  The app targets SDK 37 and builds with AGP 9.4.1 / Gradle 9.6.
-  A recent F-Droid buildserver is required. Version name and code are
-  derived from app.version in gradle.properties, so UpdateCheckMode is
-  Static: bump the property, tag the release commit and add a new Builds
-  entry manually for every release. Fastlane store texts and graphics are
-  kept in fastlane/metadata/android/. Version 1.0.3 removes the foojay
-  toolchain resolver from settings.gradle.kts because the F-Droid scanner
-  flags it; the project does not use Gradle Java toolchains.
-
 AutoUpdateMode: None
 UpdateCheckMode: Static
 CurrentVersion: 1.0.3
