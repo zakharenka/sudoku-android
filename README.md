@@ -55,7 +55,7 @@ permissions.
 The version is defined in one place — `gradle.properties`:
 
 ```properties
-app.version=1.0.3
+app.version=1.0.4
 ```
 
 `app/build.gradle.kts` uses this value as `versionName` and derives
@@ -65,7 +65,7 @@ app.version=1.0.3
 major * 1_000_000 + minor * 1_000 + patch
 ```
 
-For `1.0.3` this is `versionCode = 1000003`. Versions follow semantic
+For `1.0.4` this is `versionCode = 1000004`. Versions follow semantic
 versioning `MAJOR.MINOR.PATCH`; release versions are marked with git tags.
 
 ## Building
@@ -204,7 +204,8 @@ docs/
     ├── 1.0.0.md
     ├── 1.0.1.md
     ├── 1.0.2.md
-    └── 1.0.3.md
+    ├── 1.0.3.md
+    └── 1.0.4.md
 ```
 
 Each `values-*` folder contains `strings.xml` and `plurals.xml`.

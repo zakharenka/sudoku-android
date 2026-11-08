@@ -1,0 +1,1 @@
+Sudoku 1.0.4: grade do tabuleiro refinada, dígitos maiores, notas e contadores melhorados.

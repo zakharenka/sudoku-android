@@ -1,0 +1,1 @@
+Sudoku 1.0.4 : grille du plateau affinée, chiffres agrandis, notes et compteurs améliorés.

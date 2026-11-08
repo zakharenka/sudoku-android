@@ -9,7 +9,7 @@ is uploaded.
 - The source repository is public:
   <https://github.com/zakharenka/sudoku-android>.
 - The source is licensed under GPL-3.0-or-later; see [`LICENSE`](../LICENSE).
-- Every release has an annotated git tag, for example `1.0.3`.
+- Every release has an annotated git tag, for example `1.0.4`.
 - The app contains no ads, tracking, analytics or proprietary dependencies.
 - The published terms of use must not contradict the GPL. In particular, they
   must not forbid copying, modification or redistribution of the source code.
@@ -19,6 +19,7 @@ is uploaded.
 | Path | Purpose |
 | --- | --- |
 | `metadata/me.zakharenka.sudoku.yml` | F-Droid build recipe, ready to copy into `fdroiddata` |
+| `fdroid/version.json` | Machine-readable version for F-Droid auto-updates |
 | `fastlane/metadata/android/<locale>/` | Store title, descriptions, changelogs and graphics |
 | `docs/languages.md` | Translation status and language plan |
 
@@ -29,7 +30,7 @@ fastlane/metadata/android/en-US/
 ├── title.txt
 ├── short_description.txt
 ├── full_description.txt
-├── changelogs/1000003.txt
+├── changelogs/1000004.txt
 └── images/
     ├── icon.png
     ├── featureGraphic.png
@@ -73,20 +74,24 @@ Useful references:
 
 1. Update `app.version` in `gradle.properties` and keep the semantic version
    format.
-2. Update the corresponding fastlane texts and add
+2. Update `fdroid/version.json` with the same `versionName` and the computed
+   `versionCode`. The unit test `FdroidVersionTest` fails if it drifts.
+3. Update the release notes and add
    `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt`.
-3. Commit the release and create an annotated git tag:
+4. Commit the release and create an annotated git tag:
 
    ```bash
-   git tag -a 1.0.3 -m "Sudoku 1.0.3"
+   git tag -a 1.0.5 -m "Sudoku 1.0.5"
    git push origin master --tags
    ```
 
-4. Add a new `Builds` entry to the F-Droid metadata with the full commit hash
-   and the new version name and code. Do not use a branch or tag name in
-   `commit`.
-5. Update `CurrentVersion` and `CurrentVersionCode`.
-6. Open a merge request against `fdroiddata` (or push to the existing one).
+5. F-Droid checks tags through `UpdateCheckMode: Tags` and reads
+   `fdroid/version.json` through `UpdateCheckData`. With
+   `AutoUpdateMode: Version`, it adds the new build entry and opens a metadata
+   MR automatically.
+
+No manual edit of `Builds`, `CurrentVersion` or `CurrentVersionCode` is needed
+after a release, as long as the tag contains the matching `fdroid/version.json`.
 
 ## Signing
 

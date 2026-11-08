@@ -1,0 +1,1 @@
+Sudoku 1.0.4: Spielfeldgitter verfeinert, größere Ziffern, verbesserte Notizen und Zähler.

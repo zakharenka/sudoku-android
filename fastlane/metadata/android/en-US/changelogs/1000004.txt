@@ -1,0 +1,1 @@
+Sudoku 1.0.4: refined board grid, larger digits, improved notes and counters.

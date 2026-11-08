@@ -50,15 +50,16 @@ contains the local SDK path and is not committed.
   `major * 1_000_000 + minor * 1_000 + patch`.
 - Do not hardcode the version in interface strings: use
   `BuildConfig.VERSION_NAME`.
-- Release versions are marked with an annotated git tag, for example `1.0.1`.
+- Release versions are marked with an annotated git tag, for example `1.0.4`.
 - For Google Play, build `./gradlew :app:bundleRelease`; the AAB in
   `app/build/outputs/bundle/release/` must be signed with the upload key.
 - The publishing package is assembled in `store_out/`. The folder is in
   `.gitignore` and must not be committed.
 - F-Droid builds from tagged source. The build recipe is
   `metadata/me.zakharenka.sudoku.yml`; the source repository must stay public.
-  After a release, update the `Builds` entry and `CurrentVersion` /
-  `CurrentVersionCode` as described in `docs/fdroid.md`.
+  `fdroid/version.json` mirrors `app.version` and the computed `versionCode`
+  for F-Droid's tag-based auto-update. Keep it in sync; `FdroidVersionTest`
+  enforces this. After a release, F-Droid adds the build entry automatically.
 
 ## Architecture
 
@@ -225,7 +226,9 @@ Do not rename keys without a migration: it would break existing records.
 
 ## Tests
 
-- Unit tests live in `app/src/test/java/me/zakharenka/sudoku/game/`.
+- Unit tests live in `app/src/test/java/me/zakharenka/sudoku/`; game logic
+  tests are under `game/`.
+- `FdroidVersionTest` keeps `fdroid/version.json` in sync with `BuildConfig`.
 - When changing rules, the generator, persistence or formatting, add or update
   tests.
 - There are no UI tests yet; do not add instrumentation tests unless necessary.
@@ -284,6 +287,7 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 | `docs/languages.md` | current languages and next waves |
 | `docs/fdroid.md` | F-Droid submission checklist |
 | `metadata/me.zakharenka.sudoku.yml` | F-Droid build recipe |
+| `fdroid/version.json` | version name and code for F-Droid auto-update |
 | `fastlane/metadata/android/` | F-Droid store texts and graphics |
 | `gradle.properties` | app version (`app.version`) |
 | `app/build.gradle.kts` | `versionCode` calculation, AAB build |

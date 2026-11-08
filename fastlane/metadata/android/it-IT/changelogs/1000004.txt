@@ -1,0 +1,1 @@
+Sudoku 1.0.4: griglia del tabellone rifinita, cifre più grandi, note e contatori migliorati.
