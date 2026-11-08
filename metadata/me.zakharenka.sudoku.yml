@@ -19,6 +19,7 @@ Builds:
   - versionName: 1.0.3
     versionCode: 1000003
     commit: 510ec2eee92ad2ce4f985ad06cbde643ac446966
+    subdir: app
     gradle:
       - yes
 
