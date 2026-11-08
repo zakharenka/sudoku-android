@@ -16,14 +16,15 @@ RepoType: git
 Repo: https://github.com/zakharenka/sudoku-android.git
 
 Builds:
-  - versionName: 1.0.3
-    versionCode: 1000003
-    commit: 510ec2eee92ad2ce4f985ad06cbde643ac446966
+  - versionName: 1.0.4
+    versionCode: 1000004
+    commit: eca0ac059843306576be9e33431aa6f343a91497
     subdir: app
     gradle:
       - yes
 
-AutoUpdateMode: None
-UpdateCheckMode: Static
-CurrentVersion: 1.0.3
-CurrentVersionCode: 1000003
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+UpdateCheckData: fdroid/version.json|"versionCode"\s*:\s*(\d+)|.|"versionName"\s*:\s*"([^"]+)"
+CurrentVersion: 1.0.4
+CurrentVersionCode: 1000004
