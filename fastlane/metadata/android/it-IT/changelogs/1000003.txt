@@ -1,0 +1,1 @@
+Sudoku 1.0.3: aggiornamento di manutenzione e miglioramenti alla stabilità.

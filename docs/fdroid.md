@@ -9,7 +9,7 @@ is uploaded.
 - The source repository is public:
   <https://github.com/zakharenka/sudoku-android>.
 - The source is licensed under GPL-3.0-or-later; see [`LICENSE`](../LICENSE).
-- Every release has an annotated git tag, for example `1.0.2`.
+- Every release has an annotated git tag, for example `1.0.3`.
 - The app contains no ads, tracking, analytics or proprietary dependencies.
 - The published terms of use must not contradict the GPL. In particular, they
   must not forbid copying, modification or redistribution of the source code.
@@ -29,7 +29,7 @@ fastlane/metadata/android/en-US/
 ├── title.txt
 ├── short_description.txt
 ├── full_description.txt
-├── changelogs/1000002.txt
+├── changelogs/1000003.txt
 └── images/
     ├── icon.png
     ├── featureGraphic.png
@@ -78,7 +78,7 @@ Useful references:
 3. Commit the release and create an annotated git tag:
 
    ```bash
-   git tag -a 1.0.2 -m "Sudoku 1.0.2"
+   git tag -a 1.0.3 -m "Sudoku 1.0.3"
    git push origin master --tags
    ```
 
