@@ -214,7 +214,7 @@ private fun randomJitter(random: Random, amount: Float): Float =
 fun SketchSurface(
     modifier: Modifier = Modifier,
     fill: Color,
-    border: Color,
+    border: Color?,
     strokeWidth: Dp = 1.4.dp,
     seed: Int = 0,
     shadow: Color? = null,
@@ -227,8 +227,8 @@ fun SketchSurface(
         modifier = modifier
             .drawBehind {
                 val stroke = strokeWidth.toPx()
-                val inset = stroke / 2f
-                val innerSize = Size(size.width - stroke, size.height - stroke)
+                val inset = if (border == null) 0f else stroke / 2f
+                val innerSize = Size(size.width - inset * 2f, size.height - inset * 2f)
 
                 if (straight) {
                     if (shadow != null) {
@@ -243,12 +243,14 @@ fun SketchSurface(
                         topLeft = Offset(inset, inset),
                         size = innerSize,
                     )
-                    drawRect(
-                        color = border,
-                        topLeft = Offset(inset, inset),
-                        size = innerSize,
-                        style = Stroke(width = stroke),
-                    )
+                    if (border != null) {
+                        drawRect(
+                            color = border,
+                            topLeft = Offset(inset, inset),
+                            size = innerSize,
+                            style = Stroke(width = stroke),
+                        )
+                    }
                 } else {
                     if (shadow != null) {
                         sketchFill(
@@ -271,14 +273,16 @@ fun SketchSurface(
                         wobble = 1.1.dp.toPx(),
                     )
 
-                    sketchRect(
-                        topLeft = Offset(inset, inset),
-                        size = innerSize,
-                        color = border,
-                        strokeWidth = stroke,
-                        seed = seed,
-                        wobble = 1.1.dp.toPx(),
-                    )
+                    if (border != null) {
+                        sketchRect(
+                            topLeft = Offset(inset, inset),
+                            size = innerSize,
+                            color = border,
+                            strokeWidth = stroke,
+                            seed = seed,
+                            wobble = 1.1.dp.toPx(),
+                        )
+                    }
                 }
             }
             .padding(contentPadding),

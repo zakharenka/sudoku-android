@@ -254,12 +254,13 @@ fun NumberPad(
                     )
                     Text(
                         text = remaining.toString(),
-                        color = colors.inkSoft,
-                        fontSize = 10.sp,
+                        color = colors.ink,
+                        fontSize = 12.sp,
                         fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = 2.dp, end = 4.dp),
+                            .padding(top = 1.dp, end = 3.dp),
                     )
                 }
             }
@@ -366,13 +367,13 @@ private fun ActionButton(
             if (badge != null) {
                 Text(
                     text = badge,
-                    color = contentColor,
-                    fontSize = 10.sp,
+                    color = colors.ink,
+                    fontSize = 12.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 2.dp, end = 4.dp),
+                        .padding(top = 1.dp, end = 3.dp),
                 )
             }
         }

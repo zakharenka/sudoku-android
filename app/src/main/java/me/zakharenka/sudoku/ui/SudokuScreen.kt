@@ -332,39 +332,43 @@ private fun BoardBox(
 ) {
     val colors = SudokuTheme.colors
 
-    SketchSurface(
-        modifier = modifier.aspectRatio(1f),
-        fill = colors.paperAlt,
-        border = colors.gridLineStrong,
-        strokeWidth = 2.dp,
-        seed = 20,
-        shadow = colors.shadow,
-        straight = straightGrid,
-        contentPadding = PaddingValues(4.dp),
-        contentAlignment = Alignment.TopStart,
-    ) {
-        Box(Modifier.fillMaxSize()) {
-            SudokuBoard(
-                cells = state.cells,
-                selectedIndex = state.selectedIndex,
-                straightGrid = straightGrid,
-                enabled = !state.loading && !state.paused && !state.won,
-                onSelect = onSelect,
-            )
-
-            when {
-                state.loading -> LoadingOverlay()
-
-                state.paused -> PauseOverlay(onResume = onResume)
-
-                state.won && !winDismissed -> WinOverlay(
-                    elapsedSeconds = state.elapsedSeconds,
-                    isNewRecord = state.isNewRecord,
-                    onNewGame = onNewGame,
-                    onDismiss = onDismissWin,
+    Box(modifier = modifier.aspectRatio(1f)) {
+        SketchSurface(
+            modifier = Modifier.fillMaxSize(),
+            fill = colors.paperAlt,
+            border = null,
+            strokeWidth = 2.dp,
+            seed = 20,
+            shadow = colors.shadow,
+            straight = straightGrid,
+            contentPadding = PaddingValues(0.dp),
+            contentAlignment = Alignment.TopStart,
+        ) {
+            Box(Modifier.fillMaxSize()) {
+                SudokuBoard(
+                    cells = state.cells,
+                    selectedIndex = state.selectedIndex,
+                    straightGrid = straightGrid,
+                    enabled = !state.loading && !state.paused && !state.won,
+                    onSelect = onSelect,
                 )
+
+                when {
+                    state.loading -> LoadingOverlay()
+
+                    state.paused -> PauseOverlay(onResume = onResume)
+
+                    state.won && !winDismissed -> WinOverlay(
+                        elapsedSeconds = state.elapsedSeconds,
+                        isNewRecord = state.isNewRecord,
+                        onNewGame = onNewGame,
+                        onDismiss = onDismissWin,
+                    )
+                }
             }
         }
+
+        SudokuBoardFrame(straightGrid = straightGrid)
     }
 }
 

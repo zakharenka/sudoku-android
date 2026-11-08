@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -26,8 +29,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +41,9 @@ import me.zakharenka.sudoku.ui.sketch.sketchLine
 import me.zakharenka.sudoku.ui.sketch.sketchRect
 import me.zakharenka.sudoku.ui.theme.HandFont
 import me.zakharenka.sudoku.ui.theme.SudokuTheme
+
+/** Stroke width of the outer board frame. */
+private val BoardFrameStroke = 2.dp
 
 private val EmptyCells = List(81) { Cell() }
 
@@ -133,7 +139,7 @@ fun SudokuBoard(
                 val row = selectedIndex / 9
                 val col = selectedIndex % 9
                 val cell = displayCells[selectedIndex]
-                val inset = 1.5.dp.toPx()
+                val inset = 3.dp.toPx()
                 val topLeft = Offset(col * cellPx + inset, row * cellPx + inset)
                 val rectSize = Size(cellPx - inset * 2f, cellPx - inset * 2f)
                 val color = if (cell.error) colors.danger else colors.accent
@@ -156,6 +162,44 @@ fun SudokuBoard(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Outer square frame of the board. It is drawn on top of the cells so the grid
+ * lines always meet it, and it stays visible above the pause and win overlays.
+ */
+@Composable
+internal fun SudokuBoardFrame(
+    straightGrid: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val colors = SudokuTheme.colors
+
+    Canvas(modifier.fillMaxSize()) {
+        val stroke = BoardFrameStroke.toPx()
+        // Keep the frame centered on the outer grid line, exactly like the inner
+        // lines. Otherwise it eats into the edge cells and hides their insets.
+        val topLeft = Offset(0f, 0f)
+        val frameSize = Size(size.width, size.height)
+
+        if (straightGrid) {
+            drawRect(
+                color = colors.gridLineStrong,
+                topLeft = topLeft,
+                size = frameSize,
+                style = Stroke(width = stroke),
+            )
+        } else {
+            sketchRect(
+                topLeft = topLeft,
+                size = frameSize,
+                color = colors.gridLineStrong,
+                strokeWidth = stroke,
+                seed = 20,
+                wobble = 1.1.dp.toPx(),
+            )
         }
     }
 }
@@ -191,7 +235,7 @@ private fun SudokuCell(
         else -> colors.accent
     }
 
-    val fontSize = with(LocalDensity.current) { (cellSize * 0.5f).toSp() }
+    val fontSize = with(LocalDensity.current) { (cellSize * 0.56f).toSp() }
     val interactionSource = remember { MutableInteractionSource() }
     val description = when {
         cell.error && cell.value != 0 -> stringResource(
@@ -260,56 +304,59 @@ private fun SudokuCell(
             }
 
             cell.notes.isNotEmpty() -> {
-                NotesGrid(
+                NotesLine(
                     notes = cell.notes,
                     cellSize = cellSize,
+                    color = textColor,
+                    modifier = Modifier.align(Alignment.TopStart),
                 )
             }
         }
     }
 }
 
+/**
+ * Notes are shown top-left as ascending rows (for example "147"), one row for
+ * up to five notes and two balanced rows for six to nine. The font is shrunk
+ * automatically so the whole set fits the cell.
+ */
 @Composable
-private fun NotesGrid(
+private fun NotesLine(
     notes: Set<Int>,
     cellSize: Dp,
+    color: Color,
+    modifier: Modifier = Modifier,
 ) {
-    val colors = SudokuTheme.colors
-    val fontSize = with(LocalDensity.current) { (cellSize * 0.2f).toSp() }
-    val padding = cellSize * 0.04f
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
-    ) {
-        repeat(3) { row ->
-            Row(Modifier.weight(1f)) {
-                repeat(3) { col ->
-                    val number = row * 3 + col + 1
-
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (number in notes) {
-                            Text(
-                                text = number.toString(),
-                                color = colors.inkSoft,
-                                fontSize = fontSize,
-                                fontFamily = HandFont,
-                                fontWeight = FontWeight.Normal,
-                                lineHeight = fontSize,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-                }
-            }
-        }
+    val sorted = notes.sorted()
+    val lines = if (sorted.size <= 5) {
+        listOf(sorted)
+    } else {
+        val split = (sorted.size + 1) / 2
+        listOf(sorted.subList(0, split), sorted.subList(split, sorted.size))
     }
+    val text = lines.joinToString("\n") { line -> line.joinToString("") }
+    val maxFontSize = with(LocalDensity.current) { (cellSize * 0.4f).toSp() }
+    val minFontSize = with(LocalDensity.current) { (cellSize * 0.13f).toSp() }
+
+    BasicText(
+        text = text,
+        modifier = modifier.padding(
+            start = cellSize * 0.12f,
+            top = cellSize * 0.1f,
+            end = cellSize * 0.05f,
+            bottom = cellSize * 0.05f,
+        ),
+        style = TextStyle(
+            color = color,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+        ),
+        maxLines = 2,
+        autoSize = TextAutoSize.StepBased(
+            minFontSize = minFontSize,
+            maxFontSize = maxFontSize,
+        ),
+    )
 }
 
 private fun arePeers(first: Int, second: Int): Boolean {
