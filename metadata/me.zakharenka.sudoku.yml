@@ -16,9 +16,9 @@ RepoType: git
 Repo: https://github.com/zakharenka/sudoku-android.git
 
 Builds:
-  - versionName: 1.0.2
-    versionCode: 1000002
-    commit: 3e9a710775dcb9be561ae120ad7d8d9ac4222dc0
+  - versionName: 1.0.3
+    versionCode: 1000003
+    commit: 510ec2eee92ad2ce4f985ad06cbde643ac446966
     gradle:
       - yes
 
@@ -28,9 +28,11 @@ MaintainerNotes: |
   derived from app.version in gradle.properties, so UpdateCheckMode is
   Static: bump the property, tag the release commit and add a new Builds
   entry manually for every release. Fastlane store texts and graphics are
-  kept in fastlane/metadata/android/.
+  kept in fastlane/metadata/android/. Version 1.0.3 removes the foojay
+  toolchain resolver from settings.gradle.kts because the F-Droid scanner
+  flags it; the project does not use Gradle Java toolchains.
 
 AutoUpdateMode: None
 UpdateCheckMode: Static
-CurrentVersion: 1.0.2
-CurrentVersionCode: 1000002
+CurrentVersion: 1.0.3
+CurrentVersionCode: 1000003
