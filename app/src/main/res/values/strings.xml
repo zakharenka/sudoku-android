@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">maximum</string>
 
     <string name="new_game">New game</string>
-    <string name="new_game_confirm">Start a new game? Current progress will be lost.</string>
+    <string name="new_game_confirm">Start a new game? The current game will be saved to history.</string>
     <string name="new_game_start">Start</string>
     <string name="new_game_cancel">Cancel</string>
     <string name="action_undo">Undo</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Handwritten digits</string>
     <string name="settings_language_current">Language: %1$s</string>
     <string name="settings_language_open">Change language</string>
-    <string name="settings_reset_records">Reset records</string>
-    <string name="settings_reset_confirm">Reset all records?</string>
-    <string name="settings_reset_yes">Yes</string>
-    <string name="settings_reset_cancel">Cancel</string>
-    <string name="settings_reset_done">Records reset.</string>
     <string name="settings_about">About</string>
     <string name="settings_about_version">Sudoku 9×9 · version %1$s</string>
     <string name="settings_developer_website">Developer website</string>
+
+    <string name="header_history">History</string>
+    <string name="new_game_show_errors">Show mistakes</string>
+    <string name="new_game_show_errors_note">Highlight wrong digits and count mistakes</string>
+    <string name="records_mode_show_errors">With mistakes</string>
+    <string name="records_mode_hide_errors">No mistakes</string>
+    <string name="history_title">Game history</string>
+    <string name="history_empty">No saved games yet.</string>
+    <string name="history_current">Current</string>
+    <string name="history_started">Started: %1$s</string>
+    <string name="history_solved">Solved: %1$s</string>
+    <string name="history_updated">Updated: %1$s</string>
+    <string name="history_time">Time: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Mistakes: off</string>
+    <string name="history_puzzle_preview">Sudoku puzzle preview</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_export">Export backup</string>
+    <string name="settings_import">Import backup</string>
+    <string name="settings_import_confirm">Replace all records and history with the file contents?</string>
+    <string name="settings_import_yes">Replace</string>
+    <string name="settings_import_no">Cancel</string>
+    <string name="transfer_exported">Backup saved.</string>
+    <string name="transfer_imported">Backup imported.</string>
+    <string name="transfer_failed">Could not complete the operation.</string>
+    <string name="transfer_invalid_json">The file is not valid JSON.</string>
+    <string name="transfer_invalid_version">Unsupported file version.</string>
+    <string name="transfer_invalid_fields">The file contains invalid data.</string>
+
+    <string name="records_hint_without_mistakes">Best time and solved count for games without mistakes.</string>
+    <string name="records_hint_with_mistakes">Best time and solved count for games with mistakes.</string>
 </resources>

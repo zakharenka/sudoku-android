@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">máximo</string>
 
     <string name="new_game">Nova partida</string>
-    <string name="new_game_confirm">Começar uma nova partida? O progresso atual será perdido.</string>
+    <string name="new_game_confirm">Iniciar uma nova partida? A partida atual será salva no histórico.</string>
     <string name="new_game_start">Começar</string>
     <string name="new_game_cancel">Cancelar</string>
     <string name="action_undo">Desfazer</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Dígitos manuscritos</string>
     <string name="settings_language_current">Idioma: %1$s</string>
     <string name="settings_language_open">Alterar idioma</string>
-    <string name="settings_reset_records">Redefinir recordes</string>
-    <string name="settings_reset_confirm">Redefinir todos os recordes?</string>
-    <string name="settings_reset_yes">Sim</string>
-    <string name="settings_reset_cancel">Cancelar</string>
-    <string name="settings_reset_done">Recordes redefinidos.</string>
     <string name="settings_about">Sobre</string>
     <string name="settings_about_version">Sudoku 9×9 · versão %1$s</string>
     <string name="settings_developer_website">Site do desenvolvedor</string>
+
+    <string name="header_history">Histórico</string>
+    <string name="new_game_show_errors">Mostrar erros</string>
+    <string name="new_game_show_errors_note">Destacar dígitos errados e contar os erros</string>
+    <string name="records_mode_show_errors">Com erros</string>
+    <string name="records_mode_hide_errors">Sem erros</string>
+    <string name="history_title">Histórico de partidas</string>
+    <string name="history_empty">Ainda não há partidas salvas.</string>
+    <string name="history_current">Atual</string>
+    <string name="history_started">Iniciada: %1$s</string>
+    <string name="history_solved">Resolvida: %1$s</string>
+    <string name="history_updated">Atualizada: %1$s</string>
+    <string name="history_time">Tempo: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Erros: desativados</string>
+    <string name="history_puzzle_preview">Prévia do sudoku</string>
+    <string name="settings_data">Dados</string>
+    <string name="settings_export">Exportar backup</string>
+    <string name="settings_import">Importar backup</string>
+    <string name="settings_import_confirm">Substituir todos os recordes e o histórico pelo conteúdo do arquivo?</string>
+    <string name="settings_import_yes">Substituir</string>
+    <string name="settings_import_no">Cancelar</string>
+    <string name="transfer_exported">Backup salvo.</string>
+    <string name="transfer_imported">Dados importados.</string>
+    <string name="transfer_failed">Não foi possível concluir a operação.</string>
+    <string name="transfer_invalid_json">O arquivo não é um JSON válido.</string>
+    <string name="transfer_invalid_version">Versão de arquivo não suportada.</string>
+    <string name="transfer_invalid_fields">O arquivo contém dados inválidos.</string>
+
+    <string name="records_hint_without_mistakes">Melhor tempo e partidas resolvidas sem erros.</string>
+    <string name="records_hint_with_mistakes">Melhor tempo e partidas resolvidas com erros.</string>
 </resources>

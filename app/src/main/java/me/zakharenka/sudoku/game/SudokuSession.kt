@@ -1,6 +1,7 @@
 package me.zakharenka.sudoku.game
 
 import java.util.ArrayDeque
+import java.util.UUID
 
 data class MoveOutcome(
     val changed: Boolean = false,
@@ -20,7 +21,6 @@ private data class CellChange(
 )
 
 private data class HistoryEntry(
-    val mistakes: Int,
     val changes: List<CellChange>,
 )
 
@@ -32,7 +32,12 @@ class SudokuSession(
     val solution: IntArray,
     puzzle: IntArray,
     notesMode: Boolean = false,
+    val showErrors: Boolean = true,
+    val id: String = UUID.randomUUID().toString(),
+    val createdAt: Long = System.currentTimeMillis(),
 ) {
+    val puzzleCells: IntArray = puzzle.copyOf()
+
     val cells: Array<Cell> = Array(CELLS) { index ->
         val value = puzzle[index]
         Cell(value = value, given = value != 0)
@@ -136,13 +141,17 @@ class SudokuSession(
         }
 
         val entry = snapshot(listOf(index) + affected)
-        cells[index] = cell.copy(value = number, notes = emptySet(), error = !correct)
+        cells[index] = cell.copy(
+            value = number,
+            notes = emptySet(),
+            error = showErrors && !correct,
+        )
 
         if (correct) {
             for (peer in affected) {
                 cells[peer] = cells[peer].copy(notes = cells[peer].notes - number)
             }
-        } else {
+        } else if (showErrors) {
             mistakes += 1
         }
 
@@ -186,7 +195,6 @@ class SudokuSession(
             cells[change.index] = change.cell
         }
 
-        mistakes = entry.mistakes
         selected = entry.changes.firstOrNull()?.index ?: selected
 
         return MoveOutcome(changed = true)
@@ -219,7 +227,6 @@ class SudokuSession(
             value = number,
             notes = emptySet(),
             error = false,
-            given = true,
         )
 
         for (peer in affected) {
@@ -234,6 +241,32 @@ class SudokuSession(
         return MoveOutcome(changed = true, won = finished)
     }
 
+    fun toGameRecord(
+        elapsedSeconds: Long,
+        updatedAt: Long,
+        solvedAt: Long? = if (won) updatedAt else null,
+    ): GameRecord = GameRecord(
+        id = id,
+        difficulty = difficulty,
+        showErrors = showErrors,
+        errors = mistakes,
+        puzzle = puzzleCells.copyOf(),
+        solution = solution.copyOf(),
+        values = IntArray(CELLS) { cells[it].value },
+        notes = buildMap {
+            cells.forEachIndexed { index, cell ->
+                if (cell.notes.isNotEmpty()) {
+                    put(index, cell.notes.toSet())
+                }
+            }
+        },
+        hintsUsed = hintsUsed,
+        elapsedSeconds = elapsedSeconds.coerceAtLeast(0),
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        solvedAt = solvedAt,
+    )
+
     private fun checkWin(): Boolean {
         if (cells.indices.all { cells[it].value == solution[it] }) {
             won = true
@@ -243,26 +276,7 @@ class SudokuSession(
         return false
     }
 
-    fun toSavedGame(elapsedSeconds: Long): SavedGame = SavedGame(
-        difficulty = difficulty,
-        solution = solution.copyOf(),
-        puzzle = IntArray(CELLS) { index ->
-            if (cells[index].given) cells[index].value else 0
-        },
-        values = IntArray(CELLS) { cells[it].value },
-        givens = BooleanArray(CELLS) { cells[it].given },
-        errors = BooleanArray(CELLS) { cells[it].error },
-        notes = Array(CELLS) { cells[it].notes },
-        selected = selected,
-        notesMode = notesMode,
-        mistakes = mistakes,
-        hintsUsed = hintsUsed,
-        elapsedSeconds = elapsedSeconds.coerceAtLeast(0),
-        won = won,
-    )
-
     private fun snapshot(indices: List<Int>): HistoryEntry = HistoryEntry(
-        mistakes = mistakes,
         changes = indices.map { index -> CellChange(index, cells[index]) },
     )
 
@@ -283,38 +297,34 @@ class SudokuSession(
         const val MAX_HINTS = 3
         private const val MAX_HISTORY = 200
 
-        fun restore(saved: SavedGame): SudokuSession {
-            require(saved.solution.size == CELLS)
-            require(saved.puzzle.size == CELLS)
-            require(saved.values.size == CELLS)
-            require(saved.givens.size == CELLS)
-            require(saved.errors.size == CELLS)
-            require(saved.notes.size == CELLS)
+        fun restore(game: GameRecord, notesMode: Boolean = false): SudokuSession {
+            require(game.isValid())
 
             val session = SudokuSession(
-                difficulty = saved.difficulty,
-                solution = saved.solution.copyOf(),
-                puzzle = saved.puzzle.copyOf(),
-                notesMode = saved.notesMode,
+                difficulty = game.difficulty,
+                solution = game.solution.copyOf(),
+                puzzle = game.puzzle.copyOf(),
+                notesMode = notesMode,
+                showErrors = game.showErrors,
+                id = game.id,
+                createdAt = game.createdAt,
             )
 
             for (index in 0 until CELLS) {
-                val value = saved.values[index]
-                require(value in 0..SIZE)
+                val value = game.values[index]
 
                 session.cells[index] = Cell(
                     value = value,
-                    given = saved.givens[index],
-                    error = saved.errors[index],
-                    notes = saved.notes[index].filter { it in 1..SIZE }.toSet(),
+                    given = game.puzzle[index] != 0,
+                    error = game.showErrors && value != 0 && value != game.solution[index],
+                    notes = game.notes[index]?.filter { it in 1..SIZE }?.toSet() ?: emptySet(),
                 )
             }
 
-            session.selected = saved.selected?.takeIf { it in 0 until CELLS }
-                ?: session.cells.indexOfFirst { it.value == 0 }.takeIf { it >= 0 }
-            session.mistakes = saved.mistakes.coerceAtLeast(0)
-            session.hintsUsed = saved.hintsUsed.coerceIn(0, MAX_HINTS)
-            session.won = saved.won
+            session.selected = session.cells.indexOfFirst { it.value == 0 }.takeIf { it >= 0 }
+            session.mistakes = if (game.showErrors) game.errors else 0
+            session.hintsUsed = game.hintsUsed
+            session.won = game.solved
 
             return session
         }

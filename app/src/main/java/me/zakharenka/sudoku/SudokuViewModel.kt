@@ -1,25 +1,35 @@
 package me.zakharenka.sudoku
 
 import android.app.Application
+import android.net.Uri
 import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import me.zakharenka.sudoku.data.RecordsStore
-import me.zakharenka.sudoku.data.SavedGameStore
+import me.zakharenka.sudoku.data.DataDecodeResult
+import me.zakharenka.sudoku.data.DataError
+import me.zakharenka.sudoku.data.DataTransferResult
+import me.zakharenka.sudoku.data.SettingsStore
+import me.zakharenka.sudoku.data.SudokuDataCodec
+import me.zakharenka.sudoku.data.SudokuDataStore
 import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
+import me.zakharenka.sudoku.game.GameRecord
 import me.zakharenka.sudoku.game.MoveOutcome
-import me.zakharenka.sudoku.game.SavedGame
+import me.zakharenka.sudoku.game.RecordStats
+import me.zakharenka.sudoku.game.SudokuData
 import me.zakharenka.sudoku.game.SudokuGenerator
 import me.zakharenka.sudoku.game.SudokuSession
 
@@ -28,14 +38,16 @@ data class GameUiState(
     val cells: List<Cell> = emptyList(),
     val selectedIndex: Int? = null,
     val notesMode: Boolean = false,
+    val showErrors: Boolean = true,
     val mistakes: Int = 0,
     val hintsRemaining: Int = SudokuSession.MAX_HINTS,
     val elapsedSeconds: Long = 0,
     val paused: Boolean = false,
     val won: Boolean = false,
     val loading: Boolean = true,
-    val bestTimes: Map<Difficulty, Long?> = emptyMap(),
-    val solvedCounts: Map<Difficulty, Int> = emptyMap(),
+    val records: Map<Difficulty, RecordStats> = emptyMap(),
+    val history: List<GameRecord> = emptyList(),
+    val currentGameId: String? = null,
     val isNewRecord: Boolean = false,
     val canUndo: Boolean = false,
     val canErase: Boolean = false,
@@ -43,119 +55,121 @@ data class GameUiState(
 )
 
 class SudokuViewModel(application: Application) : AndroidViewModel(application) {
-    private val records = RecordsStore(application)
-    private val savedGames = SavedGameStore(application)
+    private val settings = SettingsStore(application)
+    private val dataStore = SudokuDataStore(application)
     private val generator = SudokuGenerator()
+    private val saveMutex = Mutex()
 
+    private var data = SudokuData()
     private var session: SudokuSession? = null
     private var generationJob: Job? = null
     private var timerJob: Job? = null
     private var elapsedMillis = 0L
     private var timerStartedAt = 0L
-    private var bestTimes = records.loadBestTimes()
-    private var solvedCounts = records.loadSolvedCounts()
-    private var notesMode = records.notesMode
+    private var notesMode = settings.notesMode
 
-    var themeMode by mutableStateOf(records.themeMode)
+    var themeMode by mutableStateOf(settings.themeMode)
         private set
 
-    var straightGrid by mutableStateOf(records.straightGrid)
+    var straightGrid by mutableStateOf(settings.straightGrid)
         private set
 
-    var sameHighlight by mutableStateOf(records.sameHighlight)
+    var sameHighlight by mutableStateOf(settings.sameHighlight)
         private set
 
-    var handwrittenDigits by mutableStateOf(records.handwrittenDigits)
+    var handwrittenDigits by mutableStateOf(settings.handwrittenDigits)
+        private set
+
+    var showErrorsDefault by mutableStateOf(settings.showErrors)
         private set
 
     var uiState by mutableStateOf(
         GameUiState(
             notesMode = notesMode,
-            bestTimes = bestTimes,
-            solvedCounts = solvedCounts,
+            showErrors = showErrorsDefault,
         ),
     )
         private set
 
     init {
-        val saved = savedGames.load()
-        if (saved == null || !restoreSavedGame(saved)) {
-            newGame(Difficulty.EASY)
+        viewModelScope.launch {
+            data = dataStore.load()
+
+            val current = data.currentGame()
+
+            if (current != null) {
+                restoreGame(current)
+            } else {
+                startGame(Difficulty.EASY, showErrorsDefault)
+            }
         }
     }
 
     fun updateThemeMode(mode: ThemeMode) {
         themeMode = mode
-        records.themeMode = mode
+        settings.themeMode = mode
     }
 
     fun updateStraightGrid(enabled: Boolean) {
         straightGrid = enabled
-        records.straightGrid = enabled
+        settings.straightGrid = enabled
     }
 
     fun updateSameHighlight(enabled: Boolean) {
         sameHighlight = enabled
-        records.sameHighlight = enabled
+        settings.sameHighlight = enabled
     }
 
     fun updateHandwrittenDigits(enabled: Boolean) {
         handwrittenDigits = enabled
-        records.handwrittenDigits = enabled
+        settings.handwrittenDigits = enabled
     }
 
-    fun clearBestTimes() {
-        records.clearBestTimes()
-        bestTimes = records.loadBestTimes()
-        solvedCounts = records.loadSolvedCounts()
+    fun openRecords() {
+        uiState = uiState.copy(records = data.recordsByDifficulty())
+    }
+
+    fun newGame(
+        difficulty: Difficulty = uiState.difficulty,
+        showErrors: Boolean = showErrorsDefault,
+    ) {
+        showErrorsDefault = showErrors
+        settings.showErrors = showErrors
+        startGame(difficulty, showErrors)
+    }
+
+    fun openHistory() {
+        val current = session?.takeIf { !it.won && !uiState.loading }
+
+        if (current != null) {
+            val record = current.toGameRecord(
+                elapsedSeconds = elapsedMillis / 1000,
+                updatedAt = System.currentTimeMillis(),
+            )
+            data = data.upsertGame(record).copy(currentGameId = record.id)
+            saveData()
+        }
+
         uiState = uiState.copy(
-            bestTimes = bestTimes,
-            solvedCounts = solvedCounts,
+            history = data.games.sortedByDescending { it.createdAt },
+            currentGameId = data.currentGameId,
         )
     }
 
-    fun newGame(difficulty: Difficulty = uiState.difficulty) {
+    fun loadGame(gameId: String) {
+        val game = data.games.firstOrNull { it.id == gameId } ?: return
+
+        if (session?.id == gameId) {
+            return
+        }
+
         generationJob?.cancel()
         stopTimer()
-        savedGames.clear()
-        session = null
-        elapsedMillis = 0
-        timerStartedAt = 0
+        persistCurrentGame()
 
-        uiState = uiState.copy(
-            difficulty = difficulty,
-            cells = emptyList(),
-            selectedIndex = null,
-            notesMode = notesMode,
-            mistakes = 0,
-            hintsRemaining = SudokuSession.MAX_HINTS,
-            elapsedSeconds = 0,
-            paused = false,
-            won = false,
-            loading = true,
-            isNewRecord = false,
-            canUndo = false,
-            canErase = false,
-            gameId = uiState.gameId + 1,
-        )
-
-        generationJob = viewModelScope.launch {
-            val generated = withContext(Dispatchers.Default) { generator.generate(difficulty) }
-
-            if (!isActive) {
-                return@launch
-            }
-
-            session = SudokuSession(
-                difficulty = difficulty,
-                solution = generated.solution,
-                puzzle = generated.puzzle,
-                notesMode = notesMode,
-            )
-            uiState = uiState.copy(loading = false)
-            refresh()
-            startTimer()
-        }
+        data = data.copy(currentGameId = game.id)
+        saveData()
+        restoreGame(game, startPaused = !game.solved)
     }
 
     fun select(index: Int) {
@@ -234,7 +248,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         session.toggleNotes()
         notesMode = session.notesMode
-        records.notesMode = notesMode
+        settings.notesMode = notesMode
         refresh()
     }
 
@@ -253,6 +267,8 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         stopTimer()
         uiState = uiState.copy(paused = true)
+        persistCurrentGame()
+        saveData()
     }
 
     fun resume() {
@@ -268,10 +284,173 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         if (!uiState.loading && !uiState.won) {
             if (!uiState.paused) {
                 pause()
+            } else {
+                persistCurrentGame()
+                saveData()
             }
-            saveCurrentGame()
         } else {
-            saveCurrentGame()
+            saveData()
+        }
+    }
+
+    fun exportData(uri: Uri, onResult: (DataTransferResult) -> Unit) {
+        viewModelScope.launch {
+            val result = runCatching {
+                persistCurrentGame()
+                saveCurrentData()
+                val payload = SudokuDataCodec.encode(data)
+
+                withContext(Dispatchers.IO) {
+                    val output = getApplication<Application>().contentResolver
+                        .openOutputStream(uri, "wt")
+                        ?: throw IOException("Cannot open export stream")
+
+                    output.use { stream ->
+                        stream.write(payload.toByteArray())
+                    }
+                }
+            }
+
+            onResult(
+                if (result.isSuccess) {
+                    DataTransferResult.Success
+                } else {
+                    DataTransferResult.Failure(DataError.IO_ERROR)
+                },
+            )
+        }
+    }
+
+    fun importData(uri: Uri, onResult: (DataTransferResult) -> Unit) {
+        viewModelScope.launch {
+            val raw = withContext(Dispatchers.IO) {
+                runCatching {
+                    getApplication<Application>().contentResolver
+                        .openInputStream(uri)
+                        ?.use { it.readBytes().decodeToString() }
+                }.getOrNull()
+            }
+
+            if (raw == null) {
+                onResult(DataTransferResult.Failure(DataError.IO_ERROR))
+                return@launch
+            }
+
+            when (val decoded = SudokuDataCodec.decode(raw)) {
+                is DataDecodeResult.Failure -> {
+                    onResult(DataTransferResult.Failure(decoded.error))
+                    return@launch
+                }
+
+                is DataDecodeResult.Success -> {
+                    val imported = decoded.data.normalized()
+                    val saved = runCatching { saveCurrentData(imported) }
+
+                    if (saved.isFailure) {
+                        onResult(DataTransferResult.Failure(DataError.IO_ERROR))
+                        return@launch
+                    }
+
+                    generationJob?.cancel()
+                    stopTimer()
+                    session = null
+                    elapsedMillis = 0
+                    timerStartedAt = 0
+                    data = imported
+                    uiState = uiState.copy(
+                        history = data.games.sortedByDescending { it.createdAt },
+                        currentGameId = data.currentGameId,
+                    )
+
+                    val current = data.currentGame()
+
+                    if (current != null) {
+                        restoreGame(current)
+                    } else {
+                        startGame(uiState.difficulty, showErrorsDefault, startPaused = true)
+                    }
+
+                    onResult(DataTransferResult.Success)
+                }
+            }
+        }
+    }
+
+    private fun startGame(
+        difficulty: Difficulty,
+        showErrors: Boolean,
+        startPaused: Boolean = false,
+    ) {
+        generationJob?.cancel()
+        stopTimer()
+
+        val previous = session?.takeIf { !it.won && !uiState.loading }
+
+        if (previous != null) {
+            data = data.upsertGame(
+                previous.toGameRecord(
+                    elapsedSeconds = elapsedMillis / 1000,
+                    updatedAt = System.currentTimeMillis(),
+                ),
+            )
+        }
+
+        session = null
+        elapsedMillis = 0
+        timerStartedAt = 0
+
+        uiState = uiState.copy(
+            difficulty = difficulty,
+            showErrors = showErrors,
+            cells = emptyList(),
+            selectedIndex = null,
+            notesMode = notesMode,
+            mistakes = 0,
+            hintsRemaining = SudokuSession.MAX_HINTS,
+            elapsedSeconds = 0,
+            paused = startPaused,
+            won = false,
+            loading = true,
+            isNewRecord = false,
+            canUndo = false,
+            canErase = false,
+            currentGameId = data.currentGameId,
+            gameId = uiState.gameId + 1,
+        )
+
+        saveData()
+
+        generationJob = viewModelScope.launch {
+            val generated = withContext(Dispatchers.Default) { generator.generate(difficulty) }
+
+            if (!isActive) {
+                return@launch
+            }
+
+            val now = System.currentTimeMillis()
+            val newSession = SudokuSession(
+                difficulty = difficulty,
+                solution = generated.solution,
+                puzzle = generated.puzzle,
+                notesMode = notesMode,
+                showErrors = showErrors,
+            )
+
+            session = newSession
+            data = data.upsertGame(
+                newSession.toGameRecord(
+                    elapsedSeconds = 0,
+                    updatedAt = now,
+                ),
+            ).copy(currentGameId = newSession.id)
+            saveData()
+
+            uiState = uiState.copy(loading = false)
+            refresh()
+
+            if (!startPaused) {
+                startTimer()
+            }
         }
     }
 
@@ -283,22 +462,25 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         if (outcome.changed) {
             refresh()
+            persistCurrentGame()
+            saveData()
         }
     }
 
     private fun finishWin(session: SudokuSession) {
         stopTimer()
-        savedGames.clear()
 
-        val seconds = elapsedMillis / 1000
-        val isRecord = records.saveBestTime(session.difficulty, seconds)
-        solvedCounts = records.incrementSolvedCount(session.difficulty)
+        val now = System.currentTimeMillis()
+        val record = session.toGameRecord(
+            elapsedSeconds = elapsedMillis / 1000,
+            updatedAt = now,
+            solvedAt = now,
+        )
+        val win = data.withWin(record)
+        data = win.data
+        saveData()
 
-        if (isRecord) {
-            bestTimes = records.loadBestTimes()
-        }
-
-        refresh(isNewRecord = isRecord)
+        refresh(isNewRecord = win.isNewRecord)
     }
 
     private fun refresh(
@@ -308,18 +490,18 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         uiState = uiState.copy(
             difficulty = session.difficulty,
+            showErrors = session.showErrors,
             cells = session.cells.toList(),
             selectedIndex = session.selected,
             notesMode = session.notesMode,
             mistakes = session.mistakes,
             hintsRemaining = session.hintsRemaining,
             won = session.won,
-            bestTimes = bestTimes,
-            solvedCounts = solvedCounts,
             isNewRecord = isNewRecord,
             canUndo = session.canUndo,
             canErase = session.canErase,
             elapsedSeconds = elapsedMillis / 1000,
+            currentGameId = data.currentGameId,
         )
     }
 
@@ -334,6 +516,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         timerStartedAt = SystemClock.elapsedRealtime() - elapsedMillis
+        var lastCheckpointAt = SystemClock.elapsedRealtime()
         timerJob = viewModelScope.launch {
             while (isActive) {
                 elapsedMillis = SystemClock.elapsedRealtime() - timerStartedAt
@@ -341,6 +524,12 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
                 if (seconds != uiState.elapsedSeconds) {
                     uiState = uiState.copy(elapsedSeconds = seconds)
+                }
+
+                if (SystemClock.elapsedRealtime() - lastCheckpointAt >= CHECKPOINT_INTERVAL_MS) {
+                    lastCheckpointAt = SystemClock.elapsedRealtime()
+                    persistCurrentGame()
+                    saveData()
                 }
 
                 delay(250)
@@ -360,63 +549,84 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         uiState = uiState.copy(elapsedSeconds = elapsedMillis / 1000)
     }
 
-    private fun restoreSavedGame(saved: SavedGame): Boolean {
-        if (saved.won) {
-            savedGames.clear()
-            return false
-        }
+    private fun restoreGame(
+        game: GameRecord,
+        startPaused: Boolean = true,
+    ) {
+        val restored = runCatching { SudokuSession.restore(game, notesMode) }.getOrNull()
 
-        val restored = runCatching { SudokuSession.restore(saved) }.getOrNull()
         if (restored == null) {
-            savedGames.clear()
-            return false
+            data = data.copy(currentGameId = null)
+            saveData()
+            startGame(Difficulty.EASY, showErrorsDefault)
+            return
         }
 
         session = restored
         notesMode = restored.notesMode
-        records.notesMode = notesMode
-        elapsedMillis = saved.elapsedSeconds * 1000
+        settings.notesMode = notesMode
+        elapsedMillis = game.elapsedSeconds * 1000
         timerStartedAt = 0
+        data = data.copy(currentGameId = game.id)
 
         uiState = uiState.copy(
             difficulty = restored.difficulty,
+            showErrors = restored.showErrors,
             cells = restored.cells.toList(),
             selectedIndex = restored.selected,
             notesMode = restored.notesMode,
             mistakes = restored.mistakes,
             hintsRemaining = restored.hintsRemaining,
-            elapsedSeconds = saved.elapsedSeconds,
-            paused = true,
-            won = false,
+            elapsedSeconds = game.elapsedSeconds,
+            paused = startPaused && !restored.won,
+            won = restored.won,
             loading = false,
-            bestTimes = bestTimes,
-            solvedCounts = solvedCounts,
             isNewRecord = false,
             canUndo = false,
             canErase = restored.canErase,
+            currentGameId = data.currentGameId,
             gameId = uiState.gameId + 1,
         )
 
-        return true
+        if (!startPaused && !restored.won) {
+            startTimer()
+        }
     }
 
-    private fun saveCurrentGame() {
-        val current = session
+    private fun persistCurrentGame() {
+        val current = session ?: return
 
-        if (current == null || current.won || uiState.loading) {
-            savedGames.clear()
+        if (current.won || uiState.loading) {
             return
         }
 
-        savedGames.save(current.toSavedGame(elapsedMillis / 1000))
+        val record = current.toGameRecord(
+            elapsedSeconds = elapsedMillis / 1000,
+            updatedAt = System.currentTimeMillis(),
+        )
+        data = data.upsertGame(record).copy(currentGameId = record.id)
+    }
+
+    private fun saveData() {
+        viewModelScope.launch {
+            saveMutex.withLock {
+                runCatching { dataStore.save(data) }
+            }
+        }
+    }
+
+    private suspend fun saveCurrentData(dataToSave: SudokuData = data) {
+        saveMutex.withLock {
+            dataStore.save(dataToSave)
+        }
+    }
+
+    private companion object {
+        const val CHECKPOINT_INTERVAL_MS = 10_000L
     }
 
     override fun onCleared() {
-        if (!uiState.loading && !uiState.won) {
-            stopTimer()
-            saveCurrentGame()
-        }
-
+        stopTimer()
         generationJob?.cancel()
         timerJob?.cancel()
     }

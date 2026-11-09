@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">massimo</string>
 
     <string name="new_game">Nuova partita</string>
-    <string name="new_game_confirm">Iniziare una nuova partita? I progressi attuali andranno persi.</string>
+    <string name="new_game_confirm">Iniziare una nuova partita? La partita attuale verrà salvata nella cronologia.</string>
     <string name="new_game_start">Inizia</string>
     <string name="new_game_cancel">Annulla</string>
     <string name="action_undo">Annulla</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Cifre scritte a mano</string>
     <string name="settings_language_current">Lingua: %1$s</string>
     <string name="settings_language_open">Cambia lingua</string>
-    <string name="settings_reset_records">Reimposta i record</string>
-    <string name="settings_reset_confirm">Reimpostare tutti i record?</string>
-    <string name="settings_reset_yes">Sì</string>
-    <string name="settings_reset_cancel">Annulla</string>
-    <string name="settings_reset_done">Record reimpostati.</string>
     <string name="settings_about">Informazioni</string>
     <string name="settings_about_version">Sudoku 9×9 · versione %1$s</string>
     <string name="settings_developer_website">Sito dello sviluppatore</string>
+
+    <string name="header_history">Cronologia</string>
+    <string name="new_game_show_errors">Mostra errori</string>
+    <string name="new_game_show_errors_note">Evidenzia le cifre errate e conta gli errori</string>
+    <string name="records_mode_show_errors">Con errori</string>
+    <string name="records_mode_hide_errors">Senza errori</string>
+    <string name="history_title">Cronologia partite</string>
+    <string name="history_empty">Nessuna partita salvata.</string>
+    <string name="history_current">In corso</string>
+    <string name="history_started">Avviata: %1$s</string>
+    <string name="history_solved">Risolta: %1$s</string>
+    <string name="history_updated">Aggiornata: %1$s</string>
+    <string name="history_time">Tempo: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Errori: disattivati</string>
+    <string name="history_puzzle_preview">Anteprima del sudoku</string>
+    <string name="settings_data">Dati</string>
+    <string name="settings_export">Esporta backup</string>
+    <string name="settings_import">Importa backup</string>
+    <string name="settings_import_confirm">Sostituire tutti i record e la cronologia con il contenuto del file?</string>
+    <string name="settings_import_yes">Sostituisci</string>
+    <string name="settings_import_no">Annulla</string>
+    <string name="transfer_exported">Backup salvato.</string>
+    <string name="transfer_imported">Dati importati.</string>
+    <string name="transfer_failed">Impossibile completare l\'operazione.</string>
+    <string name="transfer_invalid_json">Il file non è un JSON valido.</string>
+    <string name="transfer_invalid_version">Versione del file non supportata.</string>
+    <string name="transfer_invalid_fields">Il file contiene dati non validi.</string>
+
+    <string name="records_hint_without_mistakes">Miglior tempo e partite risolte senza errori.</string>
+    <string name="records_hint_with_mistakes">Miglior tempo e partite risolte con errori.</string>
 </resources>

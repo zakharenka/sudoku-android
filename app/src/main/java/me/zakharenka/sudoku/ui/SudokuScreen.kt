@@ -6,9 +6,13 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -54,27 +58,50 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Date
+import java.util.Locale
 import me.zakharenka.sudoku.GameUiState
 import me.zakharenka.sudoku.BuildConfig
 import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.SudokuViewModel
+import me.zakharenka.sudoku.data.DataError
+import me.zakharenka.sudoku.data.DataTransferResult
 import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Difficulty
+import me.zakharenka.sudoku.game.GameRecord
+import me.zakharenka.sudoku.game.RecordStats
+import me.zakharenka.sudoku.game.formatDateTime
 import me.zakharenka.sudoku.game.formatTime
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.EXPORT
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.HISTORY
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.IMPORT
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.INFO
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.LANGUAGE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.SETTINGS
@@ -94,12 +121,13 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     val state = viewModel.uiState
 
     var showRecords by rememberSaveable { mutableStateOf(false) }
+    var showHistory by rememberSaveable { mutableStateOf(false) }
     var showRules by rememberSaveable { mutableStateOf(false) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showNewGameDialog by rememberSaveable { mutableStateOf(false) }
     var dismissedGameId by rememberSaveable { mutableStateOf<Long?>(null) }
     var pausedByDialog by rememberSaveable { mutableStateOf(false) }
-    val dialogOpen = showRecords || showRules || showSettings || showNewGameDialog
+    val dialogOpen = showRecords || showHistory || showRules || showSettings || showNewGameDialog
     val winDismissed = dismissedGameId == state.gameId
     val keyboardFocus = remember { FocusRequester() }
 
@@ -172,7 +200,14 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 Header(
                     isWide = isWide,
                     onRules = { showRules = true },
-                    onRecords = { showRecords = true },
+                    onRecords = {
+                        viewModel.openRecords()
+                        showRecords = true
+                    },
+                    onHistory = {
+                        viewModel.openHistory()
+                        showHistory = true
+                    },
                     onSettings = { showSettings = true },
                 )
 
@@ -196,9 +231,21 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
     if (showRecords) {
         RecordsDialog(
-            bestTimes = state.bestTimes,
-            solvedCounts = state.solvedCounts,
+            records = state.records,
             onDismiss = { showRecords = false },
+        )
+    }
+
+    if (showHistory) {
+        HistoryDialog(
+            games = state.history,
+            currentGameId = state.currentGameId,
+            onSelectGame = { gameId ->
+                viewModel.loadGame(gameId)
+                pausedByDialog = false
+                showHistory = false
+            },
+            onDismiss = { showHistory = false },
         )
     }
 
@@ -216,7 +263,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onSameHighlightChange = viewModel::updateSameHighlight,
             handwrittenDigits = viewModel.handwrittenDigits,
             onHandwrittenDigitsChange = viewModel::updateHandwrittenDigits,
-            onResetRecords = viewModel::clearBestTimes,
+            onExport = viewModel::exportData,
+            onImport = viewModel::importData,
             onDismiss = { showSettings = false },
         )
     }
@@ -224,9 +272,10 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     if (showNewGameDialog) {
         NewGameDialog(
             initialDifficulty = state.difficulty,
-            onStart = { difficulty ->
+            initialShowErrors = viewModel.showErrorsDefault,
+            onStart = { difficulty, showErrors ->
                 showNewGameDialog = false
-                viewModel.newGame(difficulty)
+                viewModel.newGame(difficulty, showErrors)
             },
             onDismiss = { showNewGameDialog = false },
         )
@@ -333,6 +382,7 @@ private fun GamePanel(
                 TopToolbar(
                     difficulty = state.difficulty,
                     mistakes = state.mistakes,
+                    showErrors = state.showErrors,
                     elapsedSeconds = state.elapsedSeconds,
                     paused = state.paused,
                     enabled = !state.loading && !state.won,
@@ -375,6 +425,7 @@ private fun GamePanel(
                 TopToolbar(
                     difficulty = state.difficulty,
                     mistakes = state.mistakes,
+                    showErrors = state.showErrors,
                     elapsedSeconds = state.elapsedSeconds,
                     paused = state.paused,
                     enabled = !state.loading && !state.won,
@@ -501,9 +552,12 @@ private fun Header(
     isWide: Boolean,
     onRules: () -> Unit,
     onRecords: () -> Unit,
+    onHistory: () -> Unit,
     onSettings: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
+    val buttonSize = if (isWide) 44.dp else 40.dp
+    val iconSpacing = if (isWide) 4.dp else 2.dp
 
     Row(
         modifier = Modifier
@@ -511,18 +565,19 @@ private fun Header(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        SketchLogo(56.dp)
+        SketchLogo(if (isWide) 56.dp else 50.dp)
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(if (isWide) 12.dp else 8.dp))
 
         Text(
             text = stringResource(R.string.app_name),
             color = colors.ink,
-            fontSize = 36.sp,
+            fontSize = if (isWide) 36.sp else 31.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
-            lineHeight = 38.sp,
+            lineHeight = if (isWide) 38.sp else 34.sp,
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
 
@@ -530,24 +585,37 @@ private fun Header(
             icon = INFO,
             description = stringResource(R.string.header_rules),
             seed = 700,
+            size = buttonSize,
             onClick = onRules,
         )
 
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(iconSpacing))
 
         HeaderIconButton(
             icon = TROPHY,
             description = stringResource(R.string.header_records),
             seed = 701,
+            size = buttonSize,
             onClick = onRecords,
         )
 
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(iconSpacing))
+
+        HeaderIconButton(
+            icon = HISTORY,
+            description = stringResource(R.string.header_history),
+            seed = 703,
+            size = buttonSize,
+            onClick = onHistory,
+        )
+
+        Spacer(Modifier.width(iconSpacing))
 
         HeaderIconButton(
             icon = SETTINGS,
             description = stringResource(R.string.header_settings),
             seed = 702,
+            size = buttonSize,
             onClick = onSettings,
         )
     }
@@ -558,6 +626,7 @@ private fun HeaderIconButton(
     icon: SketchIcon,
     description: String,
     seed: Int,
+    size: Dp,
     onClick: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -565,7 +634,7 @@ private fun HeaderIconButton(
     SketchButton(
         onClick = onClick,
         modifier = Modifier
-            .size(44.dp)
+            .size(size)
             .semantics { contentDescription = description },
         fill = colors.paperSunken,
         border = colors.gridLine,
@@ -782,18 +851,58 @@ private fun DialogHeader(
 
 @Composable
 private fun RecordsDialog(
-    bestTimes: Map<Difficulty, Long?>,
-    solvedCounts: Map<Difficulty, Int>,
+    records: Map<Difficulty, RecordStats>,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
+    var showMistakes by remember { mutableStateOf(false) }
 
     SketchDialog(
         title = stringResource(R.string.records_title),
         onDismiss = onDismiss,
         seed = 800,
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            ModeButton(
+                label = stringResource(R.string.records_mode_hide_errors),
+                active = !showMistakes,
+                seed = 801,
+                modifier = Modifier.weight(1f),
+                onClick = { showMistakes = false },
+            )
+            ModeButton(
+                label = stringResource(R.string.records_mode_show_errors),
+                active = showMistakes,
+                seed = 802,
+                modifier = Modifier.weight(1f),
+                onClick = { showMistakes = true },
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+        Text(
+            text = stringResource(
+                if (showMistakes) {
+                    R.string.records_hint_with_mistakes
+                } else {
+                    R.string.records_hint_without_mistakes
+                },
+            ),
+            color = colors.inkSoft,
+            fontSize = 13.sp,
+            fontFamily = HandFont,
+            lineHeight = 18.sp,
+        )
+
+        Spacer(Modifier.height(12.dp))
+
         Difficulty.entries.forEach { difficulty ->
+            val record = records[difficulty]?.forMistakes(showMistakes) ?: return@forEach
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -809,7 +918,7 @@ private fun RecordsDialog(
                     Text(
                         text = stringResource(
                             R.string.records_solved_level,
-                            solvedCounts[difficulty] ?: 0,
+                            record.solved,
                         ),
                         color = colors.inkSoft.copy(alpha = 0.7f),
                         fontSize = 14.sp,
@@ -817,7 +926,7 @@ private fun RecordsDialog(
                     )
                 }
                 Text(
-                    text = bestTimes[difficulty]?.let(::formatTime) ?: "—",
+                    text = record.bestSeconds?.let(::formatTime) ?: "—",
                     color = colors.accent,
                     fontSize = 23.sp,
                     fontFamily = HandFont,
@@ -826,6 +935,279 @@ private fun RecordsDialog(
             }
             Spacer(Modifier.height(8.dp))
         }
+    }
+}
+
+@Composable
+private fun ModeButton(
+    label: String,
+    active: Boolean,
+    seed: Int,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+
+    SketchButton(
+        onClick = onClick,
+        modifier = modifier.height(46.dp),
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        active = active,
+        seed = seed,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+        Text(
+            text = label,
+            color = if (active) colors.accent else colors.inkSoft,
+            fontSize = 16.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun HistoryDialog(
+    games: List<GameRecord>,
+    currentGameId: String?,
+    onSelectGame: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+    val locale = LocalConfiguration.current.locales[0]
+    val zone = remember { ZoneId.systemDefault() }
+    val dateFormatter = remember(locale) {
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+    }
+    val groups = remember(games, zone) {
+        games.sortedByDescending { it.createdAt }
+            .groupBy { Instant.ofEpochMilli(it.createdAt).atZone(zone).toLocalDate() }
+    }
+
+    SketchDialog(
+        title = stringResource(R.string.history_title),
+        onDismiss = onDismiss,
+        seed = 807,
+    ) {
+        if (groups.isEmpty()) {
+            Text(
+                text = stringResource(R.string.history_empty),
+                color = colors.inkSoft,
+                fontSize = 17.sp,
+                fontFamily = HandFont,
+            )
+            return@SketchDialog
+        }
+
+        groups.forEach { (date, dayGames) ->
+            Text(
+                text = date.format(dateFormatter),
+                color = colors.inkSoft,
+                fontSize = 15.sp,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.6.sp,
+                modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
+            )
+
+            dayGames.forEach { game ->
+                HistoryRow(
+                    game = game,
+                    isCurrent = game.id == currentGameId,
+                    locale = locale,
+                    onClick = { onSelectGame(game.id) },
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryRow(
+    game: GameRecord,
+    isCurrent: Boolean,
+    locale: Locale,
+    onClick: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+    val mistakeText = if (game.showErrors) {
+        stringResource(
+            R.string.history_mistakes,
+            pluralStringResource(R.plurals.mistakes, game.errors, game.errors),
+        )
+    } else {
+        stringResource(R.string.history_errors_disabled)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        PuzzleThumbnail(
+            puzzle = game.puzzle,
+            modifier = Modifier.size(80.dp),
+        )
+
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(game.difficulty.labelRes()),
+                    color = colors.ink,
+                    fontSize = 18.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                )
+                if (isCurrent) {
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.history_current),
+                        color = colors.accent,
+                        fontSize = 13.sp,
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+            Text(
+                text = stringResource(
+                    R.string.history_started,
+                    formatDateTime(game.createdAt, locale),
+                ),
+                color = colors.inkSoft,
+                fontSize = 13.sp,
+                fontFamily = HandFont,
+                lineHeight = 17.sp,
+            )
+            Text(
+                text = if (game.solved) {
+                    stringResource(
+                        R.string.history_solved,
+                        formatDateTime(game.solvedAt ?: game.updatedAt, locale),
+                    )
+                } else {
+                    stringResource(
+                        R.string.history_updated,
+                        formatDateTime(game.updatedAt, locale),
+                    )
+                },
+                color = colors.inkSoft,
+                fontSize = 13.sp,
+                fontFamily = HandFont,
+                lineHeight = 17.sp,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.history_time,
+                        formatTime(game.elapsedSeconds),
+                    ),
+                    color = colors.accent,
+                    fontSize = 13.sp,
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = mistakeText,
+                    color = if (game.showErrors) colors.inkSoft else colors.inkSoft.copy(alpha = 0.65f),
+                    fontSize = 13.sp,
+                    fontFamily = HandFont,
+                    textAlign = TextAlign.End,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PuzzleThumbnail(
+    puzzle: IntArray,
+    modifier: Modifier = Modifier,
+) {
+    val colors = SudokuTheme.colors
+    val density = LocalDensity.current
+    val textMeasurer = rememberTextMeasurer()
+    val description = stringResource(R.string.history_puzzle_preview)
+
+    Canvas(
+        modifier = modifier.semantics { contentDescription = description },
+    ) {
+        val cell = size.minDimension / 9f
+        val lineWidth = 0.7.dp.toPx()
+        val strongWidth = 1.3.dp.toPx()
+        val textStyle = TextStyle(
+            color = colors.ink,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = with(density) { (cell * 0.78f).toSp() },
+        )
+
+        drawRect(color = colors.paperSunken)
+
+        for (index in 1..8) {
+            val thick = index % 3 == 0
+            val width = if (thick) strongWidth else lineWidth
+            val color = if (thick) colors.gridLineStrong else colors.gridLine
+            val offset = index * cell
+
+            drawLine(
+                color = color,
+                start = Offset(offset, 0f),
+                end = Offset(offset, size.height),
+                strokeWidth = width,
+            )
+            drawLine(
+                color = color,
+                start = Offset(0f, offset),
+                end = Offset(size.width, offset),
+                strokeWidth = width,
+            )
+        }
+
+        for (index in puzzle.indices) {
+            val value = puzzle[index]
+
+            if (value == 0) {
+                continue
+            }
+
+            val row = index / 9
+            val col = index % 9
+            val layout = textMeasurer.measure(
+                text = AnnotatedString(value.toString()),
+                style = textStyle,
+                maxLines = 1,
+            )
+
+            drawText(
+                textLayoutResult = layout,
+                topLeft = Offset(
+                    x = col * cell + (cell - layout.size.width) / 2f,
+                    y = row * cell + (cell - layout.size.height) / 2f,
+                ),
+            )
+        }
+
+        drawRect(
+            color = colors.gridLineStrong,
+            topLeft = Offset.Zero,
+            size = size,
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = strongWidth),
+        )
     }
 }
 
@@ -888,7 +1270,8 @@ private fun SettingsDialog(
     onSameHighlightChange: (Boolean) -> Unit,
     handwrittenDigits: Boolean,
     onHandwrittenDigitsChange: (Boolean) -> Unit,
-    onResetRecords: () -> Unit,
+    onExport: (Uri, (DataTransferResult) -> Unit) -> Unit,
+    onImport: (Uri, (DataTransferResult) -> Unit) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -898,8 +1281,26 @@ private fun SettingsDialog(
     val currentLanguage = currentLocale
         .getDisplayLanguage(currentLocale)
         .replaceFirstChar { it.titlecase(currentLocale) }
-    var confirmReset by remember { mutableStateOf(false) }
-    var resetDone by remember { mutableStateOf(false) }
+    var pendingImport by rememberSaveable { mutableStateOf<String?>(null) }
+    var transferMessage by rememberSaveable { mutableStateOf<TransferMessage?>(null) }
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri != null) {
+            transferMessage = null
+            onExport(uri) { result ->
+                transferMessage = result.toMessage(export = true)
+            }
+        }
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            transferMessage = null
+            pendingImport = uri.toString()
+        }
+    }
 
     SketchDialog(
         title = stringResource(R.string.settings_title),
@@ -986,46 +1387,42 @@ private fun SettingsDialog(
             onClick = { openAppLanguageSettings(context) },
         )
 
-        Spacer(Modifier.height(16.dp))
+        SectionLabel(stringResource(R.string.settings_data))
 
-        SketchButton(
-            onClick = {
-                confirmReset = true
-                resetDone = false
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            fill = colors.dangerWash.copy(alpha = 0.55f),
-            border = colors.danger.copy(alpha = 0.6f),
+        SettingsActionButton(
+            icon = EXPORT,
+            label = stringResource(R.string.settings_export),
             seed = 842,
-            contentPadding = PaddingValues(horizontal = 12.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.settings_reset_records),
-                color = colors.danger,
-                fontSize = 18.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { exportLauncher.launch(backupFileName()) },
+        )
 
-        if (confirmReset) {
-            Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
+
+        SettingsActionButton(
+            icon = IMPORT,
+            label = stringResource(R.string.settings_import),
+            seed = 843,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { importLauncher.launch(arrayOf("application/json")) },
+        )
+
+        if (pendingImport != null) {
+            Spacer(Modifier.height(10.dp))
 
             SketchSurface(
                 modifier = Modifier.fillMaxWidth(),
                 fill = colors.dangerWash,
                 border = colors.danger,
                 strokeWidth = 1.6.dp,
-                seed = 843,
+                seed = 844,
                 contentPadding = PaddingValues(12.dp),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = stringResource(R.string.settings_reset_confirm),
+                        text = stringResource(R.string.settings_import_confirm),
                         color = colors.danger,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -1034,18 +1431,24 @@ private fun SettingsDialog(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SketchButton(
                             onClick = {
-                                onResetRecords()
-                                confirmReset = false
-                                resetDone = true
+                                val uri = pendingImport?.let(Uri::parse)
+                                pendingImport = null
+
+                                if (uri != null) {
+                                    transferMessage = null
+                                    onImport(uri) { result ->
+                                        transferMessage = result.toMessage(export = false)
+                                    }
+                                }
                             },
                             modifier = Modifier.height(44.dp),
                             fill = colors.dangerWash,
                             border = colors.danger,
-                            seed = 844,
+                            seed = 845,
                             contentPadding = PaddingValues(horizontal = 14.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.settings_reset_yes),
+                                text = stringResource(R.string.settings_import_yes),
                                 color = colors.danger,
                                 fontSize = 17.sp,
                                 fontFamily = HandFont,
@@ -1053,15 +1456,15 @@ private fun SettingsDialog(
                             )
                         }
                         SketchButton(
-                            onClick = { confirmReset = false },
+                            onClick = { pendingImport = null },
                             modifier = Modifier.height(44.dp),
                             fill = colors.paperSunken,
                             border = colors.gridLine,
-                            seed = 845,
+                            seed = 846,
                             contentPadding = PaddingValues(horizontal = 14.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.settings_reset_cancel),
+                                text = stringResource(R.string.settings_import_no),
                                 color = colors.inkSoft,
                                 fontSize = 17.sp,
                                 fontFamily = HandFont,
@@ -1073,11 +1476,17 @@ private fun SettingsDialog(
             }
         }
 
-        if (resetDone) {
+        if (transferMessage != null) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = stringResource(R.string.settings_reset_done),
-                color = colors.success,
+                text = stringResource(transferMessage!!.messageRes),
+                color = if (transferMessage == TransferMessage.EXPORTED ||
+                    transferMessage == TransferMessage.IMPORTED
+                ) {
+                    colors.success
+                } else {
+                    colors.danger
+                },
                 fontSize = 17.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
@@ -1107,14 +1516,45 @@ private fun SettingsDialog(
     }
 }
 
+private enum class TransferMessage(val messageRes: Int) {
+    EXPORTED(R.string.transfer_exported),
+    IMPORTED(R.string.transfer_imported),
+    FAILED(R.string.transfer_failed),
+    INVALID_JSON(R.string.transfer_invalid_json),
+    INVALID_VERSION(R.string.transfer_invalid_version),
+    INVALID_FIELDS(R.string.transfer_invalid_fields),
+}
+
+private fun DataTransferResult.toMessage(export: Boolean): TransferMessage = when (this) {
+    is DataTransferResult.Success -> if (export) {
+        TransferMessage.EXPORTED
+    } else {
+        TransferMessage.IMPORTED
+    }
+
+    is DataTransferResult.Failure -> when (error) {
+        DataError.IO_ERROR -> TransferMessage.FAILED
+        DataError.INVALID_JSON -> TransferMessage.INVALID_JSON
+        DataError.UNSUPPORTED_VERSION -> TransferMessage.INVALID_VERSION
+        DataError.INVALID_FIELDS -> TransferMessage.INVALID_FIELDS
+    }
+}
+
+private fun backupFileName(): String {
+    val stamp = SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(Date())
+    return "sudoku-backup-$stamp.json"
+}
+
 @Composable
 private fun NewGameDialog(
     initialDifficulty: Difficulty,
-    onStart: (Difficulty) -> Unit,
+    initialShowErrors: Boolean,
+    onStart: (Difficulty, Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
     var selected by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
+    var showErrors by remember(initialShowErrors) { mutableStateOf(initialShowErrors) }
 
     SketchDialog(
         title = stringResource(R.string.new_game),
@@ -1172,6 +1612,24 @@ private fun NewGameDialog(
             Spacer(Modifier.height(6.dp))
         }
 
+        Spacer(Modifier.height(4.dp))
+
+        SettingsCheckRow(
+            label = stringResource(R.string.new_game_show_errors),
+            checked = showErrors,
+            seed = 879,
+            onToggle = { showErrors = !showErrors },
+        )
+
+        Text(
+            text = stringResource(R.string.new_game_show_errors_note),
+            color = colors.inkSoft,
+            fontSize = 13.sp,
+            fontFamily = HandFont,
+            lineHeight = 18.sp,
+            modifier = Modifier.padding(start = 32.dp, top = 4.dp, end = 4.dp),
+        )
+
         Spacer(Modifier.height(10.dp))
 
         Row(
@@ -1179,7 +1637,7 @@ private fun NewGameDialog(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             SketchButton(
-                onClick = { onStart(selected) },
+                onClick = { onStart(selected, showErrors) },
                 modifier = Modifier
                     .weight(1f)
                     .height(50.dp),

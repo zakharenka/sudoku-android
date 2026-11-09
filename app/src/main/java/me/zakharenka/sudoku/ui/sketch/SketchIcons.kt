@@ -31,6 +31,9 @@ enum class SketchIcon {
     CLOCK,
     CLOSE,
     LANGUAGE,
+    HISTORY,
+    EXPORT,
+    IMPORT,
 }
 
 @Composable
@@ -51,6 +54,10 @@ fun SketchIcon(
 
         fun line(x1: Float, y1: Float, x2: Float, y2: Float, seed: Int, width: Float = stroke) {
             sketchLine(point(x1, y1), point(x2, y2), tint, width, seed, wobble = 0.8f)
+        }
+
+        fun ofsLine(y: Float, seed: Int, width: Float = stroke) {
+            line(-0.22f, y, 0.26f, y, seed, width)
         }
 
         fun circle(radius: Float, seed: Int, width: Float = stroke) {
@@ -236,6 +243,33 @@ fun SketchIcon(
                 line(-0.27f, 0f, 0.27f, 0f, 51)
                 line(-0.24f, -0.13f, 0.24f, -0.13f, 52, stroke * 0.8f)
                 line(-0.24f, 0.13f, 0.24f, 0.13f, 53, stroke * 0.8f)
+            }
+
+            SketchIcon.HISTORY -> {
+                ofsLine(-0.18f, 54, stroke * 1.2f)
+                ofsLine(0.02f, 55, stroke * 1.2f)
+                ofsLine(0.22f, 56, stroke * 1.2f)
+                drawCircle(tint, radius = 0.028f * side, center = point(-0.29f, -0.18f))
+                drawCircle(tint, radius = 0.028f * side, center = point(-0.29f, 0.02f))
+                drawCircle(tint, radius = 0.028f * side, center = point(-0.29f, 0.22f))
+            }
+
+            SketchIcon.EXPORT -> {
+                line(-0.3f, 0.2f, -0.3f, 0.32f, 57)
+                line(-0.3f, 0.32f, 0.3f, 0.32f, 58)
+                line(0.3f, 0.2f, 0.3f, 0.32f, 59)
+                line(0f, 0.14f, 0f, -0.28f, 60, stroke * 1.2f)
+                line(0f, -0.28f, -0.14f, -0.12f, 61)
+                line(0f, -0.28f, 0.14f, -0.12f, 62)
+            }
+
+            SketchIcon.IMPORT -> {
+                line(-0.3f, 0.2f, -0.3f, 0.32f, 63)
+                line(-0.3f, 0.32f, 0.3f, 0.32f, 64)
+                line(0.3f, 0.2f, 0.3f, 0.32f, 65)
+                line(0f, -0.28f, 0f, 0.14f, 66, stroke * 1.2f)
+                line(0f, 0.14f, -0.14f, -0.02f, 67)
+                line(0f, 0.14f, 0.14f, -0.02f, 68)
             }
         }
     }

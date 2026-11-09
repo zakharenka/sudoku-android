@@ -21,11 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.GameUiState
@@ -53,6 +56,7 @@ import me.zakharenka.sudoku.ui.theme.SudokuTheme
 fun TopToolbar(
     difficulty: Difficulty,
     mistakes: Int,
+    showErrors: Boolean,
     elapsedSeconds: Long,
     paused: Boolean,
     enabled: Boolean,
@@ -65,9 +69,28 @@ fun TopToolbar(
     )
     val newGameDescription = stringResource(R.string.new_game)
     val time = formatTime(elapsedSeconds)
-    val statsDescription = stringResource(difficulty.labelRes()) + ", " +
-        pluralStringResource(R.plurals.mistakes, mistakes, mistakes) +
-        ", " + stringResource(R.string.timer_content_description, time)
+    val density = LocalDensity.current
+    val textMeasurer = rememberTextMeasurer()
+    val timerMinWidth = remember(density, textMeasurer) {
+        with(density) {
+            textMeasurer.measure(
+                text = "00:00",
+                style = TextStyle(
+                    fontFamily = HandFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 21.sp,
+                ),
+            ).size.width.toDp() + 4.dp
+        }
+    }
+    val statsDescription = if (showErrors) {
+        stringResource(difficulty.labelRes()) + ", " +
+            pluralStringResource(R.plurals.mistakes, mistakes, mistakes) +
+            ", " + stringResource(R.string.timer_content_description, time)
+    } else {
+        stringResource(difficulty.labelRes()) + ", " +
+            stringResource(R.string.timer_content_description, time)
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -97,39 +120,35 @@ fun TopToolbar(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     modifier = Modifier
-                        .weight(1.2f)
+                        .weight(1f)
                         .clickable(onClick = onNewGame),
                 )
 
-                ToolbarDivider()
+                if (showErrors) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "×",
+                            color = colors.danger,
+                            fontSize = 24.sp,
+                            fontFamily = HandFont,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = mistakes.toString(),
+                            color = colors.accent,
+                            fontSize = 21.sp,
+                            fontFamily = HandFont,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
 
-                Row(
-                    modifier = Modifier.weight(0.8f),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "×",
-                        color = colors.danger,
-                        fontSize = 24.sp,
-                        fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = mistakes.toString(),
-                        color = colors.accent,
-                        fontSize = 21.sp,
-                        fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Spacer(Modifier.width(10.dp))
                 }
 
-                ToolbarDivider()
-
                 Row(
-                    modifier = Modifier.weight(1.4f),
-                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     SketchIcon(
@@ -144,6 +163,8 @@ fun TopToolbar(
                         fontSize = 21.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        modifier = Modifier.widthIn(min = timerMinWidth),
                     )
                 }
             }
@@ -184,17 +205,6 @@ fun TopToolbar(
             )
         }
     }
-}
-
-@Composable
-private fun ToolbarDivider() {
-    val colors = SudokuTheme.colors
-    Box(
-        modifier = Modifier
-            .width(1.dp)
-            .height(26.dp)
-            .background(colors.gridLine),
-    )
 }
 
 @Composable

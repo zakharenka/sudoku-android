@@ -26,7 +26,7 @@ class SudokuSessionTest {
     }
 
     @Test
-    fun wrongNumberCountsMistakeAndUndoRestoresCell() {
+    fun wrongNumberCountsMistakeAndUndoDoesNotRestoreIt() {
         val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0))
         val index = session.selected
 
@@ -45,10 +45,28 @@ class SudokuSessionTest {
         val undo = session.undo()
 
         assertTrue(undo.changed)
-        assertEquals(0, session.mistakes)
+        assertEquals(1, session.mistakes)
         assertEquals(0, session.cells[0].value)
         assertFalse(session.cells[0].error)
         assertFalse(session.canUndo)
+    }
+
+    @Test
+    fun hiddenErrorsDoNotCountMistakesOrHighlightCells() {
+        val session = SudokuSession(
+            difficulty = Difficulty.EASY,
+            solution = solution,
+            puzzle = puzzleWithBlanks(0),
+            showErrors = false,
+        )
+
+        session.select(0)
+        val wrong = if (solution[0] == 1) 2 else 1
+        session.enter(wrong)
+
+        assertEquals(0, session.mistakes)
+        assertFalse(session.cells[0].error)
+        assertEquals(wrong, session.cells[0].value)
     }
 
     @Test
@@ -105,16 +123,23 @@ class SudokuSessionTest {
     }
 
     @Test
-    fun hintFillsCorrectValueAndMarksCellAsGiven() {
-        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0))
+    fun hintFillsCorrectValueAndCellCanBeErased() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1))
 
         val outcome = session.hint()
 
         assertTrue(outcome.changed)
         assertEquals(solution[0], session.cells[0].value)
-        assertTrue(session.cells[0].given)
+        assertFalse(session.cells[0].given)
         assertFalse(session.cells[0].error)
         assertEquals(0, session.mistakes)
+        assertEquals(SudokuSession.MAX_HINTS - 1, session.hintsRemaining)
+        assertTrue(session.canErase)
+
+        session.select(0)
+        session.erase()
+
+        assertEquals(0, session.cells[0].value)
         assertEquals(SudokuSession.MAX_HINTS - 1, session.hintsRemaining)
     }
 
@@ -157,7 +182,9 @@ class SudokuSessionTest {
         session.select(0)
         session.hint()
 
-        val restored = SudokuSession.restore(session.toSavedGame(elapsedSeconds = 10))
+        val restored = SudokuSession.restore(
+            session.toGameRecord(elapsedSeconds = 10, updatedAt = 20),
+        )
 
         assertEquals(SudokuSession.MAX_HINTS - 1, restored.hintsRemaining)
         assertEquals(solution[0], restored.cells[0].value)
@@ -181,7 +208,7 @@ class SudokuSessionTest {
     }
 
     @Test
-    fun savedGameRoundTripRestoresBoardAndState() {
+    fun gameRecordRoundTripRestoresBoardAndState() {
         val session = SudokuSession(Difficulty.HARD, solution, puzzleWithBlanks(0, 1, 2))
 
         session.select(0)
@@ -197,15 +224,16 @@ class SudokuSessionTest {
         session.enter(wrong)
         session.toggleNotes()
 
-        val saved = session.toSavedGame(elapsedSeconds = 123)
-        val restored = SudokuSession.restore(saved)
+        val saved = session.toGameRecord(elapsedSeconds = 123, updatedAt = 456)
+        val restored = SudokuSession.restore(saved, notesMode = session.notesMode)
 
+        assertTrue(saved.isValid())
         assertEquals(123, saved.elapsedSeconds)
-        assertEquals(session.selected, restored.selected)
         assertEquals(session.mistakes, restored.mistakes)
         assertEquals(session.notesMode, restored.notesMode)
         assertEquals(session.won, restored.won)
         assertFalse(restored.canUndo)
+        assertEquals(session.cells.indexOfFirst { it.value == 0 }, restored.selected)
 
         for (index in 0 until SudokuSession.CELLS) {
             assertEquals(session.cells[index].value, restored.cells[index].value)
@@ -213,5 +241,26 @@ class SudokuSessionTest {
             assertEquals(session.cells[index].error, restored.cells[index].error)
             assertEquals(session.cells[index].notes, restored.cells[index].notes)
         }
+    }
+
+    @Test
+    fun hiddenErrorsAreNotStoredAsMistakes() {
+        val session = SudokuSession(
+            difficulty = Difficulty.EASY,
+            solution = solution,
+            puzzle = puzzleWithBlanks(0),
+            showErrors = false,
+        )
+
+        session.select(0)
+        session.enter(if (solution[0] == 1) 2 else 1)
+
+        val saved = session.toGameRecord(elapsedSeconds = 5, updatedAt = 6)
+        val restored = SudokuSession.restore(saved)
+
+        assertTrue(saved.isValid())
+        assertEquals(0, saved.errors)
+        assertEquals(0, restored.mistakes)
+        assertFalse(restored.cells[0].error)
     }
 }

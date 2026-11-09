@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">Maximum</string>
 
     <string name="new_game">Neues Spiel</string>
-    <string name="new_game_confirm">Neues Spiel starten? Der aktuelle Fortschritt geht verloren.</string>
+    <string name="new_game_confirm">Neues Spiel starten? Das aktuelle Spiel wird im Verlauf gespeichert.</string>
     <string name="new_game_start">Starten</string>
     <string name="new_game_cancel">Abbrechen</string>
     <string name="action_undo">Rückgängig</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Handschriftliche Ziffern</string>
     <string name="settings_language_current">Sprache: %1$s</string>
     <string name="settings_language_open">Sprache ändern</string>
-    <string name="settings_reset_records">Rekorde zurücksetzen</string>
-    <string name="settings_reset_confirm">Alle Rekorde zurücksetzen?</string>
-    <string name="settings_reset_yes">Ja</string>
-    <string name="settings_reset_cancel">Abbrechen</string>
-    <string name="settings_reset_done">Rekorde zurückgesetzt.</string>
     <string name="settings_about">Über</string>
     <string name="settings_about_version">Sudoku 9×9 · Version %1$s</string>
     <string name="settings_developer_website">Entwickler-Website</string>
+
+    <string name="header_history">Verlauf</string>
+    <string name="new_game_show_errors">Fehler anzeigen</string>
+    <string name="new_game_show_errors_note">Falsche Ziffern hervorheben und Fehler zählen</string>
+    <string name="records_mode_show_errors">Mit Fehlern</string>
+    <string name="records_mode_hide_errors">Ohne Fehler</string>
+    <string name="history_title">Spielverlauf</string>
+    <string name="history_empty">Noch keine gespeicherten Spiele.</string>
+    <string name="history_current">Aktuell</string>
+    <string name="history_started">Gestartet: %1$s</string>
+    <string name="history_solved">Gelöst: %1$s</string>
+    <string name="history_updated">Aktualisiert: %1$s</string>
+    <string name="history_time">Zeit: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Fehler: aus</string>
+    <string name="history_puzzle_preview">Sudoku-Vorschau</string>
+    <string name="settings_data">Daten</string>
+    <string name="settings_export">Sicherung exportieren</string>
+    <string name="settings_import">Sicherung importieren</string>
+    <string name="settings_import_confirm">Alle Rekorde und den Verlauf durch den Dateiinhalt ersetzen?</string>
+    <string name="settings_import_yes">Ersetzen</string>
+    <string name="settings_import_no">Abbrechen</string>
+    <string name="transfer_exported">Sicherung gespeichert.</string>
+    <string name="transfer_imported">Daten importiert.</string>
+    <string name="transfer_failed">Der Vorgang konnte nicht abgeschlossen werden.</string>
+    <string name="transfer_invalid_json">Die Datei ist kein gültiges JSON.</string>
+    <string name="transfer_invalid_version">Nicht unterstützte Dateiversion.</string>
+    <string name="transfer_invalid_fields">Die Datei enthält ungültige Daten.</string>
+
+    <string name="records_hint_without_mistakes">Bestzeit und gelöste Spiele ohne Fehler.</string>
+    <string name="records_hint_with_mistakes">Bestzeit und gelöste Spiele mit Fehlern.</string>
 </resources>

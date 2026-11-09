@@ -1,6 +1,12 @@
 package me.zakharenka.sudoku.game
 
+import java.text.DateFormat
+import java.util.Date
 import java.util.Locale
+
+fun formatDateTime(epochMillis: Long, locale: Locale = Locale.getDefault()): String =
+    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, locale)
+        .format(Date(epochMillis))
 
 fun formatTime(seconds: Long): String {
     val total = maxOf(0L, seconds)

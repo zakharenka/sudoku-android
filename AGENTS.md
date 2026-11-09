@@ -68,8 +68,9 @@ MainActivity
   └── SudokuViewModel (GameUiState)
         ├── SudokuSession      — game rules, history, victory
         ├── SudokuGenerator    — puzzle generation with a single solution
-        ├── RecordsStore       — records, counters, theme, notes
-        └── SavedGameStore     — save and restore the current game
+        ├── SettingsStore      — global settings only
+        ├── SudokuDataStore    — atomic JSON storage for the current game and history
+        └── SudokuDataCodec    — shared JSON parser/validator for load and import
 
 SudokuScreen
   ├── SudokuBoard            — 9×9 board rendering
@@ -79,9 +80,11 @@ SudokuScreen
 
 Separation rules:
 
-- `game/` — pure Kotlin with no Android imports. All rules, generation and
-  formatting live here. This code must remain testable with plain JUnit tests.
-- `data/` — SharedPreferences storage. It contains no game rules.
+- `game/` — pure Kotlin with no Android imports. All rules, generation,
+  history models and formatting live here. This code must remain testable with
+  plain JUnit tests.
+- `data/` — SharedPreferences settings and the atomic JSON file. It contains no
+  game rules; JSON parsing/validation is shared by normal loading and import.
 - `SudokuViewModel` — the only place where rules, the timer, background
   generation and persistence meet.
 - `ui/` — only renders `GameUiState` and sends actions to the ViewModel. The UI
@@ -96,7 +99,10 @@ Separation rules:
 - In the dialog, tapping a difficulty only **selects** it.
 - The game starts only with the **Start** button.
 - "Cancel" closes the dialog without changes.
-- The dialog must warn that the current progress will be lost.
+- The dialog must explain that the current game will be saved to history.
+- The dialog has a **Show mistakes** checkbox. Its value becomes the default
+  for the next new game (`show_errors` in SharedPreferences) and is stored in
+  the game data for the whole game.
 - Do not bring back starting a game immediately when a difficulty row is
   tapped.
 
@@ -105,14 +111,15 @@ Separation rules:
 - The header is one row: a hand-drawn icon and the app name.
 - There must be no "Logic without rush" slogan.
 - The in-game top bar is one row:
-  - on the left, one block: difficulty, mistakes, timer;
+  - on the left, one block: difficulty, mistakes (only when errors are shown),
+    timer;
   - on the right, two square unlabelled buttons: pause and new game.
 - Icon buttons must have a `contentDescription` from string resources.
 
 ### Settings
 
 - Settings contain only the theme, board line style, same-digit highlight,
-  handwritten digits, language, records reset, "About" and a link to the
+  handwritten digits, language, data import/export, "About" and a link to the
   developer website `https://zakharenka.me`.
 - The 9×9 board uses straight grid lines by default. The settings toggle can
   switch them back to hand-drawn wobbly lines; this affects only the board, not
@@ -120,19 +127,46 @@ Separation rules:
 - Same-digit highlighting can be disabled. This removes the highlight and the
   special text colour from cells with the selected digit; peer highlighting
   remains.
-- "Rules" and "Records" live in the header and are not duplicated in settings.
+- "Rules", "Records" and "History" live in the header and are not duplicated in
+  settings.
 - The language is changed only through the native Android screen
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
+- Import and export use the system file picker (SAF) and are located in the
+  settings dialog.
 
 ### Records
 
-- The best time is stored separately for each difficulty.
-- The number of solved puzzles is stored separately for each difficulty
-  (`solved:easy`, `solved:medium`, `solved:hard`, `solved:expert`).
-- "Best results" shows `Solved: N` under each difficulty.
-- The counter increases exactly once on victory.
-- Resetting records clears both the best times and the counters for all
-  difficulties.
+- Records are not stored separately. Best times and solved counters are derived
+  from solved games in the history.
+- There are two categories per difficulty:
+  - **No mistakes** — wins with `errors == 0`;
+  - **With mistakes** — wins with `errors > 0`.
+- The records dialog has a switch between the two categories.
+- Each solved game belongs to exactly one category and can set or update the
+  best time in that category.
+- "Best results" shows `Solved: N` under each difficulty for the selected
+  category; the sum of both categories is the total number of solved games.
+- Hidden-errors games keep `errors == 0`, so they land in the **No mistakes**
+  category.
+- Hints do not affect the category or forbid a record.
+- There is no "Reset records" action: records always reflect the whole game
+  history.
+
+### History
+
+- A separate header button next to records opens the game history.
+- Games are grouped by the start date (descending). Each row shows a mini
+  puzzle grid, difficulty, start date/time, solved date (or last-update date
+  for unfinished games), elapsed time and mistakes (or "off" in hidden mode).
+- The history contains the current game, unfinished games and solved games.
+- `currentGameId` always points to the game currently open on the screen, even
+  when that game is already solved. `solvedAt == null` marks an unfinished
+  game.
+- Starting a new game keeps the previous unfinished game in the history.
+- Tapping a history row loads that game on pause and makes it current,
+  including solved games. The previously open game is saved first.
+- The puzzle mini-grid in a row is large enough to match the height of the
+  information block, and the elapsed time is aligned to the right edge.
 
 ### Keyboard
 
@@ -148,22 +182,51 @@ Separation rules:
 - Each game has at most `SudokuSession.MAX_HINTS` (3) hints.
 - The remaining count is shown as a badge on the hint button; at zero the
   button is disabled.
-- `hintsUsed` is persisted in `SavedGame` and restored with the game.
-- Undo does not refund a hint.
+- `hintsUsed` is persisted in the game record and restored with the game.
+- A hint fills a normal, erasable cell: it is not a given and can be erased.
+- Undo can revert the hint's cell value, but does not refund the hint counter.
+- Erasing a hinted cell does not refund the hint.
 - A new game resets the counter.
 
 ### Game persistence
 
+- One JSON file `sudoku_data.json` in `filesDir` stores the current game and the
+  full game history. Records are derived from solved games. Writes go through
+  `AtomicFile`, on `Dispatchers.IO`, under a `Mutex`.
 - When the app goes to the background (`MainActivity.onStop`, except for a
   configuration change), `onAppBackgrounded()` is called: the game is paused
   and saved.
-- On the next launch the game is restored **on pause**; the timer is not
-  running.
-- A won or missing game is not saved.
-- The `SavedGameStore` format is versioned. When the format changes, increase
-  `VERSION` and ensure incompatible data is rejected correctly.
-- Validate array sizes and values on load; corrupted data must lead to a new
-  game, not a crash.
+- On the next launch the game referenced by `currentGameId` is restored **on
+  pause**; the timer is not running. A solved current game opens on its win
+  screen without a running timer.
+- A missing current game starts a new game. The current game is saved after
+  every board change, every 10 seconds while the timer runs, on pause/dialog
+  open, when history is opened, when switching games, on win, before export and
+  in `onStop`.
+- The JSON has a top-level `version`. Increase it when the format changes and
+  reject incompatible data.
+- Validate versions, array sizes, digit ranges, notes, UUID references and
+  current-game state on load. Corrupted data must lead to a new game or an
+  import error, never a crash.
+- Old SharedPreferences records (`best:*`, `solved:*`) and `saved_game` are not
+  migrated and are ignored.
+- `selected`, `notesMode`, `givens` and per-cell error flags are not stored.
+  `notesMode` is a global setting; givens come from `puzzle`; errors are derived
+  from `values` and `solution` and are always zero in hidden mode.
+
+### Import and export
+
+- Both use the system file picker: `ACTION_CREATE_DOCUMENT` and
+  `ACTION_OPEN_DOCUMENT` with MIME `application/json`.
+- Export saves the current game first and writes the same `version`,
+  `currentGameId` and `games` structure. The filename is
+  `sudoku-backup-YYYYMMDD-HHmm.json`.
+- Import uses the same parser/validator as normal loading.
+- After confirmation, imported data replaces the current data. A
+  `currentGameId` that points to a missing game is reset to `null`; a solved
+  game is a valid current game.
+- An invalid file changes nothing and shows a localized error message.
+- Theme, language and display modes are not included in the backup.
 
 ### Localization
 
@@ -213,15 +276,47 @@ Separation rules:
 
 ## Data storage
 
-`SharedPreferences`:
+`SharedPreferences` (`sudoku`) contains settings only:
 
-| File | Keys |
+| Key | Meaning |
 | --- | --- |
-| `sudoku` | `best:<difficulty>`, `solved:<difficulty>`, `theme_mode`, `notes_mode`, `straight_grid` |
-| `sudoku_saved_game` | `saved_game` (JSON, version 2) |
+| `theme_mode` | light, dark or system |
+| `notes_mode` | global notes mode |
+| `straight_grid` | board line style |
+| `same_highlight` | same-digit highlight |
+| `handwritten_digits` | handwritten digits toggle |
+| `show_errors` | default error mode for a new game |
 
-`<difficulty>`: `easy`, `medium`, `hard`, `expert`.
-Do not rename keys without a migration: it would break existing records.
+`filesDir/sudoku_data.json` is the single versioned JSON file (version 1):
+
+```text
+{
+  "version": 1,
+  "currentGameId": "uuid or null",
+  "games": [
+    {
+      "id": "uuid",
+      "difficulty": "easy",
+      "showErrors": true,
+      "errors": 0,
+      "puzzle": "530070000...",
+      "solution": "534678912...",
+      "values": "530070000...",
+      "notes": { "3": [1, 5, 9] },
+      "hintsUsed": 1,
+      "elapsedSeconds": 300,
+      "createdAt": 1762700000000,
+      "updatedAt": 1762700300000,
+      "solvedAt": null
+    }
+  ]
+}
+```
+
+`records` is not stored: it is derived from solved games. `notes` is sparse:
+only non-empty cells are present. `solvedAt == null` means an unfinished game.
+Old `best:*`, `solved:*` and `saved_game` keys are intentionally ignored; do not
+rename the settings keys without a migration.
 
 ## Code style
 
@@ -286,12 +381,15 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 
 | File | Responsibility |
 | --- | --- |
-| `SudokuViewModel.kt` | state, timer, generation, persistence |
-| `game/SudokuSession.kt` | rules, history, victory, game snapshot |
+| `SudokuViewModel.kt` | state, timer, generation, persistence, import/export |
+| `game/SudokuSession.kt` | rules, undo, victory, game record snapshot |
+| `game/SudokuData.kt` | history model and records derived from solved games |
+| `game/GameRecord.kt` | one saved game and its validation |
 | `game/SudokuGenerator.kt` | generation and solution counting |
-| `data/RecordsStore.kt` | records, per-difficulty counters, theme, notes |
-| `data/SavedGameStore.kt` | JSON persistence of the current game |
-| `ui/SudokuScreen.kt` | header, screen, settings, rules, records, new-game dialog |
+| `data/SettingsStore.kt` | global settings in SharedPreferences |
+| `data/SudokuDataStore.kt` | atomic `sudoku_data.json` reads and writes |
+| `data/SudokuDataCodec.kt` | shared JSON serialization, validation and import errors |
+| `ui/SudokuScreen.kt` | header, screen, settings, data transfer, rules, records, history, new-game dialog |
 | `ui/SudokuControls.kt` | top bar, keypad, actions, overlays |
 | `ui/sketch/Sketch.kt` | hand-drawn surfaces, buttons, lines, texture |
 | `ui/sketch/HandwrittenDigits.kt` | animated pencil digits and their stroke data |

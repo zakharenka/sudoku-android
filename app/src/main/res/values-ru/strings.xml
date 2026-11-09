@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">максимум</string>
 
     <string name="new_game">Новая игра</string>
-    <string name="new_game_confirm">Начать новую игру? Текущий прогресс будет потерян.</string>
+    <string name="new_game_confirm">Начать новую игру? Текущая игра сохранится в истории.</string>
     <string name="new_game_start">Начать</string>
     <string name="new_game_cancel">Отмена</string>
     <string name="action_undo">Отменить</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Рукописные цифры</string>
     <string name="settings_language_current">Язык: %1$s</string>
     <string name="settings_language_open">Сменить язык</string>
-    <string name="settings_reset_records">Сбросить рекорды</string>
-    <string name="settings_reset_confirm">Сбросить все рекорды?</string>
-    <string name="settings_reset_yes">Да</string>
-    <string name="settings_reset_cancel">Отмена</string>
-    <string name="settings_reset_done">Рекорды сброшены.</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_about_version">Судоку 9×9 · версия %1$s</string>
     <string name="settings_developer_website">Сайт разработчика</string>
+
+    <string name="header_history">История</string>
+    <string name="new_game_show_errors">Показывать ошибки</string>
+    <string name="new_game_show_errors_note">Подсвечивать неверные цифры и считать ошибки</string>
+    <string name="records_mode_show_errors">С ошибками</string>
+    <string name="records_mode_hide_errors">Без ошибок</string>
+    <string name="history_title">История игр</string>
+    <string name="history_empty">Пока нет сохранённых игр.</string>
+    <string name="history_current">Текущая</string>
+    <string name="history_started">Начата: %1$s</string>
+    <string name="history_solved">Решена: %1$s</string>
+    <string name="history_updated">Обновлена: %1$s</string>
+    <string name="history_time">Время: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Ошибки: отключены</string>
+    <string name="history_puzzle_preview">Миниатюра судоку</string>
+    <string name="settings_data">Данные</string>
+    <string name="settings_export">Экспорт резервной копии</string>
+    <string name="settings_import">Импорт резервной копии</string>
+    <string name="settings_import_confirm">Заменить все рекорды и историю содержимым файла?</string>
+    <string name="settings_import_yes">Заменить</string>
+    <string name="settings_import_no">Отмена</string>
+    <string name="transfer_exported">Резервная копия сохранена.</string>
+    <string name="transfer_imported">Данные импортированы.</string>
+    <string name="transfer_failed">Не удалось выполнить операцию.</string>
+    <string name="transfer_invalid_json">Файл не является корректным JSON.</string>
+    <string name="transfer_invalid_version">Неподдерживаемая версия файла.</string>
+    <string name="transfer_invalid_fields">Файл содержит некорректные данные.</string>
+
+    <string name="records_hint_without_mistakes">Лучшее время и число побед в играх без ошибок.</string>
+    <string name="records_hint_with_mistakes">Лучшее время и число побед в играх с ошибками.</string>
 </resources>

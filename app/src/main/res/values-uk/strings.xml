@@ -11,7 +11,7 @@
     <string name="difficulty_expert_note">максимум</string>
 
     <string name="new_game">Нова гра</string>
-    <string name="new_game_confirm">Почати нову гру? Поточний прогрес буде втрачено.</string>
+    <string name="new_game_confirm">Почати нову гру? Поточна гра збережеться в історії.</string>
     <string name="new_game_start">Почати</string>
     <string name="new_game_cancel">Скасувати</string>
     <string name="action_undo">Скасувати</string>
@@ -62,12 +62,38 @@
     <string name="settings_handwritten_digits">Рукописні цифри</string>
     <string name="settings_language_current">Мова: %1$s</string>
     <string name="settings_language_open">Змінити мову</string>
-    <string name="settings_reset_records">Скинути рекорди</string>
-    <string name="settings_reset_confirm">Скинути всі рекорди?</string>
-    <string name="settings_reset_yes">Так</string>
-    <string name="settings_reset_cancel">Скасувати</string>
-    <string name="settings_reset_done">Рекорди скинуто.</string>
     <string name="settings_about">Про застосунок</string>
     <string name="settings_about_version">Судоку 9×9 · версія %1$s</string>
     <string name="settings_developer_website">Сайт розробника</string>
+
+    <string name="header_history">Історія</string>
+    <string name="new_game_show_errors">Показувати помилки</string>
+    <string name="new_game_show_errors_note">Підсвічувати неправильні цифри й рахувати помилки</string>
+    <string name="records_mode_show_errors">З помилками</string>
+    <string name="records_mode_hide_errors">Без помилок</string>
+    <string name="history_title">Історія ігор</string>
+    <string name="history_empty">Ще немає збережених ігор.</string>
+    <string name="history_current">Поточна</string>
+    <string name="history_started">Почато: %1$s</string>
+    <string name="history_solved">Розв’язано: %1$s</string>
+    <string name="history_updated">Оновлено: %1$s</string>
+    <string name="history_time">Час: %1$s</string>
+    <string name="history_mistakes">%1$s</string>
+    <string name="history_errors_disabled">Помилки: вимкнено</string>
+    <string name="history_puzzle_preview">Мініатюра судоку</string>
+    <string name="settings_data">Дані</string>
+    <string name="settings_export">Експорт резервної копії</string>
+    <string name="settings_import">Імпорт резервної копії</string>
+    <string name="settings_import_confirm">Замінити всі рекорди та історію вмістом файлу?</string>
+    <string name="settings_import_yes">Замінити</string>
+    <string name="settings_import_no">Скасувати</string>
+    <string name="transfer_exported">Резервну копію збережено.</string>
+    <string name="transfer_imported">Дані імпортовано.</string>
+    <string name="transfer_failed">Не вдалося виконати операцію.</string>
+    <string name="transfer_invalid_json">Файл не є коректним JSON.</string>
+    <string name="transfer_invalid_version">Непідтримувана версія файлу.</string>
+    <string name="transfer_invalid_fields">Файл містить некоректні дані.</string>
+
+    <string name="records_hint_without_mistakes">Найкращий час і кількість перемог без помилок.</string>
+    <string name="records_hint_with_mistakes">Найкращий час і кількість перемог з помилками.</string>
 </resources>
