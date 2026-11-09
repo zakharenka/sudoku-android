@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
+import me.zakharenka.sudoku.ui.sketch.HandwrittenDigit
 import me.zakharenka.sudoku.ui.sketch.sketchFill
 import me.zakharenka.sudoku.ui.sketch.sketchLine
 import me.zakharenka.sudoku.ui.sketch.sketchRect
@@ -55,6 +57,8 @@ fun SudokuBoard(
     selectedIndex: Int?,
     straightGrid: Boolean,
     highlightSameDigits: Boolean,
+    handwrittenDigits: Boolean,
+    gameId: Long,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -73,25 +77,28 @@ fun SudokuBoard(
                         val index = row * 9 + col
                         val cell = displayCells[index]
 
-                        SudokuCell(
-                            cell = cell,
-                            row = row,
-                            col = col,
-                            cellSize = cellSize,
-                            selected = selectedIndex == index,
-                            peer = selectedIndex != null &&
-                                selectedIndex != index &&
-                                arePeers(selectedIndex, index),
-                            same = highlightSameDigits &&
-                                selectedValue != 0 &&
-                                cell.value == selectedValue &&
-                                selectedIndex != index,
-                            enabled = enabled,
-                            onClick = { onSelect(index) },
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight(),
-                        )
+                        key(gameId, cells.size, index) {
+                            SudokuCell(
+                                cell = cell,
+                                row = row,
+                                col = col,
+                                cellSize = cellSize,
+                                selected = selectedIndex == index,
+                                peer = selectedIndex != null &&
+                                    selectedIndex != index &&
+                                    arePeers(selectedIndex, index),
+                                same = highlightSameDigits &&
+                                    selectedValue != 0 &&
+                                    cell.value == selectedValue &&
+                                    selectedIndex != index,
+                                handwrittenDigits = handwrittenDigits,
+                                enabled = enabled,
+                                onClick = { onSelect(index) },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                        }
                     }
                 }
             }
@@ -217,6 +224,7 @@ private fun SudokuCell(
     selected: Boolean,
     peer: Boolean,
     same: Boolean,
+    handwrittenDigits: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -239,7 +247,7 @@ private fun SudokuCell(
         else -> colors.accent
     }
 
-    val fontSize = with(LocalDensity.current) { (cellSize * 0.56f).toSp() }
+    val digitFontSize = with(LocalDensity.current) { (cellSize * 0.70f).toSp() }
     val interactionSource = remember { MutableInteractionSource() }
     val description = when {
         cell.error && cell.value != 0 -> stringResource(
@@ -298,26 +306,31 @@ private fun SudokuCell(
             },
         contentAlignment = Alignment.Center,
     ) {
-        when {
-            cell.value != 0 -> {
-                Text(
-                    text = cell.value.toString(),
-                    color = textColor,
-                    fontSize = fontSize,
-                    fontFamily = HandFont,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = fontSize,
-                )
-            }
+        if (handwrittenDigits) {
+            HandwrittenDigit(
+                value = cell.value,
+                color = textColor,
+                seed = 7_000 + row * 9 + col,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else if (cell.value != 0) {
+            Text(
+                text = cell.value.toString(),
+                color = textColor,
+                fontSize = digitFontSize,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                lineHeight = digitFontSize,
+            )
+        }
 
-            cell.notes.isNotEmpty() -> {
-                NotesLine(
-                    notes = cell.notes,
-                    cellSize = cellSize,
-                    color = textColor,
-                    modifier = Modifier.align(Alignment.TopStart),
-                )
-            }
+        if (cell.value == 0 && cell.notes.isNotEmpty()) {
+            NotesLine(
+                notes = cell.notes,
+                cellSize = cellSize,
+                color = textColor,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
         }
     }
 }

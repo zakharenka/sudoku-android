@@ -65,6 +65,9 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     var sameHighlight by mutableStateOf(records.sameHighlight)
         private set
 
+    var handwrittenDigits by mutableStateOf(records.handwrittenDigits)
+        private set
+
     var uiState by mutableStateOf(
         GameUiState(
             notesMode = notesMode,
@@ -94,6 +97,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun updateSameHighlight(enabled: Boolean) {
         sameHighlight = enabled
         records.sameHighlight = enabled
+    }
+
+    fun updateHandwrittenDigits(enabled: Boolean) {
+        handwrittenDigits = enabled
+        records.handwrittenDigits = enabled
     }
 
     fun clearBestTimes() {

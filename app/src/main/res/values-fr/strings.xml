@@ -59,6 +59,7 @@
     <string name="settings_board">Grille</string>
     <string name="settings_straight_grid">Lignes droites de la grille</string>
     <string name="settings_same_digits">Surligner les mêmes chiffres</string>
+    <string name="settings_handwritten_digits">Chiffres manuscrits</string>
     <string name="settings_language_current">Langue : %1$s</string>
     <string name="settings_language_open">Changer de langue</string>
     <string name="settings_reset_records">Réinitialiser les records</string>

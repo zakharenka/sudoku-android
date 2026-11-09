@@ -75,6 +75,12 @@ class RecordsStore(context: Context) {
             preferences.edit { putBoolean(SAME_HIGHLIGHT_KEY, value) }
         }
 
+    var handwrittenDigits: Boolean
+        get() = preferences.getBoolean(HANDWRITTEN_DIGITS_KEY, true)
+        set(value) {
+            preferences.edit { putBoolean(HANDWRITTEN_DIGITS_KEY, value) }
+        }
+
     private fun bestKey(difficulty: Difficulty): String = "best:${difficulty.key}"
 
     private fun solvedKey(difficulty: Difficulty): String = "solved:${difficulty.key}"
@@ -85,5 +91,6 @@ class RecordsStore(context: Context) {
         const val THEME_MODE_KEY = "theme_mode"
         const val STRAIGHT_GRID_KEY = "straight_grid"
         const val SAME_HIGHLIGHT_KEY = "same_highlight"
+        const val HANDWRITTEN_DIGITS_KEY = "handwritten_digits"
     }
 }

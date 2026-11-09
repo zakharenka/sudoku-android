@@ -112,8 +112,8 @@ Separation rules:
 ### Settings
 
 - Settings contain only the theme, board line style, same-digit highlight,
-  language, records reset, "About" and a link to the developer website
-  `https://zakharenka.me`.
+  handwritten digits, language, records reset, "About" and a link to the
+  developer website `https://zakharenka.me`.
 - The 9×9 board uses straight grid lines by default. The settings toggle can
   switch them back to hand-drawn wobbly lines; this affects only the board, not
   buttons, panels or icons.
@@ -189,6 +189,10 @@ Separation rules:
 - Do not add rounded corners, gradients or "glossy" elements that break the
   sketch style.
 - Draw new icons in the same hand-drawn style; do not use Material Icons.
+- Board digits are drawn by `ui/sketch/HandwrittenDigits.kt` and animate on
+  input and erase. Handwritten digits are enabled by default; the settings
+  toggle switches cell values to plain `Text` at the same visual size and
+  disables the stroke animation. Do not remove the toggle.
 
 ### App icon
 
@@ -281,6 +285,7 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 | `ui/SudokuScreen.kt` | header, screen, settings, rules, records, new-game dialog |
 | `ui/SudokuControls.kt` | top bar, keypad, actions, overlays |
 | `ui/sketch/Sketch.kt` | hand-drawn surfaces, buttons, lines, texture |
+| `ui/sketch/HandwrittenDigits.kt` | animated pencil digits and their stroke data |
 | `ui/theme/Theme.kt` | light and dark palettes |
 | `res/values*/strings.xml` | localized strings |
 | `docs/languages.md` | current languages and next waves |

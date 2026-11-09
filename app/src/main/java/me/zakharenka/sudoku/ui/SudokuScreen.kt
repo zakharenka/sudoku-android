@@ -140,6 +140,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     boardMax = wideBoardMax,
                     straightGrid = viewModel.straightGrid,
                     sameHighlight = viewModel.sameHighlight,
+                    handwrittenDigits = viewModel.handwrittenDigits,
                     winDismissed = winDismissed,
                     onDismissWin = { dismissedGameId = state.gameId },
                     onNewGameClick = { showNewGameDialog = true },
@@ -169,6 +170,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onStraightGridChange = viewModel::updateStraightGrid,
             sameHighlight = viewModel.sameHighlight,
             onSameHighlightChange = viewModel::updateSameHighlight,
+            handwrittenDigits = viewModel.handwrittenDigits,
+            onHandwrittenDigitsChange = viewModel::updateHandwrittenDigits,
             onResetRecords = viewModel::clearBestTimes,
             onDismiss = { showSettings = false },
         )
@@ -193,6 +196,7 @@ private fun GamePanel(
     boardMax: Dp,
     straightGrid: Boolean,
     sameHighlight: Boolean,
+    handwrittenDigits: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onNewGameClick: () -> Unit,
@@ -235,6 +239,7 @@ private fun GamePanel(
                         state = state,
                         straightGrid = straightGrid,
                         sameHighlight = sameHighlight,
+                        handwrittenDigits = handwrittenDigits,
                         winDismissed = winDismissed,
                         onDismissWin = onDismissWin,
                         onSelect = viewModel::select,
@@ -271,6 +276,7 @@ private fun GamePanel(
                     state = state,
                     straightGrid = straightGrid,
                     sameHighlight = sameHighlight,
+                    handwrittenDigits = handwrittenDigits,
                     winDismissed = winDismissed,
                     onDismissWin = onDismissWin,
                     onSelect = viewModel::select,
@@ -325,6 +331,7 @@ private fun BoardBox(
     state: GameUiState,
     straightGrid: Boolean,
     sameHighlight: Boolean,
+    handwrittenDigits: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onSelect: (Int) -> Unit,
@@ -352,6 +359,8 @@ private fun BoardBox(
                     selectedIndex = state.selectedIndex,
                     straightGrid = straightGrid,
                     highlightSameDigits = sameHighlight,
+                    handwrittenDigits = handwrittenDigits,
+                    gameId = state.gameId,
                     enabled = !state.loading && !state.paused && !state.won,
                     onSelect = onSelect,
                 )
@@ -765,6 +774,8 @@ private fun SettingsDialog(
     onStraightGridChange: (Boolean) -> Unit,
     sameHighlight: Boolean,
     onSameHighlightChange: (Boolean) -> Unit,
+    handwrittenDigits: Boolean,
+    onHandwrittenDigitsChange: (Boolean) -> Unit,
     onResetRecords: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -834,6 +845,15 @@ private fun SettingsDialog(
             checked = sameHighlight,
             seed = 836,
             onToggle = { onSameHighlightChange(!sameHighlight) },
+        )
+
+        Spacer(Modifier.height(6.dp))
+
+        SettingsCheckRow(
+            label = stringResource(R.string.settings_handwritten_digits),
+            checked = handwrittenDigits,
+            seed = 837,
+            onToggle = { onHandwrittenDigitsChange(!handwrittenDigits) },
         )
 
         Text(

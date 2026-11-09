@@ -15,6 +15,9 @@ for distribution on F-Droid.
 
 - four difficulty levels: Easy, Medium, Hard and Expert;
 - puzzle generation with a single solution;
+- cell digits are drawn as hand-written pencil strokes with a writing and
+  erasing animation; the setting can switch them back to plain digits of the
+  same size;
 - cell notes, hints (three per game), undo and clear cell;
 - timer, mistake counter, and pause with auto-pause when leaving the app;
 - single-row top bar: difficulty, mistakes and timer in one block, with
@@ -29,9 +32,9 @@ for distribution on F-Droid.
   German, Italian, Ukrainian and Belarusian; the default language comes from
   the system and is changed through the native Android "App language" screen;
 - light and dark themes, plus a "follow system" mode;
-- settings: theme selection, board line style, same-digit highlighting, a
-  shortcut to the system language picker, a link to the developer website and
-  a records reset;
+- settings: theme selection, board line style, same-digit highlighting,
+  handwritten digits, a shortcut to the system language picker, a link to the
+  developer website and a records reset;
 - straight grid lines on the 9×9 board by default, with an option to switch
   back to hand-drawn wobbly lines;
 - the current game is saved when the app goes to the background: the timer
@@ -173,7 +176,8 @@ app/src/main/java/me/zakharenka/sudoku/
     ├── SudokuControls.kt    # top bar, digits, actions, overlays
     ├── sketch/
     │   ├── Sketch.kt        # hand-drawn lines, panels, buttons, texture
-    │   └── SketchIcons.kt   # hand-drawn icons
+    │   ├── SketchIcons.kt   # hand-drawn icons
+    │   └── HandwrittenDigits.kt  # animated pencil digits
     └── theme/
         ├── Theme.kt         # light and dark palettes
         └── Type.kt          # handwritten font
@@ -243,6 +247,7 @@ Data is stored locally in SharedPreferences.
 | `notes_mode` | whether notes mode is enabled |
 | `straight_grid` | whether the 9×9 board uses straight grid lines (default `true`) |
 | `same_highlight` | whether cells with the selected digit are highlighted (default `true`) |
+| `handwritten_digits` | whether cell values use animated handwritten strokes (default `true`) |
 
 `<difficulty>` is `easy`, `medium`, `hard` or `expert`.
 
