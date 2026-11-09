@@ -169,7 +169,7 @@ mandatory.
 2. Create `app/src/main/res/values-<code>/plurals.xml` with the required
    categories.
 3. Translate every string, including `contentDescription`, rules, settings,
-   statuses, the win screen and the pause screen.
+   the win screen and the pause screen.
 4. Keep all positional parameters (`%1$s`, `%2$d`, `%3$s`).
 5. Add the locale to `app/src/main/res/xml/locales_config.xml` in BCP 47
    format (`pt-BR`, `zh-CN`, `ar`).

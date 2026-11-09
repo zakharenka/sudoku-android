@@ -24,7 +24,6 @@ class MainActivity : ComponentActivity() {
                 android.graphics.Color.TRANSPARENT,
             ),
         )
-        viewModel.onLocaleChanged()
         setContent {
             SudokuTheme(themeMode = viewModel.themeMode) {
                 SudokuScreen(viewModel = viewModel)

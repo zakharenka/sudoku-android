@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -60,7 +61,6 @@ import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.SudokuViewModel
 import me.zakharenka.sudoku.data.ThemeMode
 import me.zakharenka.sudoku.game.Difficulty
-import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.formatTime
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
@@ -139,6 +139,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     isWide = isWide,
                     boardMax = wideBoardMax,
                     straightGrid = viewModel.straightGrid,
+                    sameHighlight = viewModel.sameHighlight,
                     winDismissed = winDismissed,
                     onDismissWin = { dismissedGameId = state.gameId },
                     onNewGameClick = { showNewGameDialog = true },
@@ -166,6 +167,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onThemeModeChange = viewModel::updateThemeMode,
             straightGrid = viewModel.straightGrid,
             onStraightGridChange = viewModel::updateStraightGrid,
+            sameHighlight = viewModel.sameHighlight,
+            onSameHighlightChange = viewModel::updateSameHighlight,
             onResetRecords = viewModel::clearBestTimes,
             onDismiss = { showSettings = false },
         )
@@ -189,6 +192,7 @@ private fun GamePanel(
     isWide: Boolean,
     boardMax: Dp,
     straightGrid: Boolean,
+    sameHighlight: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onNewGameClick: () -> Unit,
@@ -230,6 +234,7 @@ private fun GamePanel(
                     BoardBox(
                         state = state,
                         straightGrid = straightGrid,
+                        sameHighlight = sameHighlight,
                         winDismissed = winDismissed,
                         onDismissWin = onDismissWin,
                         onSelect = viewModel::select,
@@ -265,6 +270,7 @@ private fun GamePanel(
                 BoardBox(
                     state = state,
                     straightGrid = straightGrid,
+                    sameHighlight = sameHighlight,
                     winDismissed = winDismissed,
                     onDismissWin = onDismissWin,
                     onSelect = viewModel::select,
@@ -311,11 +317,6 @@ private fun GameControls(
             onNotes = viewModel::toggleNotes,
             onHint = viewModel::hint,
         )
-
-        StatusText(
-            status = state.status,
-            kind = state.statusKind,
-        )
     }
 }
 
@@ -323,6 +324,7 @@ private fun GameControls(
 private fun BoardBox(
     state: GameUiState,
     straightGrid: Boolean,
+    sameHighlight: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onSelect: (Int) -> Unit,
@@ -349,6 +351,7 @@ private fun BoardBox(
                     cells = state.cells,
                     selectedIndex = state.selectedIndex,
                     straightGrid = straightGrid,
+                    highlightSameDigits = sameHighlight,
                     enabled = !state.loading && !state.paused && !state.won,
                     onSelect = onSelect,
                 )
@@ -526,6 +529,7 @@ private fun SketchLogo(size: Dp) {
 
 @Composable
 private fun SketchDialog(
+    title: String,
     onDismiss: () -> Unit,
     seed: Int,
     content: @Composable ColumnScope.() -> Unit,
@@ -542,26 +546,74 @@ private fun SketchDialog(
                 .padding(20.dp),
             contentAlignment = Alignment.Center,
         ) {
-            SketchSurface(
-                modifier = Modifier
-                    .widthIn(max = 520.dp)
-                    .fillMaxWidth(),
-                fill = colors.paperAlt,
-                border = colors.ink,
-                strokeWidth = 2.dp,
-                seed = seed,
-                shadow = colors.shadow,
-                contentPadding = PaddingValues(18.dp),
-                contentAlignment = Alignment.TopStart,
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                Column(
+                SketchSurface(
                     modifier = Modifier
+                        .widthIn(max = 520.dp)
                         .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
-                    content = content,
-                )
+                        .heightIn(max = maxHeight),
+                    fill = colors.paperAlt,
+                    border = colors.ink,
+                    strokeWidth = 2.dp,
+                    seed = seed,
+                    shadow = colors.shadow,
+                    contentPadding = PaddingValues(0.dp),
+                    contentAlignment = Alignment.TopStart,
+                ) {
+                    Column(Modifier.fillMaxWidth()) {
+                        DialogHeader(
+                            title = title,
+                            seed = seed + 1,
+                            onDismiss = onDismiss,
+                            modifier = Modifier.padding(
+                                start = 18.dp,
+                                top = 18.dp,
+                                end = 18.dp,
+                                bottom = 10.dp,
+                            ),
+                        )
+                        DialogDivider(seed = seed + 2)
+                        Column(
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .verticalScroll(rememberScrollState())
+                                .padding(
+                                    start = 18.dp,
+                                    top = 12.dp,
+                                    end = 18.dp,
+                                    bottom = 18.dp,
+                                ),
+                            content = content,
+                        )
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun DialogDivider(seed: Int) {
+    val colors = SudokuTheme.colors
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp)
+            .height(2.dp),
+    ) {
+        sketchLine(
+            start = Offset(0f, size.height / 2f),
+            end = Offset(size.width, size.height / 2f),
+            color = colors.gridLine,
+            strokeWidth = 1.dp.toPx(),
+            seed = seed,
+            wobble = 0.4.dp.toPx(),
+            passes = 1,
+        )
     }
 }
 
@@ -570,11 +622,12 @@ private fun DialogHeader(
     title: String,
     seed: Int,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = SudokuTheme.colors
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -614,15 +667,11 @@ private fun RecordsDialog(
 ) {
     val colors = SudokuTheme.colors
 
-    SketchDialog(onDismiss = onDismiss, seed = 800) {
-        DialogHeader(
-            title = stringResource(R.string.records_title),
-            seed = 801,
-            onDismiss = onDismiss,
-        )
-
-        Spacer(Modifier.height(12.dp))
-
+    SketchDialog(
+        title = stringResource(R.string.records_title),
+        onDismiss = onDismiss,
+        seed = 800,
+    ) {
         Difficulty.entries.forEach { difficulty ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -656,15 +705,6 @@ private fun RecordsDialog(
             }
             Spacer(Modifier.height(8.dp))
         }
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = stringResource(R.string.records_note),
-            color = colors.inkSoft,
-            fontSize = 13.sp,
-            fontFamily = HandFont,
-        )
     }
 }
 
@@ -672,15 +712,11 @@ private fun RecordsDialog(
 private fun RulesDialog(onDismiss: () -> Unit) {
     val colors = SudokuTheme.colors
 
-    SketchDialog(onDismiss = onDismiss, seed = 810) {
-        DialogHeader(
-            title = stringResource(R.string.rules_title),
-            seed = 811,
-            onDismiss = onDismiss,
-        )
-
-        Spacer(Modifier.height(12.dp))
-
+    SketchDialog(
+        title = stringResource(R.string.rules_title),
+        onDismiss = onDismiss,
+        seed = 810,
+    ) {
         RuleLine(stringResource(R.string.rules_1))
         RuleLine(stringResource(R.string.rules_2))
         RuleLine(stringResource(R.string.rules_3))
@@ -727,6 +763,8 @@ private fun SettingsDialog(
     onThemeModeChange: (ThemeMode) -> Unit,
     straightGrid: Boolean,
     onStraightGridChange: (Boolean) -> Unit,
+    sameHighlight: Boolean,
+    onSameHighlightChange: (Boolean) -> Unit,
     onResetRecords: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -740,13 +778,11 @@ private fun SettingsDialog(
     var confirmReset by remember { mutableStateOf(false) }
     var resetDone by remember { mutableStateOf(false) }
 
-    SketchDialog(onDismiss = onDismiss, seed = 820) {
-        DialogHeader(
-            title = stringResource(R.string.settings_title),
-            seed = 821,
-            onDismiss = onDismiss,
-        )
-
+    SketchDialog(
+        title = stringResource(R.string.settings_title),
+        onDismiss = onDismiss,
+        seed = 820,
+    ) {
         SectionLabel(stringResource(R.string.settings_theme))
 
         ThemeMode.entries.forEachIndexed { index, mode ->
@@ -784,59 +820,32 @@ private fun SettingsDialog(
 
         SectionLabel(stringResource(R.string.settings_board))
 
-        SketchButton(
-            onClick = { onStraightGridChange(!straightGrid) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(46.dp),
-            fill = colors.paperSunken,
-            border = colors.gridLine,
-            active = straightGrid,
+        SettingsCheckRow(
+            label = stringResource(R.string.settings_straight_grid),
+            checked = straightGrid,
             seed = 835,
-            contentPadding = PaddingValues(horizontal = 12.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SketchCheck(checked = straightGrid)
-                Spacer(Modifier.width(10.dp))
-                Text(
-                    text = stringResource(R.string.settings_straight_grid),
-                    color = if (straightGrid) colors.accent else colors.ink,
-                    fontSize = 17.sp,
-                    fontFamily = HandFont,
-                    fontWeight = if (straightGrid) FontWeight.Bold else FontWeight.Normal,
-                )
-            }
-        }
-
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.settings_straight_grid_note),
-            color = colors.inkSoft,
-            fontSize = 13.sp,
-            fontFamily = HandFont,
-            lineHeight = 18.sp,
+            onToggle = { onStraightGridChange(!straightGrid) },
         )
 
-        SectionLabel(stringResource(R.string.settings_language))
+        Spacer(Modifier.height(6.dp))
+
+        SettingsCheckRow(
+            label = stringResource(R.string.settings_same_digits),
+            checked = sameHighlight,
+            seed = 836,
+            onToggle = { onSameHighlightChange(!sameHighlight) },
+        )
 
         Text(
             text = stringResource(R.string.settings_language_current, currentLanguage),
             color = colors.ink,
             fontSize = 16.sp,
             fontFamily = HandFont,
+            modifier = Modifier.padding(top = 16.dp),
         )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.settings_language_note),
-            color = colors.inkSoft,
-            fontSize = 13.sp,
-            fontFamily = HandFont,
-            lineHeight = 18.sp,
-        )
+
         Spacer(Modifier.height(8.dp))
+
         SettingsActionButton(
             icon = LANGUAGE,
             label = stringResource(R.string.settings_language_open),
@@ -845,7 +854,7 @@ private fun SettingsDialog(
             onClick = { openAppLanguageSettings(context) },
         )
 
-        SectionLabel(stringResource(R.string.settings_game))
+        Spacer(Modifier.height(16.dp))
 
         SketchButton(
             onClick = {
@@ -953,14 +962,6 @@ private fun SettingsDialog(
             fontSize = 15.sp,
             fontFamily = HandFont,
         )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.settings_about_storage),
-            color = colors.inkSoft,
-            fontSize = 13.sp,
-            fontFamily = HandFont,
-            lineHeight = 18.sp,
-        )
 
         Spacer(Modifier.height(10.dp))
 
@@ -983,15 +984,11 @@ private fun NewGameDialog(
     val colors = SudokuTheme.colors
     var selected by remember(initialDifficulty) { mutableStateOf(initialDifficulty) }
 
-    SketchDialog(onDismiss = onDismiss, seed = 860) {
-        DialogHeader(
-            title = stringResource(R.string.new_game),
-            seed = 861,
-            onDismiss = onDismiss,
-        )
-
-        Spacer(Modifier.height(12.dp))
-
+    SketchDialog(
+        title = stringResource(R.string.new_game),
+        onDismiss = onDismiss,
+        seed = 860,
+    ) {
         Text(
             text = stringResource(R.string.new_game_confirm),
             color = colors.inkSoft,
@@ -1169,6 +1166,43 @@ private fun SketchCheck(checked: Boolean) {
                 seed = 907,
                 wobble = 0.4.dp.toPx(),
                 passes = 1,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsCheckRow(
+    label: String,
+    checked: Boolean,
+    seed: Int,
+    onToggle: () -> Unit,
+) {
+    val colors = SudokuTheme.colors
+
+    SketchButton(
+        onClick = onToggle,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(46.dp),
+        fill = colors.paperSunken,
+        border = colors.gridLine,
+        active = checked,
+        seed = seed,
+        contentPadding = PaddingValues(horizontal = 12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SketchCheck(checked = checked)
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = label,
+                color = if (checked) colors.accent else colors.ink,
+                fontSize = 17.sp,
+                fontFamily = HandFont,
+                fontWeight = if (checked) FontWeight.Bold else FontWeight.Normal,
             )
         }
     }

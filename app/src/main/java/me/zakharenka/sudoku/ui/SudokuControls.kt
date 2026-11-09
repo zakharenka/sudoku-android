@@ -23,19 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.GameUiState
 import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
-import me.zakharenka.sudoku.game.StatusKind
 import me.zakharenka.sudoku.game.formatTime
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
@@ -378,33 +374,6 @@ private fun ActionButton(
             }
         }
     }
-}
-
-@Composable
-fun StatusText(
-    status: String,
-    kind: StatusKind,
-) {
-    val colors = SudokuTheme.colors
-
-    Text(
-        text = status,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 2.dp)
-            .semantics { liveRegion = LiveRegionMode.Polite },
-        color = when (kind) {
-            StatusKind.ERROR -> colors.danger
-            StatusKind.SUCCESS -> colors.success
-            StatusKind.NEUTRAL -> colors.inkSoft
-        },
-        fontSize = 15.sp,
-        fontFamily = HandFont,
-        fontWeight = if (kind == StatusKind.SUCCESS) FontWeight.Bold else FontWeight.Normal,
-        textAlign = TextAlign.Center,
-        minLines = 1,
-        maxLines = 2,
-    )
 }
 
 @Composable

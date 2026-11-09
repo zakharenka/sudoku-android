@@ -34,33 +34,6 @@
     <string name="cell_error">Радок %1$d, слупок %2$d, памылка, лічба %3$d</string>
     <string name="cell_notes">Радок %1$d, слупок %2$d, нататкі %3$s</string>
 
-    <string name="status_initial">Выберыце клетку і ўвядзіце лічбу</string>
-    <string name="status_generating">Генерацыя поля…</string>
-    <string name="status_generation_failed">Не ўдалося стварыць поле. Паспрабуйце яшчэ раз.</string>
-    <string name="status_new_game">Новая гульня: %1$s. Падказак: %2$d</string>
-    <string name="status_restored">Гульня адноўлена. Націсніце «Працягнуць».</string>
-    <string name="status_paused">Пауза</string>
-    <string name="status_resumed">Працягваем</string>
-    <string name="status_new_record">Вырашана! Новы рэкорд: %1$s</string>
-    <string name="status_solved">Вырашана! Час: %1$s</string>
-
-    <string name="message_select_cell">Спачатку выберыце клетку</string>
-    <string name="message_cell_filled">Гэта клетка ўжо запоўнена</string>
-    <string name="message_erase_first">Спачатку сцярыце лічбу, каб дадаць нататку</string>
-    <string name="message_note_added" tools:ignore="PluralsCandidate">Нататка %1$d дададзена</string>
-    <string name="message_note_removed" tools:ignore="PluralsCandidate">Нататка %1$d прыбрана</string>
-    <string name="message_correct">Правільна</string>
-    <string name="message_wrong_number">Няправільная лічба. Памылак: %1$d.</string>
-    <string name="message_cell_cleared">Клетку ачышчана</string>
-    <string name="message_move_undone">Ход адменены</string>
-    <string name="message_board_correct">Поле ўжо запоўнена правільна</string>
-    <string name="message_hint">Падказка: %1$d — радок %2$d, слупок %3$d. Засталося падказак: %4$d</string>
-    <string name="message_no_hints">Падказкі скончыліся</string>
-    <string name="message_cannot_erase">Гэту клетку нельга сцерці</string>
-    <string name="message_notes_enabled">Нататкі ўключаны</string>
-    <string name="message_notes_disabled">Нататкі выключаны</string>
-    <string name="message_solved">Вырашана!</string>
-
     <string name="pause_title">Пауза</string>
     <string name="pause_subtitle">Час спынены</string>
     <string name="loading_generating">Генерацыя поля…</string>
@@ -71,7 +44,6 @@
     <string name="dialog_close">Закрыць</string>
     <string name="records_title">Найлепшыя вынікі</string>
     <string name="records_solved_level">Вырашана: %1$d</string>
-    <string name="records_note">Рэкорды захоўваюцца толькі на гэтай прыладзе.</string>
     <string name="rules_title">Як гуляць</string>
     <string name="rules_1">1–9 — увядзіце лічбу ў выбранай клетцы</string>
     <string name="rules_2">Нататкі — запісвайце магчымыя варыянты ў пустой клетцы</string>
@@ -86,12 +58,9 @@
     <string name="theme_dark">Цёмная</string>
     <string name="settings_board">Поле</string>
     <string name="settings_straight_grid">Роўныя лініі сеткі</string>
-    <string name="settings_straight_grid_note">Толькі поле 9×9. Іншыя элементы застаюцца намаляванымі.</string>
-    <string name="settings_language">Мова</string>
-    <string name="settings_language_current">Бягучая мова: %1$s</string>
-    <string name="settings_language_note">Мова праграмы змяняецца ў сістэмных наладах.</string>
-    <string name="settings_language_open">Змяніць у сістэме</string>
-    <string name="settings_game">Гульня</string>
+    <string name="settings_same_digits">Падсвятляць аднолькавыя лічбы</string>
+    <string name="settings_language_current">Мова: %1$s</string>
+    <string name="settings_language_open">Змяніць мову</string>
     <string name="settings_reset_records">Скінуць рэкорды</string>
     <string name="settings_reset_confirm">Скінуць усе рэкорды?</string>
     <string name="settings_reset_yes">Так</string>
@@ -100,5 +69,4 @@
     <string name="settings_about">Пра праграму</string>
     <string name="settings_about_version">Судоку 9×9 · версія %1$s</string>
     <string name="settings_developer_website">Сайт распрацоўшчыка</string>
-    <string name="settings_about_storage">Рэкорды і бягучая гульня захоўваюцца толькі на гэтай прыладзе.</string>
 </resources>

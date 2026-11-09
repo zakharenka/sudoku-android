@@ -79,9 +79,8 @@ SudokuScreen
 
 Separation rules:
 
-- `game/` — pure Kotlin with no Android imports. All rules, generation,
-  messages and formatting live here. This code must remain testable with plain
-  JUnit tests.
+- `game/` — pure Kotlin with no Android imports. All rules, generation and
+  formatting live here. This code must remain testable with plain JUnit tests.
 - `data/` — SharedPreferences storage. It contains no game rules.
 - `SudokuViewModel` — the only place where rules, the timer, background
   generation and persistence meet.
@@ -112,11 +111,15 @@ Separation rules:
 
 ### Settings
 
-- Settings contain only the theme, board line style, language, records reset,
-  "About" and a link to the developer website `https://zakharenka.me`.
+- Settings contain only the theme, board line style, same-digit highlight,
+  language, records reset, "About" and a link to the developer website
+  `https://zakharenka.me`.
 - The 9×9 board uses straight grid lines by default. The settings toggle can
   switch them back to hand-drawn wobbly lines; this affects only the board, not
   buttons, panels or icons.
+- Same-digit highlighting can be disabled. This removes the highlight and the
+  special text colour from cells with the selected digit; peer highlighting
+  remains.
 - "Rules" and "Records" live in the header and are not duplicated in settings.
 - The language is changed only through the native Android screen
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
@@ -165,15 +168,11 @@ Separation rules:
   and Belarusian need the `one`/`few`/`many`/`other` categories; Arabic needs
   all six CLDR categories.
 - Do not hardcode text in Compose code, including `contentDescription`.
-- Game statuses and messages are localized in the ViewModel through
-  `GameMessage`; `game/` must not know about Android resources.
-- When the language changes, `MainActivity` calls
-  `viewModel.onLocaleChanged()` to refresh the current status.
 
 ### Tablets
 
 - At widths of `900.dp` and above, use the two-column layout: board on the
-  left, keypad, actions and status on the right.
+  left, keypad and actions on the right.
 - Below `900.dp` — a single centred column (phones and portrait tablets).
 - The panel is capped at `1120.dp` on wide screens and `720.dp` in compact
   mode.
@@ -274,7 +273,7 @@ adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 
 | File | Responsibility |
 | --- | --- |
-| `SudokuViewModel.kt` | state, timer, generation, persistence, status localization |
+| `SudokuViewModel.kt` | state, timer, generation, persistence |
 | `game/SudokuSession.kt` | rules, history, victory, game snapshot |
 | `game/SudokuGenerator.kt` | generation and solution counting |
 | `data/RecordsStore.kt` | records, per-difficulty counters, theme, notes |

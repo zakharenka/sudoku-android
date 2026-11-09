@@ -34,33 +34,6 @@
     <string name="cell_error">Ligne %1$d, colonne %2$d, erreur, chiffre %3$d</string>
     <string name="cell_notes">Ligne %1$d, colonne %2$d, notes %3$s</string>
 
-    <string name="status_initial">Choisissez une case et saisissez un chiffre</string>
-    <string name="status_generating">Génération d\'une grille…</string>
-    <string name="status_generation_failed">Impossible de créer une grille. Réessayez.</string>
-    <string name="status_new_game">Nouvelle partie : %1$s. Indices : %2$d</string>
-    <string name="status_restored">Partie restaurée. Appuyez sur « Reprendre ».</string>
-    <string name="status_paused">En pause</string>
-    <string name="status_resumed">Reprise</string>
-    <string name="status_new_record">Résolu ! Nouveau record : %1$s</string>
-    <string name="status_solved">Résolu ! Temps : %1$s</string>
-
-    <string name="message_select_cell">Choisissez d\'abord une case</string>
-    <string name="message_cell_filled">Cette case est déjà remplie</string>
-    <string name="message_erase_first">Effacez le chiffre avant d\'ajouter une note</string>
-    <string name="message_note_added" tools:ignore="PluralsCandidate">Note %1$d ajoutée</string>
-    <string name="message_note_removed" tools:ignore="PluralsCandidate">Note %1$d supprimée</string>
-    <string name="message_correct">Correct</string>
-    <string name="message_wrong_number">Chiffre incorrect. Erreurs : %1$d.</string>
-    <string name="message_cell_cleared">Case effacée</string>
-    <string name="message_move_undone">Coup annulé</string>
-    <string name="message_board_correct">La grille est déjà correcte</string>
-    <string name="message_hint">Indice : %1$d — ligne %2$d, colonne %3$d. Indices restants : %4$d</string>
-    <string name="message_no_hints">Plus d\'indices</string>
-    <string name="message_cannot_erase">Cette case ne peut pas être effacée</string>
-    <string name="message_notes_enabled">Notes activées</string>
-    <string name="message_notes_disabled">Notes désactivées</string>
-    <string name="message_solved">Résolu !</string>
-
     <string name="pause_title">En pause</string>
     <string name="pause_subtitle">Chronomètre arrêté</string>
     <string name="loading_generating">Génération d\'une grille…</string>
@@ -71,7 +44,6 @@
     <string name="dialog_close">Fermer</string>
     <string name="records_title">Meilleurs résultats</string>
     <string name="records_solved_level">Résolus : %1$d</string>
-    <string name="records_note">Les records sont enregistrés uniquement sur cet appareil.</string>
     <string name="rules_title">Comment jouer</string>
     <string name="rules_1">1–9 : saisissez un chiffre dans la case sélectionnée</string>
     <string name="rules_2">Notes : notez les candidats possibles dans une case vide</string>
@@ -86,12 +58,9 @@
     <string name="theme_dark">Sombre</string>
     <string name="settings_board">Grille</string>
     <string name="settings_straight_grid">Lignes droites de la grille</string>
-    <string name="settings_straight_grid_note">Seule la grille 9×9. Les autres éléments gardent le style dessiné à la main.</string>
-    <string name="settings_language">Langue</string>
-    <string name="settings_language_current">Langue actuelle : %1$s</string>
-    <string name="settings_language_note">La langue de l\'application se modifie dans les paramètres système.</string>
-    <string name="settings_language_open">Modifier dans le système</string>
-    <string name="settings_game">Jeu</string>
+    <string name="settings_same_digits">Surligner les mêmes chiffres</string>
+    <string name="settings_language_current">Langue : %1$s</string>
+    <string name="settings_language_open">Changer de langue</string>
     <string name="settings_reset_records">Réinitialiser les records</string>
     <string name="settings_reset_confirm">Réinitialiser tous les records ?</string>
     <string name="settings_reset_yes">Oui</string>
@@ -100,5 +69,4 @@
     <string name="settings_about">À propos</string>
     <string name="settings_about_version">Sudoku 9×9 · version %1$s</string>
     <string name="settings_developer_website">Site du développeur</string>
-    <string name="settings_about_storage">Les records et la partie en cours sont enregistrés uniquement sur cet appareil.</string>
 </resources>

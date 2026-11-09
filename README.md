@@ -29,8 +29,9 @@ for distribution on F-Droid.
   German, Italian, Ukrainian and Belarusian; the default language comes from
   the system and is changed through the native Android "App language" screen;
 - light and dark themes, plus a "follow system" mode;
-- settings: theme selection, board line style, a shortcut to the system
-  language picker, a link to the developer website and a records reset;
+- settings: theme selection, board line style, same-digit highlighting, a
+  shortcut to the system language picker, a link to the developer website and
+  a records reset;
 - straight grid lines on the 9×9 board by default, with an option to switch
   back to hand-drawn wobbly lines;
 - the current game is saved when the app goes to the background: the timer
@@ -165,7 +166,6 @@ app/src/main/java/me/zakharenka/sudoku/
 │   ├── SavedGame.kt         # game snapshot for storage
 │   ├── SudokuGenerator.kt   # generator and solver
 │   ├── SudokuSession.kt     # game rules with no Android dependencies
-│   ├── GameMessage.kt       # structured game messages
 │   └── Formatters.kt        # time and "mistakes" plural forms
 └── ui/
     ├── SudokuScreen.kt      # screen, header, settings and dialogs
@@ -242,6 +242,7 @@ Data is stored locally in SharedPreferences.
 | `theme_mode` | `system`, `light` or `dark` |
 | `notes_mode` | whether notes mode is enabled |
 | `straight_grid` | whether the 9×9 board uses straight grid lines (default `true`) |
+| `same_highlight` | whether cells with the selected digit are highlighted (default `true`) |
 
 `<difficulty>` is `easy`, `medium`, `hard` or `expert`.
 
@@ -262,9 +263,8 @@ difficulty.
   `plurals.xml`.
 - `locales_config.xml` connects the languages to the native "App language"
   screen.
-- The app settings have no language picker of their own: the "Change in
-  system" button opens the system
-  `android.settings.APP_LOCALE_SETTINGS` screen.
+- The app settings have no language picker of their own: the "Change language"
+  button opens the system `android.settings.APP_LOCALE_SETTINGS` screen.
 - The plan for adding more languages and the font requirements are described
   in [`docs/languages.md`](docs/languages.md).
 

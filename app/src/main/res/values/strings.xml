@@ -34,33 +34,6 @@
     <string name="cell_error">Row %1$d, column %2$d, mistake, digit %3$d</string>
     <string name="cell_notes">Row %1$d, column %2$d, notes %3$s</string>
 
-    <string name="status_initial">Choose a cell and enter a digit</string>
-    <string name="status_generating">Generating a puzzle…</string>
-    <string name="status_generation_failed">Could not create a puzzle. Try again.</string>
-    <string name="status_new_game">New game: %1$s. Clues: %2$d</string>
-    <string name="status_restored">Game restored. Tap “Resume”.</string>
-    <string name="status_paused">Paused</string>
-    <string name="status_resumed">Resuming</string>
-    <string name="status_new_record">Solved! New record: %1$s</string>
-    <string name="status_solved">Solved! Time: %1$s</string>
-
-    <string name="message_select_cell">Choose a cell first</string>
-    <string name="message_cell_filled">This cell is already filled</string>
-    <string name="message_erase_first">Erase the digit before adding a note</string>
-    <string name="message_note_added" tools:ignore="PluralsCandidate">Note %1$d added</string>
-    <string name="message_note_removed" tools:ignore="PluralsCandidate">Note %1$d removed</string>
-    <string name="message_correct">Correct</string>
-    <string name="message_wrong_number">Wrong digit. Mistakes: %1$d.</string>
-    <string name="message_cell_cleared">Cell cleared</string>
-    <string name="message_move_undone">Move undone</string>
-    <string name="message_board_correct">The board is already correct</string>
-    <string name="message_hint">Hint: %1$d — row %2$d, column %3$d. Hints left: %4$d</string>
-    <string name="message_no_hints">No hints left</string>
-    <string name="message_cannot_erase">This cell cannot be erased</string>
-    <string name="message_notes_enabled">Notes enabled</string>
-    <string name="message_notes_disabled">Notes disabled</string>
-    <string name="message_solved">Solved!</string>
-
     <string name="pause_title">Paused</string>
     <string name="pause_subtitle">Timer stopped</string>
     <string name="loading_generating">Generating a puzzle…</string>
@@ -71,7 +44,6 @@
     <string name="dialog_close">Close</string>
     <string name="records_title">Best results</string>
     <string name="records_solved_level">Solved: %1$d</string>
-    <string name="records_note">Records are stored only on this device.</string>
     <string name="rules_title">How to play</string>
     <string name="rules_1">1–9 — enter a digit in the selected cell</string>
     <string name="rules_2">Notes — write possible candidates in an empty cell</string>
@@ -86,12 +58,9 @@
     <string name="theme_dark">Dark</string>
     <string name="settings_board">Board</string>
     <string name="settings_straight_grid">Straight grid lines</string>
-    <string name="settings_straight_grid_note">Only the 9×9 board. Other elements keep the hand-drawn style.</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_language_current">Current language: %1$s</string>
-    <string name="settings_language_note">The app language is changed in the system settings.</string>
-    <string name="settings_language_open">Change in system</string>
-    <string name="settings_game">Game</string>
+    <string name="settings_same_digits">Highlight same digits</string>
+    <string name="settings_language_current">Language: %1$s</string>
+    <string name="settings_language_open">Change language</string>
     <string name="settings_reset_records">Reset records</string>
     <string name="settings_reset_confirm">Reset all records?</string>
     <string name="settings_reset_yes">Yes</string>
@@ -100,5 +69,4 @@
     <string name="settings_about">About</string>
     <string name="settings_about_version">Sudoku 9×9 · version %1$s</string>
     <string name="settings_developer_website">Developer website</string>
-    <string name="settings_about_storage">Records and the current game are stored only on this device.</string>
 </resources>

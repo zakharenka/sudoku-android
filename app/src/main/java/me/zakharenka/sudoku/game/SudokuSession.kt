@@ -2,15 +2,7 @@ package me.zakharenka.sudoku.game
 
 import java.util.ArrayDeque
 
-enum class StatusKind {
-    NEUTRAL,
-    ERROR,
-    SUCCESS,
-}
-
 data class MoveOutcome(
-    val message: GameMessage? = null,
-    val kind: StatusKind = StatusKind.NEUTRAL,
     val changed: Boolean = false,
     val won: Boolean = false,
 )
@@ -90,10 +82,7 @@ class SudokuSession(
         }
 
         notesMode = !notesMode
-        return MoveOutcome(
-            message = if (notesMode) GameMessage.NotesEnabled else GameMessage.NotesDisabled,
-            changed = true,
-        )
+        return MoveOutcome(changed = true)
     }
 
     fun enter(number: Int): MoveOutcome {
@@ -101,21 +90,16 @@ class SudokuSession(
             return MoveOutcome()
         }
 
-        val index = selected
-            ?: return MoveOutcome(GameMessage.SelectCellFirst, StatusKind.ERROR)
-
+        val index = selected ?: return MoveOutcome()
         val cell = cells[index]
 
         if (cell.given) {
-            return MoveOutcome(GameMessage.CellAlreadyFilled)
+            return MoveOutcome()
         }
 
         if (notesMode) {
             if (cell.value != 0) {
-                return MoveOutcome(
-                    GameMessage.EraseNumberFirst,
-                    StatusKind.ERROR,
-                )
+                return MoveOutcome()
             }
 
             val entry = snapshot(listOf(index))
@@ -128,14 +112,7 @@ class SudokuSession(
             cells[index] = cell.copy(notes = notes)
             pushHistory(entry)
 
-            return MoveOutcome(
-                message = if (number in notes) {
-                    GameMessage.NoteAdded(number)
-                } else {
-                    GameMessage.NoteRemoved(number)
-                },
-                changed = true,
-            )
+            return MoveOutcome(changed = true)
         }
 
         if (cell.value == number) {
@@ -163,15 +140,7 @@ class SudokuSession(
         pushHistory(entry)
         val finished = checkWin()
 
-        return when {
-            finished -> MoveOutcome(GameMessage.Solved, StatusKind.SUCCESS, changed = true, won = true)
-            correct -> MoveOutcome(GameMessage.Correct, changed = true)
-            else -> MoveOutcome(
-                GameMessage.WrongNumber(mistakes),
-                StatusKind.ERROR,
-                changed = true,
-            )
-        }
+        return MoveOutcome(changed = true, won = finished)
     }
 
     fun erase(): MoveOutcome {
@@ -183,7 +152,7 @@ class SudokuSession(
         val cell = cells[index]
 
         if (cell.given) {
-            return MoveOutcome(GameMessage.CannotEraseGiven, StatusKind.ERROR)
+            return MoveOutcome()
         }
 
         if (cell.value == 0 && cell.notes.isEmpty()) {
@@ -194,7 +163,7 @@ class SudokuSession(
         cells[index] = cell.copy(value = 0, error = false, notes = emptySet())
         pushHistory(entry)
 
-        return MoveOutcome(GameMessage.CellCleared, changed = true)
+        return MoveOutcome(changed = true)
     }
 
     fun undo(): MoveOutcome {
@@ -211,7 +180,7 @@ class SudokuSession(
         mistakes = entry.mistakes
         selected = entry.changes.firstOrNull()?.index ?: selected
 
-        return MoveOutcome(GameMessage.MoveUndone, changed = true)
+        return MoveOutcome(changed = true)
     }
 
     fun hint(): MoveOutcome {
@@ -220,7 +189,7 @@ class SudokuSession(
         }
 
         if (hintsRemaining <= 0) {
-            return MoveOutcome(GameMessage.NoHintsLeft, StatusKind.ERROR)
+            return MoveOutcome()
         }
 
         val candidates = cells.indices.filter { index ->
@@ -228,7 +197,7 @@ class SudokuSession(
         }
 
         if (candidates.isEmpty()) {
-            return MoveOutcome(GameMessage.BoardAlreadyCorrect)
+            return MoveOutcome()
         }
 
         val index = selected?.takeIf { it in candidates }
@@ -253,15 +222,7 @@ class SudokuSession(
         hintsUsed += 1
         val finished = checkWin()
 
-        val row = index / SIZE + 1
-        val col = index % SIZE + 1
-
-        return MoveOutcome(
-            message = GameMessage.Hint(number, row, col, hintsRemaining),
-            kind = StatusKind.SUCCESS,
-            changed = true,
-            won = finished,
-        )
+        return MoveOutcome(changed = true, won = finished)
     }
 
     private fun checkWin(): Boolean {

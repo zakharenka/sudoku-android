@@ -34,33 +34,6 @@
     <string name="cell_error">Riga %1$d, colonna %2$d, errore, cifra %3$d</string>
     <string name="cell_notes">Riga %1$d, colonna %2$d, note %3$s</string>
 
-    <string name="status_initial">Scegli una cella e inserisci una cifra</string>
-    <string name="status_generating">Generazione della griglia…</string>
-    <string name="status_generation_failed">Impossibile creare la griglia. Riprova.</string>
-    <string name="status_new_game">Nuova partita: %1$s. Indizi: %2$d</string>
-    <string name="status_restored">Partita ripristinata. Tocca «Riprendi».</string>
-    <string name="status_paused">In pausa</string>
-    <string name="status_resumed">Ripresa</string>
-    <string name="status_new_record">Risolto! Nuovo record: %1$s</string>
-    <string name="status_solved">Risolto! Tempo: %1$s</string>
-
-    <string name="message_select_cell">Scegli prima una cella</string>
-    <string name="message_cell_filled">Questa cella è già compilata</string>
-    <string name="message_erase_first">Cancella la cifra prima di aggiungere una nota</string>
-    <string name="message_note_added" tools:ignore="PluralsCandidate">Nota %1$d aggiunta</string>
-    <string name="message_note_removed" tools:ignore="PluralsCandidate">Nota %1$d rimossa</string>
-    <string name="message_correct">Corretto</string>
-    <string name="message_wrong_number">Cifra errata. Errori: %1$d.</string>
-    <string name="message_cell_cleared">Cella cancellata</string>
-    <string name="message_move_undone">Mossa annullata</string>
-    <string name="message_board_correct">La griglia è già corretta</string>
-    <string name="message_hint">Indizio: %1$d — riga %2$d, colonna %3$d. Indizi rimasti: %4$d</string>
-    <string name="message_no_hints">Nessun indizio rimasto</string>
-    <string name="message_cannot_erase">Questa cella non può essere cancellata</string>
-    <string name="message_notes_enabled">Note attivate</string>
-    <string name="message_notes_disabled">Note disattivate</string>
-    <string name="message_solved">Risolto!</string>
-
     <string name="pause_title">In pausa</string>
     <string name="pause_subtitle">Tempo fermato</string>
     <string name="loading_generating">Generazione della griglia…</string>
@@ -71,7 +44,6 @@
     <string name="dialog_close">Chiudi</string>
     <string name="records_title">Migliori risultati</string>
     <string name="records_solved_level">Risolti: %1$d</string>
-    <string name="records_note">I record sono salvati solo su questo dispositivo.</string>
     <string name="rules_title">Come giocare</string>
     <string name="rules_1">1–9: inserisci una cifra nella cella selezionata</string>
     <string name="rules_2">Note: scrivi i possibili candidati in una cella vuota</string>
@@ -86,12 +58,9 @@
     <string name="theme_dark">Scuro</string>
     <string name="settings_board">Tabellone</string>
     <string name="settings_straight_grid">Linee dritte della griglia</string>
-    <string name="settings_straight_grid_note">Solo la griglia 9×9. Gli altri elementi mantengono lo stile disegnato a mano.</string>
-    <string name="settings_language">Lingua</string>
-    <string name="settings_language_current">Lingua attuale: %1$s</string>
-    <string name="settings_language_note">La lingua dell\'app si cambia nelle impostazioni di sistema.</string>
-    <string name="settings_language_open">Cambia nelle impostazioni di sistema</string>
-    <string name="settings_game">Gioco</string>
+    <string name="settings_same_digits">Evidenzia le stesse cifre</string>
+    <string name="settings_language_current">Lingua: %1$s</string>
+    <string name="settings_language_open">Cambia lingua</string>
     <string name="settings_reset_records">Reimposta i record</string>
     <string name="settings_reset_confirm">Reimpostare tutti i record?</string>
     <string name="settings_reset_yes">Sì</string>
@@ -100,5 +69,4 @@
     <string name="settings_about">Informazioni</string>
     <string name="settings_about_version">Sudoku 9×9 · versione %1$s</string>
     <string name="settings_developer_website">Sito dello sviluppatore</string>
-    <string name="settings_about_storage">I record e la partita attuale sono salvati solo su questo dispositivo.</string>
 </resources>

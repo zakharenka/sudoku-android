@@ -24,8 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -52,6 +54,7 @@ fun SudokuBoard(
     cells: List<Cell>,
     selectedIndex: Int?,
     straightGrid: Boolean,
+    highlightSameDigits: Boolean,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -79,7 +82,8 @@ fun SudokuBoard(
                             peer = selectedIndex != null &&
                                 selectedIndex != index &&
                                 arePeers(selectedIndex, index),
-                            same = selectedValue != 0 &&
+                            same = highlightSameDigits &&
+                                selectedValue != 0 &&
                                 cell.value == selectedValue &&
                                 selectedIndex != index,
                             enabled = enabled,
@@ -288,6 +292,9 @@ private fun SudokuCell(
                 contentDescription = description
                 role = Role.Button
                 this.selected = selected
+                if (selected) {
+                    liveRegion = LiveRegionMode.Polite
+                }
             },
         contentAlignment = Alignment.Center,
     ) {

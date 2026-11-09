@@ -34,33 +34,6 @@
     <string name="cell_error">Рядок %1$d, стовпець %2$d, помилка, цифра %3$d</string>
     <string name="cell_notes">Рядок %1$d, стовпець %2$d, нотатки %3$s</string>
 
-    <string name="status_initial">Виберіть клітинку та введіть цифру</string>
-    <string name="status_generating">Генерація поля…</string>
-    <string name="status_generation_failed">Не вдалося створити поле. Спробуйте ще раз.</string>
-    <string name="status_new_game">Нова гра: %1$s. Підказок: %2$d</string>
-    <string name="status_restored">Гру відновлено. Натисніть «Продовжити».</string>
-    <string name="status_paused">Пауза</string>
-    <string name="status_resumed">Продовжуємо</string>
-    <string name="status_new_record">Розв\'язано! Новий рекорд: %1$s</string>
-    <string name="status_solved">Розв\'язано! Час: %1$s</string>
-
-    <string name="message_select_cell">Спочатку виберіть клітинку</string>
-    <string name="message_cell_filled">Ця клітинка вже заповнена</string>
-    <string name="message_erase_first">Спершу сотріть цифру, щоб додати нотатку</string>
-    <string name="message_note_added" tools:ignore="PluralsCandidate">Нотатку %1$d додано</string>
-    <string name="message_note_removed" tools:ignore="PluralsCandidate">Нотатку %1$d прибрано</string>
-    <string name="message_correct">Правильно</string>
-    <string name="message_wrong_number">Неправильна цифра. Помилок: %1$d.</string>
-    <string name="message_cell_cleared">Клітинку очищено</string>
-    <string name="message_move_undone">Хід скасовано</string>
-    <string name="message_board_correct">Поле вже заповнене правильно</string>
-    <string name="message_hint">Підказка: %1$d — рядок %2$d, стовпець %3$d. Залишилося підказок: %4$d</string>
-    <string name="message_no_hints">Підказки закінчилися</string>
-    <string name="message_cannot_erase">Цю клітинку не можна стерти</string>
-    <string name="message_notes_enabled">Нотатки ввімкнено</string>
-    <string name="message_notes_disabled">Нотатки вимкнено</string>
-    <string name="message_solved">Розв\'язано!</string>
-
     <string name="pause_title">Пауза</string>
     <string name="pause_subtitle">Час зупинено</string>
     <string name="loading_generating">Генерація поля…</string>
@@ -71,7 +44,6 @@
     <string name="dialog_close">Закрити</string>
     <string name="records_title">Найкращі результати</string>
     <string name="records_solved_level">Розв\'язано: %1$d</string>
-    <string name="records_note">Рекорди зберігаються лише на цьому пристрої.</string>
     <string name="rules_title">Як грати</string>
     <string name="rules_1">1–9 — введіть цифру у вибраній клітинці</string>
     <string name="rules_2">Нотатки — записуйте можливі варіанти в порожній клітинці</string>
@@ -86,12 +58,9 @@
     <string name="theme_dark">Темна</string>
     <string name="settings_board">Поле</string>
     <string name="settings_straight_grid">Рівні лінії сітки</string>
-    <string name="settings_straight_grid_note">Лише поле 9×9. Інші елементи залишаються намальованими.</string>
-    <string name="settings_language">Мова</string>
-    <string name="settings_language_current">Поточна мова: %1$s</string>
-    <string name="settings_language_note">Мова застосунку змінюється в системних налаштуваннях.</string>
-    <string name="settings_language_open">Змінити в системі</string>
-    <string name="settings_game">Гра</string>
+    <string name="settings_same_digits">Підсвічувати однакові цифри</string>
+    <string name="settings_language_current">Мова: %1$s</string>
+    <string name="settings_language_open">Змінити мову</string>
     <string name="settings_reset_records">Скинути рекорди</string>
     <string name="settings_reset_confirm">Скинути всі рекорди?</string>
     <string name="settings_reset_yes">Так</string>
@@ -100,5 +69,4 @@
     <string name="settings_about">Про застосунок</string>
     <string name="settings_about_version">Судоку 9×9 · версія %1$s</string>
     <string name="settings_developer_website">Сайт розробника</string>
-    <string name="settings_about_storage">Рекорди та поточна гра зберігаються лише на цьому пристрої.</string>
 </resources>

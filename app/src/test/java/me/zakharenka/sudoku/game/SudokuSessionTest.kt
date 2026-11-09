@@ -112,8 +112,6 @@ class SudokuSessionTest {
         val outcome = session.hint()
 
         assertFalse(outcome.changed)
-        assertEquals(GameMessage.NoHintsLeft, outcome.message)
-        assertEquals(StatusKind.ERROR, outcome.kind)
         assertEquals(1, session.cells.count { it.value == 0 })
     }
 
