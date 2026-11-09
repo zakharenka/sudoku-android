@@ -1,0 +1,1 @@
+Sudoku 1.1.0: game history, records split by mistakes, backup to a file, handwritten digits, keyboard input and refreshed settings.

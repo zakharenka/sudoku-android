@@ -1,0 +1,1 @@
+Sudoku 1.1.0: histórico de partidas, recordes separados por erros, backup em um arquivo e restauração, dígitos manuscritos, teclado e ajustes renovados.

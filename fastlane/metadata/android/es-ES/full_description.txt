@@ -9,11 +9,12 @@ CARACTERÍSTICAS
 • Temporizador, contador de errores y pausa
 • Temas claro, oscuro y del sistema
 • Nueve idiomas: inglés, ruso, español, portugués (Brasil), francés, alemán, italiano, ucraniano y bielorruso
-• Mejor tiempo y número de sudokus resueltos por nivel
+• Historial de partidas con miniaturas y reanudación con un toque
+• Récords separados para partidas con y sin errores
+• Dígitos manuscritos animados y entrada por teclado
+• Copia de seguridad en un archivo y restauración con el selector del sistema
 • La partida actual se guarda automáticamente y se restaura en pausa
 • Funciona sin conexión
 • Sin anuncios, analítica ni cuenta
 
 Sudoku es un juego gratuito de un desarrollador independiente. Si te gusta, deja una reseña: ayuda mucho.
-
-Política de privacidad: https://zakharenka.me/privacy/android_sudoku_privacy.html

@@ -9,7 +9,7 @@ and is changed through the native Android app-language settings.
 
 The app is free software under the GNU General Public License v3.0 or later.
 The source code is hosted on GitHub, and the project ships the metadata needed
-for distribution on F-Droid.
+for distribution on Google Play and F-Droid.
 
 ## Features
 
@@ -34,7 +34,7 @@ for distribution on F-Droid.
   with and without mistakes, derived from the game history;
 - game history grouped by day, with a mini puzzle preview, start and finish
   dates, elapsed time and mistakes; tapping a row loads that game on pause;
-- JSON backup import/export through the system file picker;
+- backup to a file and restore through the system file picker;
 - nine languages: English, Russian, Spanish, Portuguese (Brazil), French,
   German, Italian, Ukrainian and Belarusian; the default language comes from
   the system and is changed through the native Android "App language" screen;
@@ -44,7 +44,7 @@ for distribution on F-Droid.
   import/export and a link to the developer website;
 - straight grid lines on the 9×9 board by default, with an option to switch
   back to hand-drawn wobbly lines;
-- the current game is saved to a local JSON file when the app goes to the
+- the current game is saved to a local file when the app goes to the
   background: the timer stops and the game is restored on pause the next time
   it starts;
 - win screen with the time and a new-record message;
@@ -56,8 +56,8 @@ for distribution on F-Droid.
 - Kotlin 2.3.21, Jetpack Compose (Material 3), Compose BOM 2026.09.00;
 - AGP 9.4.1, Gradle 9.6, JDK 17+;
 - minSdk 30, targetSdk 37, compileSdk 37;
-- SharedPreferences for settings and one atomic JSON file for the current game
-  and history;
+- SharedPreferences for settings and one atomic local file for the current
+  game and history;
 - `android:localeConfig` and native Android 13+ per-app language settings.
 
 The app does not use the network, does not include analytics and requests no
@@ -68,7 +68,7 @@ permissions.
 The version is defined in one place — `gradle.properties`:
 
 ```properties
-app.version=1.0.4
+app.version=MAJOR.MINOR.PATCH
 ```
 
 `app/build.gradle.kts` uses this value as `versionName` and derives
@@ -78,8 +78,10 @@ app.version=1.0.4
 major * 1_000_000 + minor * 1_000 + patch
 ```
 
-For `1.0.4` this is `versionCode = 1000004`. Versions follow semantic
-versioning `MAJOR.MINOR.PATCH`; release versions are marked with git tags.
+The current value is whatever is set in `gradle.properties`. Use
+`python3 scripts/set-version.py X.Y.Z` to update it; the helper also keeps
+`fdroid/version.json` in sync. Versions follow semantic versioning
+`MAJOR.MINOR.PATCH`; release versions are marked with annotated git tags.
 
 ## Building
 
@@ -103,50 +105,22 @@ Release build (R8, unsigned):
 
 The APK is written to `app/build/outputs/apk/release/app-release-unsigned.apk`.
 
+## Documentation
+
+| Document | Contents |
+| --- | --- |
+| [`docs/architecture.md`](docs/architecture.md) | modules, boundaries, data flow and key files |
+| [`docs/data-storage.md`](docs/data-storage.md) | settings, saved game format, persistence and backup |
+| [`docs/game-rules.md`](docs/game-rules.md) | rules, hints, records and history |
+| [`docs/ui-guidelines.md`](docs/ui-guidelines.md) | dialogs, top bar, keyboard, tablets, sketch style and icon |
+| [`docs/release-process.md`](docs/release-process.md) | versioning, release checklist, Google Play and F-Droid |
+| [`docs/languages.md`](docs/languages.md) | supported languages and the plan for new ones |
+| [`docs/releases/`](docs/releases/) | release notes by version |
+
 ## Publishing
 
-### Google Play
-
-The Google Play package is assembled locally in `store_out/` and is not
-committed (the folder is listed in `.gitignore`). It contains the listing
-texts, icon, feature graphic, screenshots, Play Console answers and the AAB.
-
-```bash
-./gradlew :app:bundleRelease
-```
-
-The AAB is written to `app/build/outputs/bundle/release/app-release.aab`. It
-must be signed with the upload key before it is uploaded.
-
-Play Console documents:
-
-- privacy policy:
-  `https://zakharenka.me/privacy/android_sudoku_privacy.html`;
-- terms of use:
-  `https://zakharenka.me/privacy/android_sudoku_terms.html`.
-
-### F-Droid
-
-The F-Droid build recipe is in
-[`metadata/me.zakharenka.sudoku.yml`](metadata/me.zakharenka.sudoku.yml).
-F-Droid builds the app from the tagged source on GitHub, so no signed APK needs
-to be uploaded.
-
-Store texts and graphics for F-Droid live in the standard fastlane layout:
-
-```text
-fastlane/metadata/android/<locale>/
-├── title.txt
-├── short_description.txt
-├── full_description.txt
-├── changelogs/<versionCode>.txt
-└── images/
-```
-
-To submit or update the app in the official F-Droid repository, open a merge
-request against
-[`fdroid/fdroiddata`](https://gitlab.com/fdroid/fdroiddata) with the metadata
-file. See [`docs/fdroid.md`](docs/fdroid.md) for the full checklist.
+- Google Play and F-Droid:
+  [`docs/release-process.md`](docs/release-process.md).
 
 ## Tests and checks
 
@@ -172,8 +146,8 @@ app/src/main/java/me/zakharenka/sudoku/
 ├── SudokuViewModel.kt       # game state, timer, generation, persistence, import/export
 ├── data/
 │   ├── SettingsStore.kt     # global settings in SharedPreferences
-│   ├── SudokuDataStore.kt   # atomic JSON file for the current game and history
-│   ├── SudokuDataCodec.kt   # shared JSON parser/validator
+│   ├── SudokuDataStore.kt   # atomic file storage for the current game and history
+│   ├── SudokuDataCodec.kt   # shared parser/validator
 │   └── ThemeMode.kt         # system / light / dark theme
 ├── game/
 │   ├── Difficulty.kt        # difficulty levels and clue count
@@ -210,18 +184,10 @@ app/src/main/res/
 ├── drawable/                # hand-drawn app icons
 └── font/neucha.ttf          # Neucha handwritten font
 
-fastlane/metadata/android/   # F-Droid store texts and graphics
+fastlane/metadata/android/   # store texts and graphics for Google Play and F-Droid
 metadata/                    # F-Droid build recipe
-docs/
-├── fdroid.md                # F-Droid submission checklist
-├── languages.md             # current languages and next translation waves
-└── releases/
-    ├── README.md            # release notes index
-    ├── 1.0.0.md
-    ├── 1.0.1.md
-    ├── 1.0.2.md
-    ├── 1.0.3.md
-    └── 1.0.4.md
+scripts/                     # release and store-package helpers
+docs/                        # architecture, rules, UI, publishing and release notes
 ```
 
 Each `values-*` folder contains `strings.xml` and `plurals.xml`.
@@ -232,62 +198,26 @@ sends actions to `SudokuViewModel`.
 
 ## How a game works
 
-- `SudokuGenerator` creates a complete solution and removes digits down to the
-  target clue count while checking that the solution stays unique.
-- `SudokuSession` stores cells, notes, mistakes and move history, and decides
-  when the game is won. All rules live here.
-- `SudokuViewModel` drives background generation, a timer based on
-  `SystemClock.elapsedRealtime()`, pause, saving, restoring, history and data
-  import/export.
-- When the app goes to the background (`onStop`), the current game is saved and
-  the timer stops. On the next launch the game referenced by `currentGameId` is
-  restored on pause; a solved current game opens on its win screen.
-- The current game is checkpointed after every board change, every 10 seconds
-  while the timer runs, on pause or dialog open, when history is opened or a
-  game is switched, on victory, before export and in `onStop`.
-- Each game has three hints. The remaining count is shown on the hint button,
-  persisted with the game and is not refunded by undo or erase.
-- On victory the game joins **No mistakes** when `errors == 0` and
-  **With mistakes** otherwise. It can set the best time in that category and
-  increments its solved count. Hidden-errors games keep `errors == 0`, so they
-  join **No mistakes**. The solved game stays in the history and remains the
-  current game until another game is opened.
+`SudokuGenerator` creates a complete solution and removes digits while checking
+that the solution stays unique. `SudokuSession` stores cells, notes, mistakes
+and move history and decides when the game is won. `SudokuViewModel` drives
+background generation, the timer, pause, saving, restoring, history and data
+import/export.
 
-## Data storage
-
-Settings are stored in `SharedPreferences` (`sudoku`):
-
-| Key | Value |
-| --- | --- |
-| `theme_mode` | `system`, `light` or `dark` |
-| `notes_mode` | whether notes mode is enabled |
-| `straight_grid` | whether the 9×9 board uses straight grid lines (default `true`) |
-| `same_highlight` | whether cells with the selected digit are highlighted (default `true`) |
-| `handwritten_digits` | whether cell values use animated handwritten strokes (default `true`) |
-| `show_errors` | default error mode for a new game (default `true`) |
-
-The current game and the full game history live in one versioned JSON file,
-`filesDir/sudoku_data.json`, written atomically. It contains `version`,
-`currentGameId` and `games` (current, unfinished and solved). `currentGameId`
-always references the game shown on the screen, including a solved one. Records
-are not stored separately: best times and solved counters are derived from
-solved games, split into "without mistakes" (`errors == 0`) and "with mistakes"
-(`errors > 0`). Notes are stored as a sparse object and per-cell error flags are
-derived from the saved values and solution. Old `best:*`, `solved:*` and
-`saved_game` keys are ignored and not migrated.
+See [`docs/game-rules.md`](docs/game-rules.md) and
+[`docs/data-storage.md`](docs/data-storage.md) for the full behavior and storage
+rules.
 
 ## Localization
 
-- English is the default language. The app currently supports `en`, `ru`, `es`,
-  `pt-BR`, `fr`, `de`, `it`, `uk` and `be`.
-- All user-facing strings live in `values*/strings.xml`; plural forms live in
-  `plurals.xml`.
-- `locales_config.xml` connects the languages to the native "App language"
-  screen.
-- The app settings have no language picker of their own: the "Change language"
-  button opens the system `android.settings.APP_LOCALE_SETTINGS` screen.
-- The plan for adding more languages and the font requirements are described
-  in [`docs/languages.md`](docs/languages.md).
+English is the default language. The app currently supports `en`, `ru`, `es`,
+`pt-BR`, `fr`, `de`, `it`, `uk` and `be`. All user-facing strings live in
+`values*/strings.xml`; plural forms live in `plurals.xml`. The app settings
+have no language picker of their own: the "Change language" button opens the
+system `android.settings.APP_LOCALE_SETTINGS` screen.
+
+See [`docs/languages.md`](docs/languages.md) for the translation plan and the
+checklist for adding a language.
 
 ## Font and icon
 
@@ -296,8 +226,8 @@ file is `app/src/main/res/font/neucha.ttf` and the license is in
 `app/src/main/assets/licenses/Neucha-OFL.txt`.
 
 The app icon is an adaptive icon with hand-drawn light and dark variants and a
-monochrome layer showing the digit 9. The content is scaled to 80% around the
-centre to keep margins under masks of different shapes.
+monochrome layer showing the digit 9. See
+[`docs/ui-guidelines.md`](docs/ui-guidelines.md) for the icon and style rules.
 
 ## License
 

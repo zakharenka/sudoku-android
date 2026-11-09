@@ -15,3 +15,7 @@ app/release/
 *.jks
 *.keystore
 keystore.properties
+
+# Python release scripts
+__pycache__/
+*.pyc

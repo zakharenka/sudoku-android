@@ -9,11 +9,12 @@ FUNKTIONEN
 • Timer, Fehlerzähler und Pause
 • Helles, dunkles und System-Design
 • Neun Sprachen: Englisch, Russisch, Spanisch, Portugiesisch (Brasilien), Französisch, Deutsch, Italienisch, Ukrainisch und Belarussisch
-• Beste Zeit und Anzahl gelöster Sudokus pro Schwierigkeitsgrad
+• Spielverlauf mit Miniaturansichten und Fortsetzen mit einem Tipp
+• Bestzeiten getrennt für Spiele mit und ohne Fehler
+• Animierte handgezeichnete Ziffern und Tastatureingabe
+• Sicherung in eine Datei und Wiederherstellung über die Dateiauswahl
 • Das aktuelle Spiel wird automatisch gespeichert und pausiert wiederhergestellt
 • Funktioniert offline
 • Keine Werbung, keine Analyse, kein Konto
 
 Sudoku ist ein kostenloses Spiel von einem unabhängigen Entwickler. Wenn es dir gefällt, hinterlasse eine Bewertung — das hilft sehr.
-
-Datenschutzerklärung: https://zakharenka.me/privacy/android_sudoku_privacy.html

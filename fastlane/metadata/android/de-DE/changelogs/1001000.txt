@@ -1,0 +1,1 @@
+Sudoku 1.1.0: Spielverlauf, Bestzeiten getrennt nach Fehlern, Sicherung in eine Datei, handgezeichnete Ziffern, Tastatur und überarbeitete Einstellungen.

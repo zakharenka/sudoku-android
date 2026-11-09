@@ -21,8 +21,7 @@ The app ships nine languages. All of them are connected to the native Android
 | Ukrainian | `uk` | `values-uk/` | ready |
 | Belarusian | `be` | `values-be/` | ready |
 
-English and Russian use the Neucha font without restrictions. The new
-first-wave languages are fully covered as well: the font contains the needed
+The current languages are fully covered: the Neucha font contains the needed
 diacritics for Spanish, Portuguese, French, German and Italian, plus Cyrillic
 for Ukrainian and Belarusian.
 
@@ -194,7 +193,7 @@ Reset the app language selection:
 adb shell cmd locale set-app-locales me.zakharenka.sudoku --locales ""
 ```
 
-11. Update this document, `README.md` and `AGENTS.md`.
+11. Update this document, `README.md` and the fastlane store texts.
 
 ## Pseudolocales for layout testing
 

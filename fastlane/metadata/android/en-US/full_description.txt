@@ -9,11 +9,12 @@ FEATURES
 • Timer, mistake counter and pause
 • Light, dark and system themes
 • Nine languages: English, Russian, Spanish, Portuguese (Brazil), French, German, Italian, Ukrainian and Belarusian
-• Best time and solved puzzle count for each difficulty
+• Game history with mini puzzle previews and one-tap resume
+• Best results split by games with and without mistakes
+• Animated handwritten digits and keyboard input
+• Backup to a file and restore through the system file picker
 • The current game is saved automatically and restored on pause
 • Works offline
 • No ads, no analytics, no account
 
 Sudoku is a free game made by an independent developer. If you enjoy it, leave a review — it helps a lot.
-
-Privacy policy: https://zakharenka.me/privacy/android_sudoku_privacy.html
