@@ -52,6 +52,27 @@ class SudokuSessionTest {
     }
 
     @Test
+    fun selectionMovesByOneCellAndStopsAtEdges() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0))
+
+        session.select(0)
+        session.moveSelection(0, -1)
+        session.moveSelection(-1, 0)
+        assertEquals(0, session.selected)
+
+        session.moveSelection(0, 1)
+        assertEquals(1, session.selected)
+
+        session.moveSelection(1, 0)
+        assertEquals(10, session.selected)
+
+        repeat(20) {
+            session.moveSelection(1, 1)
+        }
+        assertEquals(SudokuSession.CELLS - 1, session.selected)
+    }
+
+    @Test
     fun notesCanBeAddedAndRemoved() {
         val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0))
 

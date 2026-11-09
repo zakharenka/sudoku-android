@@ -134,6 +134,15 @@ Separation rules:
 - Resetting records clears both the best times and the counters for all
   difficulties.
 
+### Keyboard
+
+- Digits `1–9` on the main row and numpad enter the selected digit.
+- `0`, Backspace and Delete erase the selected cell.
+- Arrow keys move the selection one cell and stop at the board edges.
+- Keyboard input is ignored while a dialog is open, during loading, pause or
+  victory.
+- Focus must return to the board after a dialog closes and after resume.
+
 ### Hints
 
 - Each game has at most `SudokuSession.MAX_HINTS` (3) hints.

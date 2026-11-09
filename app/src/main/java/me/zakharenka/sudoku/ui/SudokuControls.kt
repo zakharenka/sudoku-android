@@ -77,7 +77,7 @@ fun TopToolbar(
         SketchSurface(
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp)
+                .height(52.dp)
                 .semantics { contentDescription = statsDescription },
             fill = colors.paperSunken,
             border = colors.gridLine,
@@ -92,7 +92,7 @@ fun TopToolbar(
                 Text(
                     text = stringResource(difficulty.labelRes()),
                     color = colors.ink,
-                    fontSize = 15.sp,
+                    fontSize = 17.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -111,7 +111,7 @@ fun TopToolbar(
                     Text(
                         text = "×",
                         color = colors.danger,
-                        fontSize = 22.sp,
+                        fontSize = 24.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                     )
@@ -119,7 +119,7 @@ fun TopToolbar(
                     Text(
                         text = mistakes.toString(),
                         color = colors.accent,
-                        fontSize = 19.sp,
+                        fontSize = 21.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                     )
@@ -135,13 +135,13 @@ fun TopToolbar(
                     SketchIcon(
                         icon = CLOCK,
                         tint = colors.inkSoft,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
                         text = time,
                         color = colors.accent,
-                        fontSize = 19.sp,
+                        fontSize = 21.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                     )
@@ -152,7 +152,7 @@ fun TopToolbar(
         SketchButton(
             onClick = onTogglePause,
             modifier = Modifier
-                .size(48.dp)
+                .size(52.dp)
                 .semantics { contentDescription = pauseDescription },
             enabled = enabled,
             fill = colors.paperSunken,
@@ -163,14 +163,14 @@ fun TopToolbar(
             SketchIcon(
                 icon = if (paused) PLAY else PAUSE,
                 tint = colors.accent,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(22.dp),
             )
         }
 
         SketchButton(
             onClick = onNewGame,
             modifier = Modifier
-                .size(48.dp)
+                .size(52.dp)
                 .semantics { contentDescription = newGameDescription },
             fill = colors.paperSunken,
             border = colors.gridLine,
@@ -180,7 +180,7 @@ fun TopToolbar(
             SketchIcon(
                 icon = REFRESH,
                 tint = colors.inkSoft,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(22.dp),
             )
         }
     }
@@ -192,7 +192,7 @@ private fun ToolbarDivider() {
     Box(
         modifier = Modifier
             .width(1.dp)
-            .height(24.dp)
+            .height(26.dp)
             .background(colors.gridLine),
     )
 }
@@ -231,7 +231,7 @@ fun NumberPad(
                 onClick = { onNumber(number) },
                 modifier = Modifier
                     .weight(1f)
-                    .height(54.dp)
+                    .height(58.dp)
                     .semantics { contentDescription = description },
                 enabled = enabled && !complete,
                 fill = colors.paperSunken,
@@ -243,7 +243,7 @@ fun NumberPad(
                     Text(
                         text = number.toString(),
                         color = colors.accent,
-                        fontSize = 23.sp,
+                        fontSize = 27.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.align(Alignment.Center),
@@ -251,7 +251,7 @@ fun NumberPad(
                     Text(
                         text = remaining.toString(),
                         color = colors.ink,
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
@@ -331,7 +331,7 @@ private fun ActionButton(
 
     SketchButton(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(70.dp),
         enabled = enabled,
         fill = colors.paperSunken,
         border = colors.gridLine,
@@ -348,13 +348,13 @@ private fun ActionButton(
                 SketchIcon(
                     icon = icon,
                     tint = contentColor,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.height(3.dp))
                 Text(
                     text = label,
                     color = contentColor,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -364,7 +364,7 @@ private fun ActionButton(
                 Text(
                     text = badge,
                     color = colors.ink,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -383,13 +383,13 @@ fun LoadingOverlay() {
     BoardOverlay {
         SketchSpinner(
             color = colors.accent,
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(44.dp),
         )
         Spacer(Modifier.height(14.dp))
         Text(
             text = stringResource(R.string.loading_generating),
             color = colors.inkSoft,
-            fontSize = 17.sp,
+            fontSize = 19.sp,
             fontFamily = HandFont,
         )
     }
@@ -403,7 +403,7 @@ fun PauseOverlay(onResume: () -> Unit) {
         Text(
             text = stringResource(R.string.pause_title),
             color = colors.ink,
-            fontSize = 32.sp,
+            fontSize = 36.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
         )
@@ -411,7 +411,7 @@ fun PauseOverlay(onResume: () -> Unit) {
         Text(
             text = stringResource(R.string.pause_subtitle),
             color = colors.inkSoft,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             fontFamily = HandFont,
         )
         Spacer(Modifier.height(18.dp))
@@ -437,13 +437,13 @@ fun WinOverlay(
         SketchIcon(
             icon = TROPHY,
             tint = colors.accent,
-            modifier = Modifier.size(46.dp),
+            modifier = Modifier.size(50.dp),
         )
         Spacer(Modifier.height(6.dp))
         Text(
             text = stringResource(R.string.win_title),
             color = colors.success,
-            fontSize = 34.sp,
+            fontSize = 38.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
         )
@@ -451,7 +451,7 @@ fun WinOverlay(
         Text(
             text = formatTime(elapsedSeconds),
             color = colors.ink,
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.5.sp,
@@ -461,7 +461,7 @@ fun WinOverlay(
             Text(
                 text = stringResource(R.string.win_new_record),
                 color = colors.accent,
-                fontSize = 15.sp,
+                fontSize = 17.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
             )
@@ -514,7 +514,7 @@ fun OverlayButton(
     SketchButton(
         onClick = onClick,
         modifier = Modifier
-            .height(44.dp)
+            .height(48.dp)
             .widthIn(min = 120.dp),
         fill = if (primary) colors.accentWash else colors.paperSunken,
         border = if (primary) colors.accent else colors.gridLine,
@@ -525,7 +525,7 @@ fun OverlayButton(
         Text(
             text = text,
             color = if (primary) colors.accent else colors.inkSoft,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
         )

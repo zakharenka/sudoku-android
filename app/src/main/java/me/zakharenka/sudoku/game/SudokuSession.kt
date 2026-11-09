@@ -74,6 +74,15 @@ class SudokuSession(
         }
     }
 
+    fun moveSelection(rowDelta: Int, colDelta: Int) {
+        val current = selected
+            ?: cells.indexOfFirst { it.value == 0 }.takeIf { it >= 0 }
+            ?: 0
+        val row = (current / SIZE + rowDelta).coerceIn(0, SIZE - 1)
+        val col = (current % SIZE + colDelta).coerceIn(0, SIZE - 1)
+        selected = row * SIZE + col
+    }
+
     fun remaining(number: Int): Int = SIZE - cells.count { it.value == number }
 
     fun toggleNotes(): MoveOutcome {

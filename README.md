@@ -18,6 +18,8 @@ for distribution on F-Droid.
 - cell digits are drawn as hand-written pencil strokes with a writing and
   erasing animation; the setting can switch them back to plain digits of the
   same size;
+- hardware keyboard support: digits and numpad enter values, `0`, Backspace and
+  Delete erase, arrow keys move the selected cell;
 - cell notes, hints (three per game), undo and clear cell;
 - timer, mistake counter, and pause with auto-pause when leaving the app;
 - single-row top bar: difficulty, mistakes and timer in one block, with

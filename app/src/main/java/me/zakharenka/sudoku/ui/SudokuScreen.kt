@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.core.net.toUri
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -32,6 +33,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,9 +41,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -88,17 +98,51 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showNewGameDialog by rememberSaveable { mutableStateOf(false) }
     var dismissedGameId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var pausedByDialog by rememberSaveable { mutableStateOf(false) }
+    val dialogOpen = showRecords || showRules || showSettings || showNewGameDialog
     val winDismissed = dismissedGameId == state.gameId
+    val keyboardFocus = remember { FocusRequester() }
 
-    BackHandler(enabled = state.paused) {
+    LaunchedEffect(dialogOpen, state.paused, state.won) {
+        if (!dialogOpen && !state.paused && !state.won) {
+            keyboardFocus.requestFocus()
+        }
+    }
+
+    LaunchedEffect(dialogOpen, state.loading, state.won) {
+        if (dialogOpen) {
+            if (!state.paused && !state.loading && !state.won) {
+                pausedByDialog = true
+                viewModel.pause()
+            }
+        } else if (pausedByDialog) {
+            pausedByDialog = false
+            viewModel.resume()
+        }
+    }
+
+    BackHandler(enabled = state.paused && !dialogOpen) {
         viewModel.resume()
     }
 
-    BackHandler(enabled = state.won && !winDismissed) {
+    BackHandler(enabled = state.won && !winDismissed && !dialogOpen) {
         dismissedGameId = state.gameId
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .focusRequester(keyboardFocus)
+            .onPreviewKeyEvent { event ->
+                handleBoardKey(
+                    event = event,
+                    state = state,
+                    dialogOpen = dialogOpen,
+                    viewModel = viewModel,
+                )
+            }
+            .focusable(),
+    ) {
         Canvas(Modifier.fillMaxSize()) {
             paperTexture(
                 base = colors.paper,
@@ -186,6 +230,74 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             },
             onDismiss = { showNewGameDialog = false },
         )
+    }
+}
+
+private fun handleBoardKey(
+    event: KeyEvent,
+    state: GameUiState,
+    dialogOpen: Boolean,
+    viewModel: SudokuViewModel,
+): Boolean {
+    if (dialogOpen || state.loading || state.paused || state.won) {
+        return false
+    }
+
+    if (event.type != KeyEventType.KeyDown) {
+        return false
+    }
+
+    val digit = event.digitNumber()
+    if (digit != null) {
+        if (digit == 0) {
+            viewModel.erase()
+        } else {
+            viewModel.enter(digit)
+        }
+        return true
+    }
+
+    return when (event.key) {
+        Key.DirectionUp -> {
+            viewModel.moveSelection(-1, 0)
+            true
+        }
+
+        Key.DirectionDown -> {
+            viewModel.moveSelection(1, 0)
+            true
+        }
+
+        Key.DirectionLeft -> {
+            viewModel.moveSelection(0, -1)
+            true
+        }
+
+        Key.DirectionRight -> {
+            viewModel.moveSelection(0, 1)
+            true
+        }
+
+        Key.Backspace, Key.Delete -> {
+            viewModel.erase()
+            true
+        }
+
+        else -> false
+    }
+}
+
+private fun KeyEvent.digitNumber(): Int? {
+    val keyCode = nativeKeyEvent.keyCode
+
+    return when (keyCode) {
+        in android.view.KeyEvent.KEYCODE_0..android.view.KeyEvent.KEYCODE_9 ->
+            keyCode - android.view.KeyEvent.KEYCODE_0
+
+        in android.view.KeyEvent.KEYCODE_NUMPAD_0..android.view.KeyEvent.KEYCODE_NUMPAD_9 ->
+            keyCode - android.view.KeyEvent.KEYCODE_NUMPAD_0
+
+        else -> null
     }
 }
 
@@ -399,17 +511,17 @@ private fun Header(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        SketchLogo(52.dp)
+        SketchLogo(56.dp)
 
         Spacer(Modifier.width(12.dp))
 
         Text(
             text = stringResource(R.string.app_name),
             color = colors.ink,
-            fontSize = 34.sp,
+            fontSize = 36.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
-            lineHeight = 36.sp,
+            lineHeight = 38.sp,
             maxLines = 1,
             modifier = Modifier.weight(1f),
         )
@@ -453,7 +565,7 @@ private fun HeaderIconButton(
     SketchButton(
         onClick = onClick,
         modifier = Modifier
-            .size(40.dp)
+            .size(44.dp)
             .semantics { contentDescription = description },
         fill = colors.paperSunken,
         border = colors.gridLine,
@@ -463,7 +575,7 @@ private fun HeaderIconButton(
         SketchIcon(
             icon = icon,
             tint = colors.inkSoft,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(22.dp),
         )
     }
 }
@@ -528,7 +640,7 @@ private fun SketchLogo(size: Dp) {
         Text(
             text = "9",
             color = colors.ink,
-            fontSize = 22.sp,
+            fontSize = 24.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center),
@@ -642,7 +754,7 @@ private fun DialogHeader(
         Text(
             text = title,
             color = colors.ink,
-            fontSize = 28.sp,
+            fontSize = 30.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
@@ -652,7 +764,7 @@ private fun DialogHeader(
         SketchButton(
             onClick = onDismiss,
             modifier = Modifier
-                .size(40.dp)
+                .size(44.dp)
                 .semantics { contentDescription = closeDescription },
             fill = colors.paperSunken,
             border = colors.gridLine,
@@ -662,7 +774,7 @@ private fun DialogHeader(
             SketchIcon(
                 icon = CLOSE,
                 tint = colors.inkSoft,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(20.dp),
             )
         }
     }
@@ -691,7 +803,7 @@ private fun RecordsDialog(
                     Text(
                         text = stringResource(difficulty.labelRes()),
                         color = colors.inkSoft,
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontFamily = HandFont,
                     )
                     Text(
@@ -700,14 +812,14 @@ private fun RecordsDialog(
                             solvedCounts[difficulty] ?: 0,
                         ),
                         color = colors.inkSoft.copy(alpha = 0.7f),
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontFamily = HandFont,
                     )
                 }
                 Text(
                     text = bestTimes[difficulty]?.let(::formatTime) ?: "—",
                     color = colors.accent,
-                    fontSize = 20.sp,
+                    fontSize = 23.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
@@ -736,9 +848,9 @@ private fun RulesDialog(onDismiss: () -> Unit) {
         Text(
             text = stringResource(R.string.rules_text),
             color = colors.inkSoft,
-            fontSize = 15.sp,
+            fontSize = 17.sp,
             fontFamily = HandFont,
-            lineHeight = 21.sp,
+            lineHeight = 24.sp,
         )
     }
 }
@@ -751,7 +863,7 @@ private fun RuleLine(text: String) {
         Text(
             text = "•",
             color = colors.accent,
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
         )
@@ -759,9 +871,9 @@ private fun RuleLine(text: String) {
         Text(
             text = text,
             color = colors.ink,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontFamily = HandFont,
-            lineHeight = 21.sp,
+            lineHeight = 24.sp,
         )
     }
 }
@@ -803,7 +915,7 @@ private fun SettingsDialog(
                 onClick = { onThemeModeChange(mode) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(46.dp),
+                    .height(50.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 active = active,
@@ -819,7 +931,7 @@ private fun SettingsDialog(
                     Text(
                         text = stringResource(mode.labelRes()),
                         color = if (active) colors.accent else colors.ink,
-                        fontSize = 17.sp,
+                        fontSize = 19.sp,
                         fontFamily = HandFont,
                         fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                     )
@@ -859,7 +971,7 @@ private fun SettingsDialog(
         Text(
             text = stringResource(R.string.settings_language_current, currentLanguage),
             color = colors.ink,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontFamily = HandFont,
             modifier = Modifier.padding(top = 16.dp),
         )
@@ -883,7 +995,7 @@ private fun SettingsDialog(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(46.dp),
+                .height(50.dp),
             fill = colors.dangerWash.copy(alpha = 0.55f),
             border = colors.danger.copy(alpha = 0.6f),
             seed = 842,
@@ -892,7 +1004,7 @@ private fun SettingsDialog(
             Text(
                 text = stringResource(R.string.settings_reset_records),
                 color = colors.danger,
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
             )
@@ -913,7 +1025,7 @@ private fun SettingsDialog(
                     Text(
                         text = stringResource(R.string.settings_reset_confirm),
                         color = colors.danger,
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         fontFamily = HandFont,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -926,7 +1038,7 @@ private fun SettingsDialog(
                                 confirmReset = false
                                 resetDone = true
                             },
-                            modifier = Modifier.height(40.dp),
+                            modifier = Modifier.height(44.dp),
                             fill = colors.dangerWash,
                             border = colors.danger,
                             seed = 844,
@@ -935,14 +1047,14 @@ private fun SettingsDialog(
                             Text(
                                 text = stringResource(R.string.settings_reset_yes),
                                 color = colors.danger,
-                                fontSize = 15.sp,
+                                fontSize = 17.sp,
                                 fontFamily = HandFont,
                                 fontWeight = FontWeight.Bold,
                             )
                         }
                         SketchButton(
                             onClick = { confirmReset = false },
-                            modifier = Modifier.height(40.dp),
+                            modifier = Modifier.height(44.dp),
                             fill = colors.paperSunken,
                             border = colors.gridLine,
                             seed = 845,
@@ -951,7 +1063,7 @@ private fun SettingsDialog(
                             Text(
                                 text = stringResource(R.string.settings_reset_cancel),
                                 color = colors.inkSoft,
-                                fontSize = 15.sp,
+                                fontSize = 17.sp,
                                 fontFamily = HandFont,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -966,7 +1078,7 @@ private fun SettingsDialog(
             Text(
                 text = stringResource(R.string.settings_reset_done),
                 color = colors.success,
-                fontSize = 15.sp,
+                fontSize = 17.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth(),
@@ -979,7 +1091,7 @@ private fun SettingsDialog(
         Text(
             text = stringResource(R.string.settings_about_version, BuildConfig.VERSION_NAME),
             color = colors.inkSoft,
-            fontSize = 15.sp,
+            fontSize = 17.sp,
             fontFamily = HandFont,
         )
 
@@ -1012,9 +1124,9 @@ private fun NewGameDialog(
         Text(
             text = stringResource(R.string.new_game_confirm),
             color = colors.inkSoft,
-            fontSize = 15.sp,
+            fontSize = 17.sp,
             fontFamily = HandFont,
-            lineHeight = 21.sp,
+            lineHeight = 24.sp,
         )
 
         Spacer(Modifier.height(12.dp))
@@ -1026,7 +1138,7 @@ private fun NewGameDialog(
                 onClick = { selected = difficulty },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(56.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 active = active,
@@ -1043,14 +1155,14 @@ private fun NewGameDialog(
                         Text(
                             text = stringResource(difficulty.labelRes()),
                             color = if (active) colors.accent else colors.ink,
-                            fontSize = 17.sp,
+                            fontSize = 19.sp,
                             fontFamily = HandFont,
                             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                         )
                         Text(
                             text = stringResource(difficulty.noteRes()),
                             color = colors.inkSoft,
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontFamily = HandFont,
                         )
                     }
@@ -1070,7 +1182,7 @@ private fun NewGameDialog(
                 onClick = { onStart(selected) },
                 modifier = Modifier
                     .weight(1f)
-                    .height(46.dp),
+                    .height(50.dp),
                 fill = colors.accentWash,
                 border = colors.accent,
                 active = true,
@@ -1080,7 +1192,7 @@ private fun NewGameDialog(
                 Text(
                     text = stringResource(R.string.new_game_start),
                     color = colors.accent,
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
@@ -1090,7 +1202,7 @@ private fun NewGameDialog(
                 onClick = onDismiss,
                 modifier = Modifier
                     .weight(1f)
-                    .height(46.dp),
+                    .height(50.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 seed = 881,
@@ -1099,7 +1211,7 @@ private fun NewGameDialog(
                 Text(
                     text = stringResource(R.string.new_game_cancel),
                     color = colors.inkSoft,
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
@@ -1115,7 +1227,7 @@ private fun SectionLabel(text: String) {
     Text(
         text = text,
         color = colors.inkSoft,
-        fontSize = 13.sp,
+        fontSize = 14.sp,
         fontFamily = HandFont,
         fontWeight = FontWeight.Bold,
         letterSpacing = 1.sp,
@@ -1127,7 +1239,7 @@ private fun SectionLabel(text: String) {
 private fun SketchRadio(active: Boolean) {
     val colors = SudokuTheme.colors
 
-    Canvas(Modifier.size(20.dp)) {
+    Canvas(Modifier.size(22.dp)) {
         val stroke = 1.5.dp.toPx()
         sketchOval(
             center = Offset(size.width / 2f, size.height / 2f),
@@ -1153,7 +1265,7 @@ private fun SketchRadio(active: Boolean) {
 private fun SketchCheck(checked: Boolean) {
     val colors = SudokuTheme.colors
 
-    Canvas(Modifier.size(20.dp)) {
+    Canvas(Modifier.size(22.dp)) {
         val side = size.minDimension
         val stroke = 1.5.dp.toPx()
         val inset = stroke
@@ -1204,7 +1316,7 @@ private fun SettingsCheckRow(
         onClick = onToggle,
         modifier = Modifier
             .fillMaxWidth()
-            .height(46.dp),
+            .height(50.dp),
         fill = colors.paperSunken,
         border = colors.gridLine,
         active = checked,
@@ -1220,7 +1332,7 @@ private fun SettingsCheckRow(
             Text(
                 text = label,
                 color = if (checked) colors.accent else colors.ink,
-                fontSize = 17.sp,
+                fontSize = 19.sp,
                 fontFamily = HandFont,
                 fontWeight = if (checked) FontWeight.Bold else FontWeight.Normal,
             )
@@ -1240,7 +1352,7 @@ private fun SettingsActionButton(
 
     SketchButton(
         onClick = onClick,
-        modifier = modifier.height(48.dp),
+        modifier = modifier.height(50.dp),
         fill = colors.paperSunken,
         border = colors.gridLine,
         seed = seed,
@@ -1253,12 +1365,12 @@ private fun SettingsActionButton(
             SketchIcon(
                 icon = icon,
                 tint = colors.inkSoft,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(20.dp),
             )
             Text(
                 text = label,
                 color = colors.ink,
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,

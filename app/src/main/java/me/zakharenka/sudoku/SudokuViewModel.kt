@@ -172,6 +172,20 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         refresh()
     }
 
+    fun moveSelection(rowDelta: Int, colDelta: Int) {
+        if (uiState.loading || uiState.paused) {
+            return
+        }
+
+        val session = session ?: return
+        if (session.won) {
+            return
+        }
+
+        session.moveSelection(rowDelta, colDelta)
+        refresh()
+    }
+
     fun enter(number: Int) {
         if (uiState.loading || uiState.paused) {
             return

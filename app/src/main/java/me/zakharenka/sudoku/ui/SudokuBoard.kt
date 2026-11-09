@@ -355,8 +355,8 @@ private fun NotesLine(
         listOf(sorted.subList(0, split), sorted.subList(split, sorted.size))
     }
     val text = lines.joinToString("\n") { line -> line.joinToString("") }
-    val maxFontSize = with(LocalDensity.current) { (cellSize * 0.4f).toSp() }
-    val minFontSize = with(LocalDensity.current) { (cellSize * 0.13f).toSp() }
+    val maxFontSize = with(LocalDensity.current) { (cellSize * 0.44f).toSp() }
+    val minFontSize = with(LocalDensity.current) { (cellSize * 0.14f).toSp() }
 
     BasicText(
         text = text,
