@@ -8,10 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
@@ -19,8 +19,11 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
@@ -164,6 +167,7 @@ fun HandwrittenDigit(
     modifier: Modifier = Modifier,
 ) {
     var displayedValue by remember { mutableIntStateOf(value) }
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     val progress = remember { Animatable(if (value == 0) 0f else 1f) }
 
     LaunchedEffect(value) {
@@ -224,34 +228,26 @@ fun HandwrittenDigit(
         return
     }
 
-    val geometry = remember(displayedValue, seed) {
-        buildDigitGeometry(displayedValue, seed)
+    val geometry = remember(displayedValue, seed, canvasSize) {
+        if (canvasSize == IntSize.Zero) {
+            null
+        } else {
+            buildDigitGeometry(displayedValue, seed, canvasSize)
+        }
     }
 
-    Canvas(modifier) {
-        if (geometry.strokes.isEmpty()) {
+    Canvas(
+        modifier = modifier.onSizeChanged { canvasSize = it },
+    ) {
+        if (geometry == null || geometry.strokes.isEmpty()) {
             return@Canvas
         }
 
-        val side = min(size.width, size.height)
-        if (side <= 0f) {
-            return@Canvas
-        }
-
-        val box = side * 0.66f
-        val left = (size.width - box) / 2f
-        val top = (size.height - box) / 2f
-
-        withTransform({
-            translate(left, top)
-            scale(box, box, pivot = Offset.Zero)
-        }) {
-            drawDigitGeometry(
-                geometry = geometry,
-                progress = progress.value,
-                color = color,
-            )
-        }
+        drawDigitGeometry(
+            geometry = geometry,
+            progress = progress.value,
+            color = color,
+        )
     }
 }
 
@@ -264,13 +260,24 @@ private class StrokeGeometry(
 private class DigitGeometry(
     val strokes: List<StrokeGeometry>,
     val totalLength: Float,
+    val strokeWidth: Float,
 )
 
-private fun buildDigitGeometry(value: Int, seed: Int): DigitGeometry {
+private fun buildDigitGeometry(
+    value: Int,
+    seed: Int,
+    canvasSize: IntSize,
+): DigitGeometry {
     val strokes = HandwrittenDigitStrokes[value].orEmpty()
     val random = Random(seed * 31 + value * 1009)
     val result = mutableListOf<StrokeGeometry>()
     var totalLength = 0f
+
+    val side = min(canvasSize.width, canvasSize.height).toFloat()
+    val box = max(1f, (side * 0.66f).roundToInt().toFloat())
+    val left = ((canvasSize.width - box) / 2f).roundToInt().toFloat()
+    val top = ((canvasSize.height - box) / 2f).roundToInt().toFloat()
+    val strokeWidth = max(1f, (box * 0.09f).roundToInt().toFloat())
 
     for (source in strokes) {
         if (source.size < 2) {
@@ -281,8 +288,8 @@ private fun buildDigitGeometry(value: Int, seed: Int): DigitGeometry {
         source.forEachIndexed { index, point ->
             val jitterX = (random.nextFloat() * 2f - 1f) * 0.006f
             val jitterY = (random.nextFloat() * 2f - 1f) * 0.006f
-            val x = point.x + jitterX
-            val y = point.y + jitterY
+            val x = left + (point.x + jitterX) * box
+            val y = top + (point.y + jitterY) * box
 
             if (index == 0) {
                 path.moveTo(x, y)
@@ -304,7 +311,11 @@ private fun buildDigitGeometry(value: Int, seed: Int): DigitGeometry {
         totalLength += measure.length
     }
 
-    return DigitGeometry(strokes = result, totalLength = totalLength)
+    return DigitGeometry(
+        strokes = result,
+        totalLength = totalLength,
+        strokeWidth = strokeWidth,
+    )
 }
 
 private fun DrawScope.drawDigitGeometry(
@@ -320,12 +331,7 @@ private fun DrawScope.drawDigitGeometry(
     val target = geometry.totalLength * clamped
     var consumed = 0f
     val mainStroke = Stroke(
-        width = 0.085f,
-        cap = StrokeCap.Round,
-        join = StrokeJoin.Round,
-    )
-    val softStroke = Stroke(
-        width = 0.125f,
+        width = geometry.strokeWidth,
         cap = StrokeCap.Round,
         join = StrokeJoin.Round,
     )
@@ -348,11 +354,6 @@ private fun DrawScope.drawDigitGeometry(
             }
         }
 
-        drawPath(
-            path = path,
-            color = color.copy(alpha = color.alpha * 0.22f),
-            style = softStroke,
-        )
         drawPath(
             path = path,
             color = color,
