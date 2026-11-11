@@ -1,0 +1,1 @@
+Sudoku 1.2.0: status e estatísticas no histórico, recordes dentro da janela de histórico, layout que suporta fonte do sistema 2,0, teclado numérico mais limpo e ícones desenhados à mão.

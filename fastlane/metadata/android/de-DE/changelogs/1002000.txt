@@ -1,0 +1,1 @@
+Sudoku 1.2.0: Status und Statistik im Verlauf, Bestzeiten im Verlaufsdialog, ein Layout bis 2,0-facher Systemschrift, ein ruhigeres Ziffernfeld und handgezeichnete Symbole.

@@ -1,0 +1,1 @@
+Sudoku 1.2.0: statuses and stats in the history, records inside the history dialog, a layout that holds up to 2.0 system font scale, a calmer number pad and hand-drawn icons.

@@ -1,0 +1,1 @@
+Sudoku 1.2.0 : statuts et statistiques dans l'historique, records dans la boîte d'historique, mise en page jusqu'à une police système 2,0, pavé numérique plus sobre et icônes dessinées à la main.

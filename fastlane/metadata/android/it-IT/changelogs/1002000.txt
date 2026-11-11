@@ -1,0 +1,1 @@
+Sudoku 1.2.0: stati e statistiche nella cronologia, record nella finestra della cronologia, layout fino a caratteri di sistema 2,0, tastierino più pulito e icone disegnate a mano.

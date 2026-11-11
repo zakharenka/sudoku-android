@@ -1,0 +1,1 @@
+Sudoku 1.2.0: estados y estadísticas en el historial, récords dentro del diálogo de historial, diseño que aguanta un tamaño de fuente 2,0, teclado numérico más limpio e iconos dibujados a mano.
