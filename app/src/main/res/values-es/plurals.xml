@@ -4,4 +4,9 @@
         <item quantity="many">%d errores</item>
         <item quantity="other">%d errores</item>
     </plurals>
+    <plurals name="hints">
+        <item quantity="one">%d pista</item>
+        <item quantity="many">%d pistas</item>
+        <item quantity="other">%d pistas</item>
+    </plurals>
 </resources>

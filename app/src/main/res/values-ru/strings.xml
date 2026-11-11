@@ -78,8 +78,8 @@
     <string name="history_solved">Решена: %1$s</string>
     <string name="history_updated">Обновлена: %1$s</string>
     <string name="history_time">Время: %1$s</string>
-    <string name="history_mistakes">%1$s</string>
-    <string name="history_errors_disabled">Ошибки: отключены</string>
+    <string name="history_status_solved">Решена</string>
+    <string name="history_status_in_progress">В процессе</string>
     <string name="history_puzzle_preview">Миниатюра судоку</string>
     <string name="settings_data">Данные</string>
     <string name="settings_export">Экспорт резервной копии</string>

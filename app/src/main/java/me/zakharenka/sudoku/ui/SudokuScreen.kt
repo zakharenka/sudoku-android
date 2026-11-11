@@ -33,6 +33,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -79,6 +81,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -98,6 +101,8 @@ import me.zakharenka.sudoku.game.formatDateTime
 import me.zakharenka.sudoku.game.formatTime
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.CHECK
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOCK
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOSE
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.EXPORT
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.HISTORY
@@ -722,6 +727,7 @@ private fun SketchDialog(
     title: String,
     onDismiss: () -> Unit,
     seed: Int,
+    scrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -768,8 +774,14 @@ private fun SketchDialog(
                         DialogDivider(seed = seed + 2)
                         Column(
                             modifier = Modifier
-                                .weight(1f, fill = false)
-                                .verticalScroll(rememberScrollState())
+                                .weight(1f, fill = !scrollable)
+                                .then(
+                                    if (scrollable) {
+                                        Modifier.verticalScroll(rememberScrollState())
+                                    } else {
+                                        Modifier
+                                    },
+                                )
                                 .padding(
                                     start = 18.dp,
                                     top = 12.dp,
@@ -985,11 +997,13 @@ private fun HistoryDialog(
         games.sortedByDescending { it.createdAt }
             .groupBy { Instant.ofEpochMilli(it.createdAt).atZone(zone).toLocalDate() }
     }
+    val useLazyList = games.size > HISTORY_LAZY_THRESHOLD
 
     SketchDialog(
         title = stringResource(R.string.history_title),
         onDismiss = onDismiss,
         seed = 807,
+        scrollable = !useLazyList,
     ) {
         if (groups.isEmpty()) {
             Text(
@@ -1001,28 +1015,55 @@ private fun HistoryDialog(
             return@SketchDialog
         }
 
-        groups.forEach { (date, dayGames) ->
-            Text(
-                text = date.format(dateFormatter),
-                color = colors.inkSoft,
-                fontSize = 15.sp,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.6.sp,
-                modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
-            )
+        if (useLazyList) {
+            LazyColumn(Modifier.fillMaxSize()) {
+                groups.forEach { (date, dayGames) ->
+                    item(key = "date-$date") {
+                        HistoryDateHeader(date, dateFormatter)
+                    }
 
-            dayGames.forEach { game ->
-                HistoryRow(
-                    game = game,
-                    isCurrent = game.id == currentGameId,
-                    locale = locale,
-                    onClick = { onSelectGame(game.id) },
-                )
-                Spacer(Modifier.height(8.dp))
+                    items(dayGames, key = { it.id }) { game ->
+                        HistoryRow(
+                            game = game,
+                            isCurrent = game.id == currentGameId,
+                            locale = locale,
+                            onClick = { onSelectGame(game.id) },
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            }
+        } else {
+            groups.forEach { (date, dayGames) ->
+                HistoryDateHeader(date, dateFormatter)
+
+                dayGames.forEach { game ->
+                    HistoryRow(
+                        game = game,
+                        isCurrent = game.id == currentGameId,
+                        locale = locale,
+                        onClick = { onSelectGame(game.id) },
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
             }
         }
     }
+}
+
+private const val HISTORY_LAZY_THRESHOLD = 50
+
+@Composable
+private fun HistoryDateHeader(date: LocalDate, formatter: DateTimeFormatter) {
+    Text(
+        text = date.format(formatter),
+        color = SudokuTheme.colors.inkSoft,
+        fontSize = 15.sp,
+        fontFamily = HandFont,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.6.sp,
+        modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
+    )
 }
 
 @Composable
@@ -1033,14 +1074,17 @@ private fun HistoryRow(
     onClick: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
-    val mistakeText = if (game.showErrors) {
-        stringResource(
-            R.string.history_mistakes,
-            pluralStringResource(R.plurals.mistakes, game.errors, game.errors),
-        )
+    val mistakeText = if (game.showErrors && game.errors > 0) {
+        pluralStringResource(R.plurals.mistakes, game.errors, game.errors)
     } else {
-        stringResource(R.string.history_errors_disabled)
+        null
     }
+    val hintText = if (game.hintsUsed > 0) {
+        pluralStringResource(R.plurals.hints, game.hintsUsed, game.hintsUsed)
+    } else {
+        null
+    }
+    val statsText = listOfNotNull(mistakeText, hintText).joinToString(", ")
 
     Row(
         modifier = Modifier
@@ -1068,6 +1112,8 @@ private fun HistoryRow(
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
+                Spacer(Modifier.width(6.dp))
+                HistoryStatusIcon(solved = game.solved)
                 if (isCurrent) {
                     Spacer(Modifier.width(6.dp))
                     Text(
@@ -1121,16 +1167,38 @@ private fun HistoryRow(
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                 )
-                Text(
-                    text = mistakeText,
-                    color = if (game.showErrors) colors.inkSoft else colors.inkSoft.copy(alpha = 0.65f),
-                    fontSize = 13.sp,
-                    fontFamily = HandFont,
-                    textAlign = TextAlign.End,
-                )
+                if (statsText.isNotEmpty()) {
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = statsText,
+                        color = colors.inkSoft,
+                        fontSize = 13.sp,
+                        fontFamily = HandFont,
+                        textAlign = TextAlign.End,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun HistoryStatusIcon(solved: Boolean) {
+    val colors = SudokuTheme.colors
+    val description = stringResource(
+        if (solved) R.string.history_status_solved else R.string.history_status_in_progress,
+    )
+
+    SketchIcon(
+        icon = if (solved) CHECK else CLOCK,
+        tint = if (solved) colors.success else colors.accentSoft,
+        modifier = Modifier
+            .size(18.dp)
+            .semantics { contentDescription = description },
+    )
 }
 
 @Composable

@@ -4,4 +4,9 @@
         <item quantity="many">%d erreurs</item>
         <item quantity="other">%d erreurs</item>
     </plurals>
+    <plurals name="hints">
+        <item quantity="one">%d indice</item>
+        <item quantity="many">%d indices</item>
+        <item quantity="other">%d indices</item>
+    </plurals>
 </resources>

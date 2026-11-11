@@ -32,8 +32,9 @@ for distribution on Google Play and F-Droid.
   new-game button or by tapping the current difficulty;
 - records per difficulty and result: best time and number of solved games
   with and without mistakes, derived from the game history;
-- game history grouped by day, with a mini puzzle preview, start and finish
-  dates, elapsed time and mistakes; tapping a row loads that game on pause;
+- game history grouped by day, with a mini puzzle preview, solved or
+  in-progress status, start and finish dates, elapsed time, mistakes and used
+  hints; tapping a row loads that game on pause;
 - backup to a file and restore through the system file picker;
 - nine languages: English, Russian, Spanish, Portuguese (Brazil), French,
   German, Italian, Ukrainian and Belarusian; the default language comes from
@@ -138,6 +139,15 @@ Full check before committing:
 ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 ```
 
+Synthetic history for UI, import and performance checks:
+
+```bash
+python3 scripts/generate-history.py --count 1000
+```
+
+The script writes `build/sudoku-history.json` in the app's backup format. Use
+`--seed`, `--start-date`, `--current-index` and `--output` to change the data.
+
 ## Structure
 
 ```text
@@ -186,7 +196,7 @@ app/src/main/res/
 
 fastlane/metadata/android/   # store texts and graphics for Google Play and F-Droid
 metadata/                    # F-Droid build recipe
-scripts/                     # release and store-package helpers
+scripts/                     # release, store-package and test-data helpers
 docs/                        # architecture, rules, UI, publishing and release notes
 ```
 

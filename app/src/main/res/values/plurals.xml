@@ -3,4 +3,8 @@
         <item quantity="one">%d mistake</item>
         <item quantity="other">%d mistakes</item>
     </plurals>
+    <plurals name="hints">
+        <item quantity="one">%d hint</item>
+        <item quantity="other">%d hints</item>
+    </plurals>
 </resources>

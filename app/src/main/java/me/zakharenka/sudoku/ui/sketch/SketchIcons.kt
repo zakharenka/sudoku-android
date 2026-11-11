@@ -34,6 +34,7 @@ enum class SketchIcon {
     HISTORY,
     EXPORT,
     IMPORT,
+    CHECK,
 }
 
 @Composable
@@ -270,6 +271,11 @@ fun SketchIcon(
                 line(0f, -0.28f, 0f, 0.14f, 66, stroke * 1.2f)
                 line(0f, 0.14f, -0.14f, -0.02f, 67)
                 line(0f, 0.14f, 0.14f, -0.02f, 68)
+            }
+
+            SketchIcon.CHECK -> {
+                line(-0.28f, 0f, -0.06f, 0.2f, 70, stroke * 1.5f)
+                line(-0.06f, 0.2f, 0.28f, -0.22f, 71, stroke * 1.5f)
             }
         }
     }

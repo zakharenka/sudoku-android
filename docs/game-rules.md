@@ -48,9 +48,12 @@
 
 - The history contains the current game, unfinished games and solved games.
 - Games are grouped by the start date in descending order.
-- Each row shows a mini puzzle grid, difficulty, start date and time, solved
-  date (or last-update date for unfinished games), elapsed time and mistakes
-  (or "off" in hidden mode).
+- Each row shows a mini puzzle grid, difficulty, a solved or in-progress icon,
+  start date and time, solved date (or last-update date for unfinished games)
+  and elapsed time.
+- The bottom-right corner shows mistakes and used hints in one line, for
+  example `1 mistake, 3 hints`. Zero values are omitted, so the line may show
+  only mistakes, only hints or nothing.
 - Starting a new game keeps the previous unfinished game in the history.
 - Tapping a history row loads that game on pause and makes it current,
   including solved games. The previously open game is saved first.

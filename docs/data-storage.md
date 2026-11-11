@@ -48,6 +48,7 @@ full game history. The format version is 1:
 - `records` is not stored: best times and solved counters are derived from
   solved games.
 - `notes` is sparse: only non-empty cells are present.
+- `hintsUsed` counts hints spent in the game; zero means no hints were used.
 - `selected`, `notesMode`, `givens` and per-cell error flags are not stored.
   `notesMode` is a global setting; givens come from `puzzle`; errors are derived
   from `values` and `solution` and are always zero in hidden mode.

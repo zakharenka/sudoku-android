@@ -78,8 +78,8 @@
     <string name="history_solved">Gelöst: %1$s</string>
     <string name="history_updated">Aktualisiert: %1$s</string>
     <string name="history_time">Zeit: %1$s</string>
-    <string name="history_mistakes">%1$s</string>
-    <string name="history_errors_disabled">Fehler: aus</string>
+    <string name="history_status_solved">Gelöst</string>
+    <string name="history_status_in_progress">In Bearbeitung</string>
     <string name="history_puzzle_preview">Sudoku-Vorschau</string>
     <string name="settings_data">Daten</string>
     <string name="settings_export">Sicherung exportieren</string>

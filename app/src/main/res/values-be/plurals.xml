@@ -5,4 +5,10 @@
         <item quantity="many">%d памылак</item>
         <item quantity="other">%d памылкі</item>
     </plurals>
+    <plurals name="hints">
+        <item quantity="one">%d падказка</item>
+        <item quantity="few">%d падказкі</item>
+        <item quantity="many">%d падказак</item>
+        <item quantity="other">%d падказкі</item>
+    </plurals>
 </resources>

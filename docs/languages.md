@@ -146,8 +146,8 @@ Use the `ar-XB` pseudolocale to test RTL.
 
 ## Plurals
 
-The app currently has only the `mistakes` plural. When adding languages, check
-the CLDR categories:
+The app has `mistakes` and `hints` plurals. When adding languages, check the
+CLDR categories:
 
 | Languages | Categories |
 | --- | --- |

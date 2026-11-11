@@ -78,8 +78,8 @@
     <string name="history_solved">Вырашана: %1$s</string>
     <string name="history_updated">Абноўлена: %1$s</string>
     <string name="history_time">Час: %1$s</string>
-    <string name="history_mistakes">%1$s</string>
-    <string name="history_errors_disabled">Памылкі: адключаны</string>
+    <string name="history_status_solved">Вырашана</string>
+    <string name="history_status_in_progress">У працэсе</string>
     <string name="history_puzzle_preview">Мініятура судоку</string>
     <string name="settings_data">Даныя</string>
     <string name="settings_export">Экспарт рэзервовай копіі</string>

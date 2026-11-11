@@ -78,8 +78,8 @@
     <string name="history_solved">Розв’язано: %1$s</string>
     <string name="history_updated">Оновлено: %1$s</string>
     <string name="history_time">Час: %1$s</string>
-    <string name="history_mistakes">%1$s</string>
-    <string name="history_errors_disabled">Помилки: вимкнено</string>
+    <string name="history_status_solved">Розв\'язана</string>
+    <string name="history_status_in_progress">У процесі</string>
     <string name="history_puzzle_preview">Мініатюра судоку</string>
     <string name="settings_data">Дані</string>
     <string name="settings_export">Експорт резервної копії</string>
