@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,6 +32,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.GameUiState
@@ -92,6 +97,7 @@ fun TopToolbar(
         stringResource(difficulty.labelRes()) + ", " +
             stringResource(R.string.timer_content_description, time)
     }
+    val largeText = LocalDensity.current.fontScale >= LARGE_FONT_SCALE
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -101,72 +107,53 @@ fun TopToolbar(
         SketchSurface(
             modifier = Modifier
                 .weight(1f)
-                .height(52.dp)
+                .heightIn(min = 52.dp)
                 .semantics { contentDescription = statsDescription },
             fill = colors.paperSunken,
             border = colors.gridLine,
             seed = 300,
             shadow = colors.shadow,
-            contentPadding = PaddingValues(horizontal = 10.dp),
+            contentPadding = PaddingValues(
+                horizontal = 10.dp,
+                vertical = if (largeText) 6.dp else 0.dp,
+            ),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(difficulty.labelRes()),
-                    color = colors.ink,
-                    fontSize = 17.sp,
-                    fontFamily = HandFont,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(onClick = onNewGame),
-                )
-
-                if (showErrors) {
+            if (largeText) {
+                Column(Modifier.fillMaxWidth()) {
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = "×",
-                            color = colors.danger,
-                            fontSize = 24.sp,
-                            fontFamily = HandFont,
-                            fontWeight = FontWeight.Bold,
+                        DifficultyTitle(
+                            difficulty = difficulty,
+                            onNewGame = onNewGame,
+                            modifier = Modifier.weight(1f),
                         )
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            text = mistakes.toString(),
-                            color = colors.accent,
-                            fontSize = 21.sp,
-                            fontFamily = HandFont,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                        if (showErrors) {
+                            MistakesCounter(mistakes = mistakes)
+                        }
                     }
-
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.height(2.dp))
+                    TimerValue(time = time, minWidth = timerMinWidth)
                 }
-
+            } else {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SketchIcon(
-                        icon = CLOCK,
-                        tint = colors.inkSoft,
-                        modifier = Modifier.size(18.dp),
+                    DifficultyTitle(
+                        difficulty = difficulty,
+                        onNewGame = onNewGame,
+                        modifier = Modifier.weight(1f),
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = time,
-                        color = colors.accent,
-                        fontSize = 21.sp,
-                        fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        modifier = Modifier.widthIn(min = timerMinWidth),
-                    )
+
+                    if (showErrors) {
+                        MistakesCounter(mistakes = mistakes)
+                        Spacer(Modifier.width(10.dp))
+                    }
+
+                    TimerValue(time = time, minWidth = timerMinWidth)
                 }
             }
         }
@@ -185,7 +172,7 @@ fun TopToolbar(
             SketchIcon(
                 icon = if (paused) PLAY else PAUSE,
                 tint = colors.accent,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(28.dp),
             )
         }
 
@@ -202,9 +189,87 @@ fun TopToolbar(
             SketchIcon(
                 icon = REFRESH,
                 tint = colors.inkSoft,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(28.dp),
             )
         }
+    }
+}
+
+private const val LARGE_FONT_SCALE = 1.3f
+private const val ACTION_GRID_FONT_SCALE = 1.5f
+
+@Composable
+private fun DifficultyTitle(
+    difficulty: Difficulty,
+    onNewGame: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = SudokuTheme.colors
+
+    BasicText(
+        text = stringResource(difficulty.labelRes()),
+        style = TextStyle(
+            color = colors.ink,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 24.sp,
+        ),
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(
+            minFontSize = 12.sp,
+            maxFontSize = 17.sp,
+            stepSize = 1.sp,
+        ),
+        modifier = modifier.clickable(onClick = onNewGame),
+    )
+}
+
+@Composable
+private fun MistakesCounter(mistakes: Int) {
+    val colors = SudokuTheme.colors
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "×",
+            color = colors.danger,
+            fontSize = 24.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 24.sp,
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = mistakes.toString(),
+            color = colors.accent,
+            fontSize = 21.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 24.sp,
+        )
+    }
+}
+
+@Composable
+private fun TimerValue(time: String, minWidth: Dp) {
+    val colors = SudokuTheme.colors
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        SketchIcon(
+            icon = CLOCK,
+            tint = colors.inkSoft,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = time,
+            color = colors.accent,
+            fontSize = 21.sp,
+            fontFamily = HandFont,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 24.sp,
+            maxLines = 1,
+            modifier = Modifier.widthIn(min = minWidth),
+        )
     }
 }
 
@@ -226,10 +291,12 @@ fun NumberPad(
     }
     val fontScale = LocalDensity.current.fontScale.coerceIn(1f, 2f)
     val buttonHeight = (66f + (fontScale - 1f) * 16f).dp
+    val spacing = 4.dp
+    val countSize = with(LocalDensity.current) { 14.dp.toSp() }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacing),
     ) {
         for (number in 1..9) {
             val remaining = (9 - counts[number]).coerceAtLeast(0)
@@ -266,14 +333,15 @@ fun NumberPad(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
-                        boxFraction = 0.75f,
+                        boxFraction = 0.7f,
                     )
                     Text(
                         text = remaining.toString(),
                         color = colors.ink,
-                        fontSize = 12.sp,
+                        fontSize = countSize,
                         fontFamily = HandFont,
-                        lineHeight = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = countSize * 1.15f,
                         maxLines = 1,
                         modifier = Modifier.padding(top = 2.dp),
                     )
@@ -292,53 +360,102 @@ fun ActionRow(
     onHint: () -> Unit,
 ) {
     val locked = state.loading || state.paused || state.won
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        ActionButton(
+    val fontScale = LocalDensity.current.fontScale.coerceIn(1f, 2f)
+    val buttonHeight = (70f + (fontScale - 1f) * 38f).dp
+    val actions = listOf(
+        ActionSpec(
             icon = UNDO,
             label = stringResource(R.string.action_undo),
             enabled = !locked && state.canUndo,
-            modifier = Modifier.weight(1f),
             seed = 500,
             onClick = onUndo,
-        )
-        ActionButton(
+        ),
+        ActionSpec(
             icon = ERASE,
             label = stringResource(R.string.action_erase),
             enabled = !locked && state.canErase,
-            modifier = Modifier.weight(1f),
             seed = 501,
             onClick = onErase,
-        )
-        ActionButton(
+        ),
+        ActionSpec(
             icon = NOTES,
             label = stringResource(R.string.action_notes),
             enabled = !locked,
             active = state.notesMode,
-            modifier = Modifier.weight(1f),
             seed = 502,
             onClick = onNotes,
-        )
-        ActionButton(
+        ),
+        ActionSpec(
             icon = HINT,
             label = stringResource(R.string.action_hint),
             enabled = !locked && state.hintsRemaining > 0,
             badge = state.hintsRemaining.toString(),
-            modifier = Modifier.weight(1f),
             seed = 503,
             onClick = onHint,
-        )
+        ),
+    )
+
+    if (fontScale >= ACTION_GRID_FONT_SCALE) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            actions.chunked(2).forEach { rowActions ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    rowActions.forEach { action ->
+                        ActionButton(
+                            icon = action.icon,
+                            label = action.label,
+                            enabled = action.enabled,
+                            height = buttonHeight,
+                            modifier = Modifier.weight(1f),
+                            active = action.active,
+                            badge = action.badge,
+                            seed = action.seed,
+                            onClick = action.onClick,
+                        )
+                    }
+                }
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            actions.forEach { action ->
+                ActionButton(
+                    icon = action.icon,
+                    label = action.label,
+                    enabled = action.enabled,
+                    height = buttonHeight,
+                    modifier = Modifier.weight(1f),
+                    active = action.active,
+                    badge = action.badge,
+                    seed = action.seed,
+                    onClick = action.onClick,
+                )
+            }
+        }
     }
 }
+
+private data class ActionSpec(
+    val icon: SketchIcon,
+    val label: String,
+    val enabled: Boolean,
+    val active: Boolean = false,
+    val badge: String? = null,
+    val seed: Int,
+    val onClick: () -> Unit,
+)
 
 @Composable
 private fun ActionButton(
     icon: SketchIcon,
     label: String,
     enabled: Boolean,
+    height: Dp,
     modifier: Modifier = Modifier,
     active: Boolean = false,
     badge: String? = null,
@@ -347,10 +464,11 @@ private fun ActionButton(
 ) {
     val colors = SudokuTheme.colors
     val contentColor = if (active) colors.accent else colors.inkSoft
+    val badgeFontSize = with(LocalDensity.current) { 14.dp.toSp() }
 
     SketchButton(
         onClick = onClick,
-        modifier = modifier.height(70.dp),
+        modifier = modifier.height(height),
         enabled = enabled,
         fill = colors.paperSunken,
         border = colors.gridLine,
@@ -367,7 +485,7 @@ private fun ActionButton(
                 SketchIcon(
                     icon = icon,
                     tint = contentColor,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(28.dp),
                 )
                 Spacer(Modifier.height(3.dp))
                 Text(
@@ -376,14 +494,16 @@ private fun ActionButton(
                     fontSize = 14.sp,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
+                    maxLines = 2,
+                    lineHeight = 16.sp,
+                    textAlign = TextAlign.Center,
                 )
             }
             if (badge != null) {
                 Text(
                     text = badge,
                     color = colors.ink,
-                    fontSize = 14.sp,
+                    fontSize = badgeFontSize,
                     fontFamily = HandFont,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -419,12 +539,19 @@ fun PauseOverlay(onResume: () -> Unit) {
     val colors = SudokuTheme.colors
 
     BoardOverlay {
-        Text(
+        BasicText(
             text = stringResource(R.string.pause_title),
-            color = colors.ink,
-            fontSize = 36.sp,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
+            style = TextStyle(
+                color = colors.ink,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 24.sp,
+                maxFontSize = 36.sp,
+                stepSize = 1.sp,
+            ),
         )
         Spacer(Modifier.height(2.dp))
         Text(
@@ -459,21 +586,35 @@ fun WinOverlay(
             modifier = Modifier.size(50.dp),
         )
         Spacer(Modifier.height(6.dp))
-        Text(
+        BasicText(
             text = stringResource(R.string.win_title),
-            color = colors.success,
-            fontSize = 38.sp,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
+            style = TextStyle(
+                color = colors.success,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 24.sp,
+                maxFontSize = 38.sp,
+                stepSize = 1.sp,
+            ),
         )
         Spacer(Modifier.height(2.dp))
-        Text(
+        BasicText(
             text = formatTime(elapsedSeconds),
-            color = colors.ink,
-            fontSize = 28.sp,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.5.sp,
+            style = TextStyle(
+                color = colors.ink,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp,
+            ),
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 20.sp,
+                maxFontSize = 28.sp,
+                stepSize = 1.sp,
+            ),
         )
         if (isNewRecord) {
             Spacer(Modifier.height(4.dp))
@@ -533,13 +674,13 @@ fun OverlayButton(
     SketchButton(
         onClick = onClick,
         modifier = Modifier
-            .height(48.dp)
+            .heightIn(min = 48.dp)
             .widthIn(min = 120.dp),
         fill = if (primary) colors.accentWash else colors.paperSunken,
         border = if (primary) colors.accent else colors.gridLine,
         active = primary,
         seed = seed,
-        contentPadding = PaddingValues(horizontal = 16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     ) {
         Text(
             text = text,

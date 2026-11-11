@@ -823,14 +823,19 @@ private fun DialogHeader(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        BasicText(
             text = title,
-            color = colors.ink,
-            fontSize = 30.sp,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
+            style = TextStyle(
+                color = colors.ink,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            ),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 20.sp,
+                maxFontSize = 30.sp,
+                stepSize = 1.sp,
+            ),
             modifier = Modifier.weight(1f),
         )
         val closeDescription = stringResource(R.string.dialog_close)
@@ -961,12 +966,12 @@ private fun ModeButton(
 
     SketchButton(
         onClick = onClick,
-        modifier = modifier.height(46.dp),
+        modifier = modifier.heightIn(min = 46.dp),
         fill = colors.paperSunken,
         border = colors.gridLine,
         active = active,
         seed = seed,
-        contentPadding = PaddingValues(horizontal = 8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Text(
             text = label,
@@ -974,7 +979,8 @@ private fun ModeButton(
             fontSize = 16.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
-            maxLines = 1,
+            maxLines = 2,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -1184,7 +1190,7 @@ private fun HistoryRow(
                         fontSize = 13.sp,
                         fontFamily = HandFont,
                         textAlign = TextAlign.End,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
@@ -1646,12 +1652,12 @@ private fun NewGameDialog(
                 onClick = { selected = difficulty },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 active = active,
                 seed = 870 + index,
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -1708,12 +1714,12 @@ private fun NewGameDialog(
                 onClick = { onStart(selected, showErrors) },
                 modifier = Modifier
                     .weight(1f)
-                    .height(50.dp),
+                    .heightIn(min = 50.dp),
                 fill = colors.accentWash,
                 border = colors.accent,
                 active = true,
                 seed = 880,
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.new_game_start),
@@ -1728,11 +1734,11 @@ private fun NewGameDialog(
                 onClick = onDismiss,
                 modifier = Modifier
                     .weight(1f)
-                    .height(50.dp),
+                    .heightIn(min = 50.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 seed = 881,
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.new_game_cancel),

@@ -42,6 +42,22 @@
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
 - Import and export use the system file picker (SAF).
 
+## Font scaling
+
+- Support system font scale up to `2.0`.
+- UI text uses `sp` and must wrap instead of being clipped. Do not give
+  text-bearing rows a fixed height; use `heightIn(min = ...)` and vertical
+  padding.
+- Single-line titles use auto-sizing to keep the full word or dialog title
+  visible.
+- Game glyphs — board digits and number-pad digits — are vector drawings sized
+  from their cell or key, not from the system font scale.
+- Counts inside number-pad keys are sized from the key width with a minimum
+  readable size, so they never become larger than the digit.
+- At font scale `1.3` and above the game top bar switches to two lines. At
+  `1.5` and above the action row switches to a 2×2 grid so labels stay whole.
+- Never disable system font scaling globally.
+
 ## Keyboard
 
 - Digits `1–9` on the main row and numpad enter the selected digit.
