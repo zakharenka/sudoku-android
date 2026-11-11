@@ -419,6 +419,7 @@ private fun GamePanel(
                         state = state,
                         onNewGameClick = onNewGameClick,
                         viewModel = viewModel,
+                        boardCellSize = boardMax / 9,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -467,6 +468,7 @@ private fun GameControls(
     state: GameUiState,
     onNewGameClick: () -> Unit,
     viewModel: SudokuViewModel,
+    boardCellSize: Dp? = null,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -477,6 +479,7 @@ private fun GameControls(
             cells = state.cells,
             enabled = !state.loading && !state.paused && !state.won,
             onNumber = viewModel::enter,
+            boardCellSize = boardCellSize,
         )
 
         Spacer(Modifier.height(8.dp))
