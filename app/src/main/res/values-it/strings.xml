@@ -59,7 +59,6 @@
     <string name="settings_board">Tabellone</string>
     <string name="settings_straight_grid">Linee dritte della griglia</string>
     <string name="settings_same_digits">Evidenzia le stesse cifre</string>
-    <string name="settings_handwritten_digits">Cifre scritte a mano</string>
     <string name="settings_language_current">Lingua: %1$s</string>
     <string name="settings_language_open">Cambia lingua</string>
     <string name="settings_about">Informazioni</string>

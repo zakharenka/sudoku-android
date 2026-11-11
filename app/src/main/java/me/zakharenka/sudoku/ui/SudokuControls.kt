@@ -36,6 +36,7 @@ import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.game.Difficulty
 import me.zakharenka.sudoku.game.formatTime
+import me.zakharenka.sudoku.ui.sketch.HandwrittenDigit
 import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOCK
@@ -223,6 +224,8 @@ fun NumberPad(
         }
         result
     }
+    val fontScale = LocalDensity.current.fontScale.coerceIn(1f, 2f)
+    val buttonHeight = (66f + (fontScale - 1f) * 16f).dp
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -241,32 +244,38 @@ fun NumberPad(
                 onClick = { onNumber(number) },
                 modifier = Modifier
                     .weight(1f)
-                    .height(58.dp)
+                    .height(buttonHeight)
                     .semantics { contentDescription = description },
                 enabled = enabled && !complete,
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 seed = 400 + number,
-                contentPadding = PaddingValues(2.dp),
+                contentPadding = PaddingValues(1.dp),
             ) {
-                Box(Modifier.fillMaxSize()) {
-                    Text(
-                        text = number.toString(),
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 1.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    HandwrittenDigit(
+                        value = number,
                         color = colors.accent,
-                        fontSize = 27.sp,
-                        fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center),
+                        seed = 9_000 + number,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        boxFraction = 0.75f,
                     )
                     Text(
                         text = remaining.toString(),
                         color = colors.ink,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontFamily = HandFont,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 1.dp, end = 3.dp),
+                        lineHeight = 14.sp,
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 2.dp),
                     )
                 }
             }

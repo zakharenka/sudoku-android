@@ -57,7 +57,6 @@ fun SudokuBoard(
     selectedIndex: Int?,
     straightGrid: Boolean,
     highlightSameDigits: Boolean,
-    handwrittenDigits: Boolean,
     gameId: Long,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
@@ -91,7 +90,6 @@ fun SudokuBoard(
                                     selectedValue != 0 &&
                                     cell.value == selectedValue &&
                                     selectedIndex != index,
-                                handwrittenDigits = handwrittenDigits,
                                 enabled = enabled,
                                 onClick = { onSelect(index) },
                                 modifier = Modifier
@@ -224,7 +222,6 @@ private fun SudokuCell(
     selected: Boolean,
     peer: Boolean,
     same: Boolean,
-    handwrittenDigits: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -247,7 +244,6 @@ private fun SudokuCell(
         else -> colors.accent
     }
 
-    val digitFontSize = with(LocalDensity.current) { (cellSize * 0.70f).toSp() }
     val interactionSource = remember { MutableInteractionSource() }
     val description = when {
         cell.error && cell.value != 0 -> stringResource(
@@ -306,23 +302,12 @@ private fun SudokuCell(
             },
         contentAlignment = Alignment.Center,
     ) {
-        if (handwrittenDigits) {
-            HandwrittenDigit(
-                value = cell.value,
-                color = textColor,
-                seed = 7_000 + row * 9 + col,
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else if (cell.value != 0) {
-            Text(
-                text = cell.value.toString(),
-                color = textColor,
-                fontSize = digitFontSize,
-                fontFamily = HandFont,
-                fontWeight = FontWeight.Bold,
-                lineHeight = digitFontSize,
-            )
-        }
+        HandwrittenDigit(
+            value = cell.value,
+            color = textColor,
+            seed = 7_000 + row * 9 + col,
+            modifier = Modifier.fillMaxSize(),
+        )
 
         if (cell.value == 0 && cell.notes.isNotEmpty()) {
             NotesLine(

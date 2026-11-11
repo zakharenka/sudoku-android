@@ -40,9 +40,9 @@ for distribution on Google Play and F-Droid.
   German, Italian, Ukrainian and Belarusian; the default language comes from
   the system and is changed through the native Android "App language" screen;
 - light and dark themes, plus a "follow system" mode;
-- settings: theme selection, board line style, same-digit highlighting,
-  handwritten digits, a shortcut to the system language picker, backup
-  import/export and a link to the developer website;
+- settings: theme selection, board line style, same-digit highlighting, a
+  shortcut to the system language picker, backup import/export and a link to
+  the developer website;
 - straight grid lines on the 9×9 board by default, with an option to switch
   back to hand-drawn wobbly lines;
 - the current game is saved to a local file when the app goes to the

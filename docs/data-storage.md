@@ -10,7 +10,6 @@ Global settings are stored in `SharedPreferences` under the name `sudoku`:
 | `notes_mode` | global notes mode |
 | `straight_grid` | board line style |
 | `same_highlight` | same-digit highlight |
-| `handwritten_digits` | handwritten digits toggle |
 | `show_errors` | default error mode for a new game |
 
 ## Game data

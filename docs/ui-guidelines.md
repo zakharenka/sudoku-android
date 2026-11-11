@@ -9,8 +9,10 @@
     and timer;
   - on the right, two square unlabelled buttons: pause and new game.
 - Icon buttons must have a `contentDescription` from string resources.
-- "Rules", "Records" and "History" live in the header and are not duplicated in
-  settings.
+- "Rules", "History" and "Settings" live in the header and are not duplicated
+  in settings. "Records" opens from the History dialog header, next to Close.
+- Dialog headers accept extra action buttons before the Close button; History
+  uses this for Records.
 
 ## New game dialog
 
@@ -28,8 +30,8 @@
 ## Settings
 
 - Settings contain only the theme, board line style, same-digit highlight,
-  handwritten digits, language, data import/export, "About" and a link to the
-  developer website `https://zakharenka.me`.
+  language, data import/export, "About" and a link to the developer website
+  `https://zakharenka.me`.
 - The 9×9 board uses straight grid lines by default. The settings toggle can
   switch them back to hand-drawn wobbly lines; this affects only the board, not
   buttons, panels or icons.
@@ -71,10 +73,11 @@
 - Do not add rounded corners, gradients or "glossy" elements that break the
   sketch style.
 - Draw new icons in the same hand-drawn style; do not use Material Icons.
-- Board digits are drawn by `ui/sketch/HandwrittenDigits.kt` and animate on
-  input and erase. Handwritten digits are enabled by default; the settings
-  toggle switches cell values to plain `Text` at the same visual size and
-  disables the stroke animation. Do not remove the toggle.
+- All large digits (board cells and number-pad keys) are drawn by
+  `ui/sketch/HandwrittenDigits.kt` and animate on input and erase. There is no
+  plain-text digit mode and no handwritten-digits setting.
+- The number-pad key shows the large handwritten digit with its remaining count
+  centered underneath; zero is shown and the key stays disabled.
 
 ## App icon
 

@@ -59,7 +59,6 @@
     <string name="settings_board">Board</string>
     <string name="settings_straight_grid">Straight grid lines</string>
     <string name="settings_same_digits">Highlight same digits</string>
-    <string name="settings_handwritten_digits">Handwritten digits</string>
     <string name="settings_language_current">Language: %1$s</string>
     <string name="settings_language_open">Change language</string>
     <string name="settings_about">About</string>

@@ -59,7 +59,6 @@
     <string name="settings_board">Поле</string>
     <string name="settings_straight_grid">Роўныя лініі сеткі</string>
     <string name="settings_same_digits">Падсвятляць аднолькавыя лічбы</string>
-    <string name="settings_handwritten_digits">Рукапісныя лічбы</string>
     <string name="settings_language_current">Мова: %1$s</string>
     <string name="settings_language_open">Змяніць мову</string>
     <string name="settings_about">Пра праграму</string>

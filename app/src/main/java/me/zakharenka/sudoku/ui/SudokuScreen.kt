@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -36,6 +37,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -205,10 +208,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 Header(
                     isWide = isWide,
                     onRules = { showRules = true },
-                    onRecords = {
-                        viewModel.openRecords()
-                        showRecords = true
-                    },
                     onHistory = {
                         viewModel.openHistory()
                         showHistory = true
@@ -224,7 +223,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     boardMax = wideBoardMax,
                     straightGrid = viewModel.straightGrid,
                     sameHighlight = viewModel.sameHighlight,
-                    handwrittenDigits = viewModel.handwrittenDigits,
                     winDismissed = winDismissed,
                     onDismissWin = { dismissedGameId = state.gameId },
                     onNewGameClick = { showNewGameDialog = true },
@@ -232,13 +230,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 )
             }
         }
-    }
-
-    if (showRecords) {
-        RecordsDialog(
-            records = state.records,
-            onDismiss = { showRecords = false },
-        )
     }
 
     if (showHistory) {
@@ -250,7 +241,18 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 pausedByDialog = false
                 showHistory = false
             },
+            onRecords = {
+                viewModel.openRecords()
+                showRecords = true
+            },
             onDismiss = { showHistory = false },
+        )
+    }
+
+    if (showRecords) {
+        RecordsDialog(
+            records = state.records,
+            onDismiss = { showRecords = false },
         )
     }
 
@@ -266,8 +268,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onStraightGridChange = viewModel::updateStraightGrid,
             sameHighlight = viewModel.sameHighlight,
             onSameHighlightChange = viewModel::updateSameHighlight,
-            handwrittenDigits = viewModel.handwrittenDigits,
-            onHandwrittenDigitsChange = viewModel::updateHandwrittenDigits,
             onExport = viewModel::exportData,
             onImport = viewModel::importData,
             onDismiss = { showSettings = false },
@@ -362,7 +362,6 @@ private fun GamePanel(
     boardMax: Dp,
     straightGrid: Boolean,
     sameHighlight: Boolean,
-    handwrittenDigits: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onNewGameClick: () -> Unit,
@@ -406,7 +405,6 @@ private fun GamePanel(
                         state = state,
                         straightGrid = straightGrid,
                         sameHighlight = sameHighlight,
-                        handwrittenDigits = handwrittenDigits,
                         winDismissed = winDismissed,
                         onDismissWin = onDismissWin,
                         onSelect = viewModel::select,
@@ -444,7 +442,6 @@ private fun GamePanel(
                     state = state,
                     straightGrid = straightGrid,
                     sameHighlight = sameHighlight,
-                    handwrittenDigits = handwrittenDigits,
                     winDismissed = winDismissed,
                     onDismissWin = onDismissWin,
                     onSelect = viewModel::select,
@@ -499,7 +496,6 @@ private fun BoardBox(
     state: GameUiState,
     straightGrid: Boolean,
     sameHighlight: Boolean,
-    handwrittenDigits: Boolean,
     winDismissed: Boolean,
     onDismissWin: () -> Unit,
     onSelect: (Int) -> Unit,
@@ -527,7 +523,6 @@ private fun BoardBox(
                     selectedIndex = state.selectedIndex,
                     straightGrid = straightGrid,
                     highlightSameDigits = sameHighlight,
-                    handwrittenDigits = handwrittenDigits,
                     gameId = state.gameId,
                     enabled = !state.loading && !state.paused && !state.won,
                     onSelect = onSelect,
@@ -556,7 +551,6 @@ private fun BoardBox(
 private fun Header(
     isWide: Boolean,
     onRules: () -> Unit,
-    onRecords: () -> Unit,
     onHistory: () -> Unit,
     onSettings: () -> Unit,
 ) {
@@ -574,15 +568,19 @@ private fun Header(
 
         Spacer(Modifier.width(if (isWide) 12.dp else 8.dp))
 
-        Text(
+        BasicText(
             text = stringResource(R.string.app_name),
-            color = colors.ink,
-            fontSize = if (isWide) 36.sp else 31.sp,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
-            lineHeight = if (isWide) 38.sp else 34.sp,
+            style = TextStyle(
+                color = colors.ink,
+                fontFamily = HandFont,
+                fontWeight = FontWeight.Bold,
+            ),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 20.sp,
+                maxFontSize = if (isWide) 36.sp else 31.sp,
+                stepSize = 1.sp,
+            ),
             modifier = Modifier.weight(1f),
         )
 
@@ -592,16 +590,6 @@ private fun Header(
             seed = 700,
             size = buttonSize,
             onClick = onRules,
-        )
-
-        Spacer(Modifier.width(iconSpacing))
-
-        HeaderIconButton(
-            icon = TROPHY,
-            description = stringResource(R.string.header_records),
-            seed = 701,
-            size = buttonSize,
-            onClick = onRecords,
         )
 
         Spacer(Modifier.width(iconSpacing))
@@ -728,6 +716,7 @@ private fun SketchDialog(
     onDismiss: () -> Unit,
     seed: Int,
     scrollable: Boolean = true,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -764,6 +753,7 @@ private fun SketchDialog(
                             title = title,
                             seed = seed + 1,
                             onDismiss = onDismiss,
+                            actions = actions,
                             modifier = Modifier.padding(
                                 start = 18.dp,
                                 top = 18.dp,
@@ -824,6 +814,7 @@ private fun DialogHeader(
     title: String,
     seed: Int,
     onDismiss: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val colors = SudokuTheme.colors
@@ -838,25 +829,33 @@ private fun DialogHeader(
             fontSize = 30.sp,
             fontFamily = HandFont,
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
         val closeDescription = stringResource(R.string.dialog_close)
 
-        SketchButton(
-            onClick = onDismiss,
-            modifier = Modifier
-                .size(44.dp)
-                .semantics { contentDescription = closeDescription },
-            fill = colors.paperSunken,
-            border = colors.gridLine,
-            seed = seed,
-            contentPadding = PaddingValues(0.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            SketchIcon(
-                icon = CLOSE,
-                tint = colors.inkSoft,
-                modifier = Modifier.size(20.dp),
-            )
+            actions()
+            SketchButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .size(44.dp)
+                    .semantics { contentDescription = closeDescription },
+                fill = colors.paperSunken,
+                border = colors.gridLine,
+                seed = seed,
+                contentPadding = PaddingValues(0.dp),
+            ) {
+                SketchIcon(
+                    icon = CLOSE,
+                    tint = colors.inkSoft,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
         }
     }
 }
@@ -985,6 +984,7 @@ private fun HistoryDialog(
     games: List<GameRecord>,
     currentGameId: String?,
     onSelectGame: (String) -> Unit,
+    onRecords: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -1004,6 +1004,15 @@ private fun HistoryDialog(
         onDismiss = onDismiss,
         seed = 807,
         scrollable = !useLazyList,
+        actions = {
+            HeaderIconButton(
+                icon = TROPHY,
+                description = stringResource(R.string.header_records),
+                seed = 808,
+                size = 44.dp,
+                onClick = onRecords,
+            )
+        },
     ) {
         if (groups.isEmpty()) {
             Text(
@@ -1336,8 +1345,6 @@ private fun SettingsDialog(
     onStraightGridChange: (Boolean) -> Unit,
     sameHighlight: Boolean,
     onSameHighlightChange: (Boolean) -> Unit,
-    handwrittenDigits: Boolean,
-    onHandwrittenDigitsChange: (Boolean) -> Unit,
     onExport: (Uri, (DataTransferResult) -> Unit) -> Unit,
     onImport: (Uri, (DataTransferResult) -> Unit) -> Unit,
     onDismiss: () -> Unit,
@@ -1384,12 +1391,12 @@ private fun SettingsDialog(
                 onClick = { onThemeModeChange(mode) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .heightIn(min = 50.dp),
                 fill = colors.paperSunken,
                 border = colors.gridLine,
                 active = active,
                 seed = 830 + index,
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -1429,13 +1436,6 @@ private fun SettingsDialog(
         )
 
         Spacer(Modifier.height(6.dp))
-
-        SettingsCheckRow(
-            label = stringResource(R.string.settings_handwritten_digits),
-            checked = handwrittenDigits,
-            seed = 837,
-            onToggle = { onHandwrittenDigitsChange(!handwrittenDigits) },
-        )
 
         Text(
             text = stringResource(R.string.settings_language_current, currentLanguage),
@@ -1842,12 +1842,12 @@ private fun SettingsCheckRow(
         onClick = onToggle,
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp),
+            .heightIn(min = 50.dp),
         fill = colors.paperSunken,
         border = colors.gridLine,
         active = checked,
         seed = seed,
-        contentPadding = PaddingValues(horizontal = 12.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1878,11 +1878,11 @@ private fun SettingsActionButton(
 
     SketchButton(
         onClick = onClick,
-        modifier = modifier.height(50.dp),
+        modifier = modifier.heightIn(min = 50.dp),
         fill = colors.paperSunken,
         border = colors.gridLine,
         seed = seed,
-        contentPadding = PaddingValues(horizontal = 8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -1899,7 +1899,6 @@ private fun SettingsActionButton(
                 fontSize = 16.sp,
                 fontFamily = HandFont,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
             )
         }
     }

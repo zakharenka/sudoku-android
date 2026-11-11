@@ -34,12 +34,6 @@ class SettingsStore(context: Context) {
             preferences.edit { putBoolean(SAME_HIGHLIGHT_KEY, value) }
         }
 
-    var handwrittenDigits: Boolean
-        get() = preferences.getBoolean(HANDWRITTEN_DIGITS_KEY, true)
-        set(value) {
-            preferences.edit { putBoolean(HANDWRITTEN_DIGITS_KEY, value) }
-        }
-
     var showErrors: Boolean
         get() = preferences.getBoolean(SHOW_ERRORS_KEY, true)
         set(value) {
@@ -52,7 +46,6 @@ class SettingsStore(context: Context) {
         const val THEME_MODE_KEY = "theme_mode"
         const val STRAIGHT_GRID_KEY = "straight_grid"
         const val SAME_HIGHLIGHT_KEY = "same_highlight"
-        const val HANDWRITTEN_DIGITS_KEY = "handwritten_digits"
         const val SHOW_ERRORS_KEY = "show_errors"
     }
 }

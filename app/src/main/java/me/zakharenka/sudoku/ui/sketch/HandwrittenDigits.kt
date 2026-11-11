@@ -165,6 +165,7 @@ fun HandwrittenDigit(
     color: Color,
     seed: Int,
     modifier: Modifier = Modifier,
+    boxFraction: Float = 0.66f,
 ) {
     var displayedValue by remember { mutableIntStateOf(value) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -228,11 +229,11 @@ fun HandwrittenDigit(
         return
     }
 
-    val geometry = remember(displayedValue, seed, canvasSize) {
+    val geometry = remember(displayedValue, seed, canvasSize, boxFraction) {
         if (canvasSize == IntSize.Zero) {
             null
         } else {
-            buildDigitGeometry(displayedValue, seed, canvasSize)
+            buildDigitGeometry(displayedValue, seed, canvasSize, boxFraction)
         }
     }
 
@@ -267,6 +268,7 @@ private fun buildDigitGeometry(
     value: Int,
     seed: Int,
     canvasSize: IntSize,
+    boxFraction: Float,
 ): DigitGeometry {
     val strokes = HandwrittenDigitStrokes[value].orEmpty()
     val random = Random(seed * 31 + value * 1009)
@@ -274,7 +276,7 @@ private fun buildDigitGeometry(
     var totalLength = 0f
 
     val side = min(canvasSize.width, canvasSize.height).toFloat()
-    val box = max(1f, (side * 0.66f).roundToInt().toFloat())
+    val box = max(1f, (side * boxFraction).roundToInt().toFloat())
     val left = ((canvasSize.width - box) / 2f).roundToInt().toFloat()
     val top = ((canvasSize.height - box) / 2f).roundToInt().toFloat()
     val strokeWidth = max(1f, (box * 0.09f).roundToInt().toFloat())

@@ -77,9 +77,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     var sameHighlight by mutableStateOf(settings.sameHighlight)
         private set
 
-    var handwrittenDigits by mutableStateOf(settings.handwrittenDigits)
-        private set
-
     var showErrorsDefault by mutableStateOf(settings.showErrors)
         private set
 
@@ -118,11 +115,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun updateSameHighlight(enabled: Boolean) {
         sameHighlight = enabled
         settings.sameHighlight = enabled
-    }
-
-    fun updateHandwrittenDigits(enabled: Boolean) {
-        handwrittenDigits = enabled
-        settings.handwrittenDigits = enabled
     }
 
     fun openRecords() {

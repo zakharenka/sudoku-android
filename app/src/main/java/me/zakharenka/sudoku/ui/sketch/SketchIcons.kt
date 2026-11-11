@@ -76,24 +76,20 @@ fun SketchIcon(
         when (icon) {
             SketchIcon.UNDO -> {
                 val path = Path().apply {
-                    val start = point(-0.25f, 0.08f)
+                    val start = point(0.24f, 0.24f)
                     moveTo(start.x, start.y)
-                    val c1 = point(-0.18f, -0.28f)
-                    val c2 = point(0.22f, -0.28f)
-                    val end = point(0.25f, 0.08f)
+                    val c1 = point(0.24f, -0.1f)
+                    val c2 = point(0.04f, -0.1f)
+                    val end = point(-0.22f, -0.1f)
                     cubicTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y)
-                    val c3 = point(0.27f, 0.28f)
-                    val c4 = point(0.08f, 0.32f)
-                    val tail = point(-0.05f, 0.26f)
-                    cubicTo(c3.x, c3.y, c4.x, c4.y, tail.x, tail.y)
                 }
                 drawPath(
                     path = path,
                     color = tint,
                     style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round),
                 )
-                line(-0.25f, 0.08f, -0.1f, -0.04f, 11)
-                line(-0.25f, 0.08f, -0.12f, 0.18f, 12)
+                line(-0.22f, -0.1f, -0.04f, -0.21f, 11)
+                line(-0.22f, -0.1f, -0.04f, 0.01f, 12)
             }
 
             SketchIcon.ERASE -> {
@@ -156,24 +152,36 @@ fun SketchIcon(
             }
 
             SketchIcon.REFRESH -> {
-                val radius = 0.24f * side
-                val startAngle = -55f
+                val radius = 0.21f * side
+                val startAngle = 60f
+                val sweepAngle = 270f
                 drawArc(
                     color = tint,
                     startAngle = startAngle,
-                    sweepAngle = 290f,
+                    sweepAngle = sweepAngle,
                     useCenter = false,
                     topLeft = Offset(centerX - radius, centerY - radius),
                     size = Size(radius * 2f, radius * 2f),
                     style = Stroke(stroke, cap = StrokeCap.Round),
                 )
-                val angle = startAngle * PI / 180.0
-                val tip = Offset(
+                val angle = (startAngle + sweepAngle) * PI / 180.0
+                val base = Offset(
                     centerX + cos(angle).toFloat() * radius,
                     centerY + sin(angle).toFloat() * radius,
                 )
-                sketchLine(tip, tip + Offset(-0.12f * side, -0.03f * side), tint, stroke, 24, 0.5f)
-                sketchLine(tip, tip + Offset(-0.03f * side, 0.12f * side), tint, stroke, 25, 0.5f)
+                val tangent = Offset(
+                    -sin(angle).toFloat(),
+                    cos(angle).toFloat(),
+                )
+                val tip = base + tangent * (0.16f * side)
+                val normal = Offset(-tangent.y, tangent.x) * (0.1f * side)
+                val arrowHead = Path().apply {
+                    moveTo(tip.x, tip.y)
+                    lineTo(base.x + normal.x, base.y + normal.y)
+                    lineTo(base.x - normal.x, base.y - normal.y)
+                    close()
+                }
+                drawPath(arrowHead, tint)
             }
 
             SketchIcon.TROPHY -> {
