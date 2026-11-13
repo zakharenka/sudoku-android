@@ -8,6 +8,7 @@ Global settings are stored in `SharedPreferences` under the name `sudoku`:
 | --- | --- |
 | `theme_mode` | `system`, `light` or `dark` |
 | `notes_mode` | global notes mode |
+| `fast_input` | global fast mode |
 | `straight_grid` | board line style |
 | `same_highlight` | same-digit highlight |
 | `show_errors` | default error mode for a new game |

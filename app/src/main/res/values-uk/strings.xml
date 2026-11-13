@@ -17,6 +17,7 @@
     <string name="action_undo">Скасувати</string>
     <string name="action_erase">Стерти</string>
     <string name="action_notes">Нотатки</string>
+    <string name="action_fast_input">Швидкий режим</string>
     <string name="action_hint">Підказка</string>
     <string name="action_pause">Пауза</string>
     <string name="action_resume">Продовжити</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Час: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Цифра %1$d, залишилося %2$d</string>
+    <string name="number_armed">Цифра %1$d вибрана</string>
     <string name="number_complete">Цифра %1$d, усі розставлені</string>
 
     <string name="cell_empty">Рядок %1$d, стовпець %2$d, порожньо</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Як грати</string>
     <string name="rules_1">1–9 — введіть цифру у вибраній клітинці</string>
     <string name="rules_2">Нотатки — записуйте можливі варіанти в порожній клітинці</string>
+    <string name="rules_5">Швидкий режим — виберіть цифру, потім торкайтеся клітинок: заповнити їх або поставити нотатку</string>
     <string name="rules_3">Пауза — зупиніть час і сховайте поле</string>
     <string name="rules_4">Підказка — відкрити правильну цифру (3 на партію)</string>
     <string name="rules_text">Кожен рядок, стовпець і блок 3×3 має містити цифри від 1 до 9 рівно один раз. Помилки виділяються червоним.</string>

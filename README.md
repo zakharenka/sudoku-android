@@ -16,11 +16,12 @@ for distribution on Google Play and F-Droid.
 - four difficulty levels: Easy, Medium, Hard and Expert;
 - puzzle generation with a single solution;
 - cell digits are drawn as hand-written pencil strokes with a writing and
-  erasing animation; the setting can switch them back to plain digits of the
-  same size;
+  erasing animation;
 - hardware keyboard support: digits and numpad enter values, `0`, Backspace and
   Delete erase, arrow keys move the selected cell;
 - cell notes, hints (three per game), undo and clear cell;
+- fast mode: choose a digit on the number pad, then tap cells to place it;
+  in notes mode the same tap toggles that note;
 - timer, a mistake counter (can be disabled per game), and pause with
   auto-pause when leaving the app;
 - single-row top bar: difficulty, mistakes (when enabled) and timer in one

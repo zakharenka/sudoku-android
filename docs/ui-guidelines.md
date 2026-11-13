@@ -42,6 +42,17 @@
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
 - Import and export use the system file picker (SAF).
 
+## Game controls
+
+- The action row has five buttons: Undo, Erase, Notes, Fast mode and Hint.
+- It uses one row of five when the row is at least `600.dp` wide; otherwise it
+  is a three-column grid with the second row centred. Action labels auto-size
+  to one line, so the row keeps the same structure at every font scale.
+- The fast mode button stays highlighted while the mode is on and
+  its `contentDescription` spells out the full name.
+- The chosen digit is highlighted on the number pad, and its
+  `contentDescription` changes to "selected".
+
 ## Font scaling
 
 - Support system font scale up to `2.0`.
@@ -52,11 +63,10 @@
   visible.
 - Game glyphs — board digits and number-pad digits — are vector drawings sized
   from their cell or key, not from the system font scale.
-- Counts inside number-pad keys are sized from the key width with a minimum
-  readable size, so they never become larger than the digit.
-- At font scale `1.3` and above the game top bar switches to two lines. At
-  `1.5` and above the action row switches to a 2×2 grid so labels stay whole.
-- Never disable system font scaling globally.
+- Counts inside number-pad keys use a fixed `14 dp` physical size and bold
+  weight, like the hint badge; they do not scale with the system font.
+- The game top bar stays on one line at every font scale; the difficulty title
+  auto-sizes. Never disable system font scaling globally.
 
 ## Keyboard
 

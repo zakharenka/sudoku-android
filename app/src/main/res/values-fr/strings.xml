@@ -17,6 +17,7 @@
     <string name="action_undo">Défaire</string>
     <string name="action_erase">Effacer</string>
     <string name="action_notes">Notes</string>
+    <string name="action_fast_input">Mode rapide</string>
     <string name="action_hint">Indice</string>
     <string name="action_pause">Pause</string>
     <string name="action_resume">Reprendre</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Temps : %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Chiffre %1$d, %2$d restants</string>
+    <string name="number_armed">Chiffre %1$d sélectionné</string>
     <string name="number_complete">Chiffre %1$d, tous placés</string>
 
     <string name="cell_empty">Ligne %1$d, colonne %2$d, vide</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Comment jouer</string>
     <string name="rules_1">1–9 : saisissez un chiffre dans la case sélectionnée</string>
     <string name="rules_2">Notes : notez les candidats possibles dans une case vide</string>
+    <string name="rules_5">Mode rapide : choisissez un chiffre, puis touchez les cases pour les remplir ou noter ce chiffre</string>
     <string name="rules_3">Pause : arrêtez le chronomètre et masquez la grille</string>
     <string name="rules_4">Indice — révèle le chiffre correct (3 par partie)</string>
     <string name="rules_text">Chaque ligne, colonne et bloc 3×3 doit contenir les chiffres de 1 à 9 exactement une fois. Les erreurs sont surlignées en rouge.</string>

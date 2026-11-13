@@ -478,8 +478,9 @@ private fun GameControls(
         NumberPad(
             cells = state.cells,
             enabled = !state.loading && !state.paused && !state.won,
-            onNumber = viewModel::enter,
+            onNumber = viewModel::pressPadNumber,
             boardCellSize = boardCellSize,
+            armedNumber = state.armedNumber,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -490,6 +491,7 @@ private fun GameControls(
             onErase = viewModel::erase,
             onNotes = viewModel::toggleNotes,
             onHint = viewModel::hint,
+            onFastInput = viewModel::toggleFastInput,
         )
     }
 }
@@ -629,13 +631,12 @@ private fun HeaderIconButton(
 
     SketchButton(
         onClick = onClick,
-        modifier = Modifier
-            .size(size)
-            .semantics { contentDescription = description },
+        modifier = Modifier.size(size),
         fill = colors.paperSunken,
         border = colors.gridLine,
         seed = seed,
         contentPadding = PaddingValues(0.dp),
+        description = description,
     ) {
         SketchIcon(
             icon = icon,
@@ -1308,6 +1309,7 @@ private fun RulesDialog(onDismiss: () -> Unit) {
     ) {
         RuleLine(stringResource(R.string.rules_1))
         RuleLine(stringResource(R.string.rules_2))
+        RuleLine(stringResource(R.string.rules_5))
         RuleLine(stringResource(R.string.rules_3))
         RuleLine(stringResource(R.string.rules_4))
 

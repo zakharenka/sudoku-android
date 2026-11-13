@@ -17,6 +17,7 @@
     <string name="action_undo">Desfazer</string>
     <string name="action_erase">Apagar</string>
     <string name="action_notes">Notas</string>
+    <string name="action_fast_input">Modo rápido</string>
     <string name="action_hint">Dica</string>
     <string name="action_pause">Pausa</string>
     <string name="action_resume">Continuar</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Tempo: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Dígito %1$d, faltam %2$d</string>
+    <string name="number_armed">Dígito %1$d selecionado</string>
     <string name="number_complete">Dígito %1$d, todos colocados</string>
 
     <string name="cell_empty">Linha %1$d, coluna %2$d, vazia</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Como jogar</string>
     <string name="rules_1">1–9: insira um dígito na célula selecionada</string>
     <string name="rules_2">Notas: escreva os candidatos possíveis em uma célula vazia</string>
+    <string name="rules_5">Modo rápido: escolha um dígito e toque nas células para preenchê-las ou marcar a nota</string>
     <string name="rules_3">Pausa: pare o tempo e oculte o tabuleiro</string>
     <string name="rules_4">Dica — revela o dígito correto (3 por partida)</string>
     <string name="rules_text">Cada linha, coluna e bloco 3×3 deve conter os dígitos de 1 a 9 exatamente uma vez. Os erros são destacados em vermelho.</string>

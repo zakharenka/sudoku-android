@@ -13,6 +13,17 @@
 - A digit fills the selected non-given cell, replacing a previous value if
   present.
 - Notes mode writes candidate digits into an empty cell.
+- Fast mode is toggled from the action row. A digit chosen on
+  the number pad is only armed: it is highlighted and nothing is written yet.
+  The next cell tap writes that digit and selects the cell; in notes mode the
+  same tap toggles that note. Tapping the armed digit again disarms it.
+- In fast mode any non-given cell can be written over, including a cell filled
+  by a hint. Givens are selected but never changed.
+- Arming is cleared on a new game, on victory, when the digit is fully placed
+  and when the mode is turned off. The armed digit is not saved with the game;
+  the mode itself is saved with the settings.
+- Keyboard input keeps the cell-first order: a typed digit fills the selected
+  cell and does not arm anything.
 - Undo reverts the last move.
 - Erase clears the selected normal cell. Givens cannot be erased.
 - Mistakes are highlighted in red when the game shows mistakes. In hidden mode

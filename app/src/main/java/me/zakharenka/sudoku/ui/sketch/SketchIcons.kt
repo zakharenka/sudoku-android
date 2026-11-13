@@ -20,6 +20,7 @@ enum class SketchIcon {
     UNDO,
     ERASE,
     NOTES,
+    FAST_INPUT,
     HINT,
     PAUSE,
     PLAY,
@@ -115,6 +116,15 @@ fun SketchIcon(
                 line(-0.3f, 0.3f, -0.22f, 0.24f, 15)
                 line(-0.3f, 0.3f, -0.14f, 0.3f, 16)
                 line(-0.14f, 0.3f, -0.22f, 0.24f, 17)
+            }
+
+            SketchIcon.FAST_INPUT -> {
+                line(0.06f, -0.32f, -0.22f, 0.04f, 25)
+                line(-0.22f, 0.04f, -0.02f, 0.04f, 26)
+                line(-0.02f, 0.04f, -0.08f, 0.32f, 27)
+                line(-0.08f, 0.32f, 0.24f, -0.06f, 28)
+                line(0.24f, -0.06f, 0.04f, -0.06f, 29)
+                line(0.04f, -0.06f, 0.06f, -0.32f, 30)
             }
 
             SketchIcon.HINT -> {

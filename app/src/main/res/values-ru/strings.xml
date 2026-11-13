@@ -17,6 +17,7 @@
     <string name="action_undo">Отменить</string>
     <string name="action_erase">Стереть</string>
     <string name="action_notes">Заметки</string>
+    <string name="action_fast_input">Быстрый ввод</string>
     <string name="action_hint">Подсказка</string>
     <string name="action_pause">Пауза</string>
     <string name="action_resume">Продолжить</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Время: %1$s</string>
     <string name="number_remaining">Цифра %1$d, осталось %2$d</string>
+    <string name="number_armed">Цифра %1$d выбрана</string>
     <string name="number_complete">Цифра %1$d, все расставлены</string>
 
     <string name="cell_empty">Строка %1$d, столбец %2$d, пусто</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Как играть</string>
     <string name="rules_1">1–9 — вписать цифру в выбранную клетку</string>
     <string name="rules_2">Заметки — записывать возможные варианты в пустой клетке</string>
+    <string name="rules_5">Быстрый ввод — выбрать цифру, затем касаться клеток: заполнить их или поставить заметку</string>
     <string name="rules_3">Пауза — остановить таймер и скрыть поле</string>
     <string name="rules_4">Подсказка — открыть правильную цифру (3 на партию)</string>
     <string name="rules_text">В каждой строке, каждом столбце и каждом блоке 3 × 3 цифры от 1 до 9 должны встречаться ровно один раз. Ошибки подсвечиваются красным.</string>

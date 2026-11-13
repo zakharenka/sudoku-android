@@ -29,6 +29,9 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import me.zakharenka.sudoku.ui.theme.SudokuTheme
@@ -301,6 +304,7 @@ fun SketchButton(
     active: Boolean = false,
     seed: Int = 0,
     contentPadding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+    description: String? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val colors = SudokuTheme.colors
@@ -310,6 +314,18 @@ fun SketchButton(
     SketchSurface(
         modifier = modifier
             .alpha(if (enabled) 1f else 0.38f)
+            .then(
+                if (description == null) {
+                    Modifier
+                } else {
+                    Modifier.semantics {
+                        contentDescription = description
+                        if (!enabled) {
+                            disabled()
+                        }
+                    }
+                },
+            )
             .clickable(
                 enabled = enabled,
                 interactionSource = interaction,

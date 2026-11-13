@@ -16,6 +16,12 @@ class SettingsStore(context: Context) {
             preferences.edit { putBoolean(NOTES_MODE_KEY, value) }
         }
 
+    var fastInput: Boolean
+        get() = preferences.getBoolean(FAST_INPUT_KEY, false)
+        set(value) {
+            preferences.edit { putBoolean(FAST_INPUT_KEY, value) }
+        }
+
     var themeMode: ThemeMode
         get() = ThemeMode.fromKey(preferences.getString(THEME_MODE_KEY, null))
         set(value) {
@@ -43,6 +49,7 @@ class SettingsStore(context: Context) {
     private companion object {
         const val PREFERENCES = "sudoku"
         const val NOTES_MODE_KEY = "notes_mode"
+        const val FAST_INPUT_KEY = "fast_input"
         const val THEME_MODE_KEY = "theme_mode"
         const val STRAIGHT_GRID_KEY = "straight_grid"
         const val SAME_HIGHLIGHT_KEY = "same_highlight"

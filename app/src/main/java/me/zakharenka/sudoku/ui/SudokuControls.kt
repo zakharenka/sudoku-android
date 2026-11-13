@@ -50,6 +50,7 @@ import me.zakharenka.sudoku.ui.sketch.SketchButton
 import me.zakharenka.sudoku.ui.sketch.SketchIcon
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.CLOCK
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.ERASE
+import me.zakharenka.sudoku.ui.sketch.SketchIcon.FAST_INPUT
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.HINT
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.NOTES
 import me.zakharenka.sudoku.ui.sketch.SketchIcon.PAUSE
@@ -173,7 +174,6 @@ fun TopToolbar(
     }
 }
 
-private const val ACTION_GRID_FONT_SCALE = 1.4f
 private val ToolbarTextStyle = TextStyle(
     platformStyle = PlatformTextStyle(includeFontPadding = false),
 )
@@ -259,6 +259,7 @@ fun NumberPad(
     enabled: Boolean,
     onNumber: (Int) -> Unit,
     boardCellSize: Dp? = null,
+    armedNumber: Int? = null,
 ) {
     val colors = SudokuTheme.colors
     val counts = remember(cells) {
@@ -286,23 +287,25 @@ fun NumberPad(
             for (number in 1..9) {
                 val remaining = (9 - counts[number]).coerceAtLeast(0)
                 val complete = remaining == 0
-                val description = if (complete) {
-                    stringResource(R.string.number_complete, number)
-                } else {
-                    stringResource(R.string.number_remaining, number, remaining)
+                val armed = armedNumber == number
+                val description = when {
+                    armed -> stringResource(R.string.number_armed, number)
+                    complete -> stringResource(R.string.number_complete, number)
+                    else -> stringResource(R.string.number_remaining, number, remaining)
                 }
 
                 SketchButton(
                     onClick = { onNumber(number) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(buttonHeight)
-                        .semantics { contentDescription = description },
+                        .height(buttonHeight),
                     enabled = enabled && !complete,
                     fill = colors.paperSunken,
                     border = colors.gridLine,
+                    active = armed,
                     seed = 400 + number,
                     contentPadding = PaddingValues(2.dp),
+                    description = description,
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -348,10 +351,12 @@ fun ActionRow(
     onErase: () -> Unit,
     onNotes: () -> Unit,
     onHint: () -> Unit,
+    onFastInput: () -> Unit,
 ) {
     val locked = state.loading || state.paused || state.won
     val fontScale = LocalDensity.current.fontScale.coerceIn(1f, 2f)
-    val buttonHeight = (70f + (fontScale - 1f) * 38f).dp
+    val gap = 6.dp
+    val buttonHeight = (54f + (fontScale - 1f) * 18f).dp
     val actions = listOf(
         ActionSpec(
             icon = UNDO,
@@ -376,6 +381,14 @@ fun ActionRow(
             onClick = onNotes,
         ),
         ActionSpec(
+            icon = FAST_INPUT,
+            label = stringResource(R.string.action_fast_input),
+            enabled = !locked,
+            active = state.fastInput,
+            seed = 504,
+            onClick = onFastInput,
+        ),
+        ActionSpec(
             icon = HINT,
             label = stringResource(R.string.action_hint),
             enabled = !locked && state.hintsRemaining > 0,
@@ -385,12 +398,18 @@ fun ActionRow(
         ),
     )
 
-    if (fontScale >= ACTION_GRID_FONT_SCALE) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            actions.chunked(2).forEach { rowActions ->
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val columns = if (maxWidth >= 600.dp) 5 else 3
+        val actionWidth = (maxWidth - gap * (columns - 1)) / columns
+
+        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+            actions.chunked(columns).forEach { rowActions ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        gap,
+                        Alignment.CenterHorizontally,
+                    ),
                 ) {
                     rowActions.forEach { action ->
                         ActionButton(
@@ -398,7 +417,7 @@ fun ActionRow(
                             label = action.label,
                             enabled = action.enabled,
                             height = buttonHeight,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.width(actionWidth),
                             active = action.active,
                             badge = action.badge,
                             seed = action.seed,
@@ -406,25 +425,6 @@ fun ActionRow(
                         )
                     }
                 }
-            }
-        }
-    } else {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            actions.forEach { action ->
-                ActionButton(
-                    icon = action.icon,
-                    label = action.label,
-                    enabled = action.enabled,
-                    height = buttonHeight,
-                    modifier = Modifier.weight(1f),
-                    active = action.active,
-                    badge = action.badge,
-                    seed = action.seed,
-                    onClick = action.onClick,
-                )
             }
         }
     }
@@ -464,7 +464,7 @@ private fun ActionButton(
         border = colors.gridLine,
         active = active,
         seed = seed,
-        contentPadding = PaddingValues(vertical = 6.dp, horizontal = 2.dp),
+        contentPadding = PaddingValues(2.dp),
     ) {
         Box(Modifier.fillMaxSize()) {
             Column(
@@ -481,12 +481,17 @@ private fun ActionButton(
                 Text(
                     text = label,
                     color = contentColor,
-                    fontSize = 14.sp,
-                    fontFamily = HandFont,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    lineHeight = 16.sp,
+                    style = TextStyle(
+                        fontFamily = HandFont,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    maxLines = 1,
                     textAlign = TextAlign.Center,
+                    autoSize = TextAutoSize.StepBased(
+                        minFontSize = 8.sp,
+                        maxFontSize = 14.sp,
+                        stepSize = 0.5.sp,
+                    ),
                 )
             }
             if (badge != null) {

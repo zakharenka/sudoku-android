@@ -38,6 +38,8 @@ data class GameUiState(
     val cells: List<Cell> = emptyList(),
     val selectedIndex: Int? = null,
     val notesMode: Boolean = false,
+    val fastInput: Boolean = false,
+    val armedNumber: Int? = null,
     val showErrors: Boolean = true,
     val mistakes: Int = 0,
     val hintsRemaining: Int = SudokuSession.MAX_HINTS,
@@ -67,6 +69,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private var elapsedMillis = 0L
     private var timerStartedAt = 0L
     private var notesMode = settings.notesMode
+    private var fastInput = settings.fastInput
 
     var themeMode by mutableStateOf(settings.themeMode)
         private set
@@ -83,6 +86,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     var uiState by mutableStateOf(
         GameUiState(
             notesMode = notesMode,
+            fastInput = fastInput,
             showErrors = showErrorsDefault,
         ),
     )
@@ -175,7 +179,19 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         session.select(index)
-        refresh()
+
+        val armed = uiState.armedNumber
+        if (!fastInput || armed == null) {
+            refresh()
+            return
+        }
+
+        val outcome = session.enter(armed)
+        if (outcome.changed || outcome.won) {
+            handleOutcome(session, outcome)
+        } else {
+            refresh()
+        }
     }
 
     fun moveSelection(rowDelta: Int, colDelta: Int) {
@@ -199,6 +215,26 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         val session = session ?: return
         handleOutcome(session, session.enter(number))
+    }
+
+    fun pressPadNumber(number: Int) {
+        if (uiState.loading || uiState.paused) {
+            return
+        }
+
+        val session = session ?: return
+        if (session.won || number !in 1..9) {
+            return
+        }
+
+        if (!fastInput) {
+            handleOutcome(session, session.enter(number))
+            return
+        }
+
+        uiState = uiState.copy(
+            armedNumber = if (uiState.armedNumber == number) null else number,
+        )
     }
 
     fun erase() {
@@ -242,6 +278,24 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         notesMode = session.notesMode
         settings.notesMode = notesMode
         refresh()
+    }
+
+    fun toggleFastInput() {
+        if (uiState.loading || uiState.paused) {
+            return
+        }
+
+        val session = session ?: return
+        if (session.won) {
+            return
+        }
+
+        fastInput = !fastInput
+        settings.fastInput = fastInput
+        uiState = uiState.copy(
+            fastInput = fastInput,
+            armedNumber = if (fastInput) uiState.armedNumber else null,
+        )
     }
 
     fun togglePause() {
@@ -397,6 +451,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             cells = emptyList(),
             selectedIndex = null,
             notesMode = notesMode,
+            armedNumber = null,
             mistakes = 0,
             hintsRemaining = SudokuSession.MAX_HINTS,
             elapsedSeconds = 0,
@@ -479,6 +534,9 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         isNewRecord: Boolean = uiState.isNewRecord,
     ) {
         val session = session ?: return
+        val armed = uiState.armedNumber?.takeIf {
+            fastInput && !session.won && session.remaining(it) > 0
+        }
 
         uiState = uiState.copy(
             difficulty = session.difficulty,
@@ -486,6 +544,8 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             cells = session.cells.toList(),
             selectedIndex = session.selected,
             notesMode = session.notesMode,
+            fastInput = fastInput,
+            armedNumber = armed,
             mistakes = session.mistakes,
             hintsRemaining = session.hintsRemaining,
             won = session.won,
@@ -567,6 +627,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             cells = restored.cells.toList(),
             selectedIndex = restored.selected,
             notesMode = restored.notesMode,
+            armedNumber = null,
             mistakes = restored.mistakes,
             hintsRemaining = restored.hintsRemaining,
             elapsedSeconds = game.elapsedSeconds,

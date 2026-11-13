@@ -17,6 +17,7 @@
     <string name="action_undo">Rückgängig</string>
     <string name="action_erase">Löschen</string>
     <string name="action_notes">Notizen</string>
+    <string name="action_fast_input">Schnellmodus</string>
     <string name="action_hint">Tipp</string>
     <string name="action_pause">Pause</string>
     <string name="action_resume">Fortsetzen</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Zeit: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Ziffer %1$d, noch %2$d</string>
+    <string name="number_armed">Ziffer %1$d ausgewählt</string>
     <string name="number_complete">Ziffer %1$d, alle platziert</string>
 
     <string name="cell_empty">Zeile %1$d, Spalte %2$d, leer</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Spielanleitung</string>
     <string name="rules_1">1–9: Gib eine Ziffer in die ausgewählte Zelle ein</string>
     <string name="rules_2">Notizen: Schreibe mögliche Kandidaten in eine leere Zelle</string>
+    <string name="rules_5">Schnellmodus: Ziffer wählen, dann Zellen antippen, um sie zu füllen oder die Notiz zu setzen</string>
     <string name="rules_3">Pause: Halte die Zeit an und blende das Spielfeld aus</string>
     <string name="rules_4">Tipp — deckt die richtige Ziffer auf (3 pro Spiel)</string>
     <string name="rules_text">Jede Zeile, jede Spalte und jeder 3×3-Block muss die Ziffern 1 bis 9 genau einmal enthalten. Fehler werden rot markiert.</string>

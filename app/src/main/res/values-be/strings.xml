@@ -17,6 +17,7 @@
     <string name="action_undo">Адмяніць</string>
     <string name="action_erase">Сцерці</string>
     <string name="action_notes">Нататкі</string>
+    <string name="action_fast_input">Хуткі рэжым</string>
     <string name="action_hint">Падказка</string>
     <string name="action_pause">Пауза</string>
     <string name="action_resume">Працягнуць</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Час: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Лічба %1$d, засталося %2$d</string>
+    <string name="number_armed">Лічба %1$d выбрана</string>
     <string name="number_complete">Лічба %1$d, усе расстаўлены</string>
 
     <string name="cell_empty">Радок %1$d, слупок %2$d, пуста</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Як гуляць</string>
     <string name="rules_1">1–9 — увядзіце лічбу ў выбранай клетцы</string>
     <string name="rules_2">Нататкі — запісвайце магчымыя варыянты ў пустой клетцы</string>
+    <string name="rules_5">Хуткі рэжым — выберыце лічбу, затым дакранайцеся да клетак: запоўніць іх або паставіць нататку</string>
     <string name="rules_3">Пауза — спыніце час і схавайце поле</string>
     <string name="rules_4">Падказка — адкрыць правільную лічбу (3 на партыю)</string>
     <string name="rules_text">Кожны радок, слупок і блок 3×3 павінны змяшчаць лічбы ад 1 да 9 роўна адзін раз. Памылкі выдзяляюцца чырвоным.</string>

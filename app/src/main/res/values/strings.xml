@@ -17,6 +17,7 @@
     <string name="action_undo">Undo</string>
     <string name="action_erase">Erase</string>
     <string name="action_notes">Notes</string>
+    <string name="action_fast_input">Fast mode</string>
     <string name="action_hint">Hint</string>
     <string name="action_pause">Pause</string>
     <string name="action_resume">Resume</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Time: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Digit %1$d, %2$d left</string>
+    <string name="number_armed">Digit %1$d selected</string>
     <string name="number_complete">Digit %1$d, all placed</string>
 
     <string name="cell_empty">Row %1$d, column %2$d, empty</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">How to play</string>
     <string name="rules_1">1–9 — enter a digit in the selected cell</string>
     <string name="rules_2">Notes — write possible candidates in an empty cell</string>
+    <string name="rules_5">Fast mode — pick a digit, then tap cells to fill them or toggle that note</string>
     <string name="rules_3">Pause — stop the timer and hide the board</string>
     <string name="rules_4">Hint — reveal the correct digit (3 per game)</string>
     <string name="rules_text">Each row, column and 3×3 box must contain the digits 1 to 9 exactly once. Mistakes are highlighted in red.</string>

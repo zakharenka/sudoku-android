@@ -17,6 +17,7 @@
     <string name="action_undo">Annulla</string>
     <string name="action_erase">Cancella</string>
     <string name="action_notes">Note</string>
+    <string name="action_fast_input">Modalità rapida</string>
     <string name="action_hint">Indizio</string>
     <string name="action_pause">Pausa</string>
     <string name="action_resume">Riprendi</string>
@@ -26,6 +27,7 @@
 
     <string name="timer_content_description">Tempo: %1$s</string>
     <string name="number_remaining" tools:ignore="PluralsCandidate">Cifra %1$d, ne restano %2$d</string>
+    <string name="number_armed">Cifra %1$d selezionata</string>
     <string name="number_complete">Cifra %1$d, tutte inserite</string>
 
     <string name="cell_empty">Riga %1$d, colonna %2$d, vuota</string>
@@ -47,6 +49,7 @@
     <string name="rules_title">Come giocare</string>
     <string name="rules_1">1–9: inserisci una cifra nella cella selezionata</string>
     <string name="rules_2">Note: scrivi i possibili candidati in una cella vuota</string>
+    <string name="rules_5">Modalità rapida: scegli una cifra, poi tocca le celle per riempirle o segnare la nota</string>
     <string name="rules_3">Pausa: ferma il tempo e nascondi la griglia</string>
     <string name="rules_4">Indizio — rivela la cifra corretta (3 per partita)</string>
     <string name="rules_text">Ogni riga, colonna e blocco 3×3 deve contenere le cifre da 1 a 9 esattamente una volta. Gli errori sono evidenziati in rosso.</string>
