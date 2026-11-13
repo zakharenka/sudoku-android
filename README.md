@@ -116,6 +116,7 @@ The APK is written to `app/build/outputs/apk/release/app-release-unsigned.apk`.
 | [`docs/game-rules.md`](docs/game-rules.md) | rules, hints, records and history |
 | [`docs/ui-guidelines.md`](docs/ui-guidelines.md) | dialogs, top bar, keyboard, tablets, sketch style and icon |
 | [`docs/release-process.md`](docs/release-process.md) | versioning, release checklist, Google Play and F-Droid |
+| [`docs/screenshots.md`](docs/screenshots.md) | store screenshot sizes, capture steps and fixture data |
 | [`docs/languages.md`](docs/languages.md) | supported languages and the plan for new ones |
 | [`docs/releases/`](docs/releases/) | release notes by version |
 

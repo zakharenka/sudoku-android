@@ -83,11 +83,14 @@
   left, keypad and actions on the right.
 - Below `900.dp` — a single centred column (phones and portrait tablets).
 - The panel is capped at `1120.dp` on wide screens and `720.dp` in compact
-  mode.
+  mode. On tablet widths (`600.dp` and above) it is also capped at 90 % of the
+  available width, up to `720.dp`, so the board and the 3+2 action grid fit
+  vertically on a 7-inch screen without scrolling.
 - In wide mode the board size is limited by width, height and a maximum of
   `760.dp`: `min(760.dp, availableWidth * 0.56, availableHeight - 160.dp)`,
   so the bottom row is not clipped on 7-inch tablets in landscape.
-- Test changes on `Medium_Tablet` in portrait and landscape.
+- Test changes on a 7-inch profile (`1200 x 1920`, `320 dpi`, `600 x 960 dp`)
+  and on `Medium_Tablet` (`2560 x 1600`, `320 dpi`) in portrait and landscape.
 
 ## Theme and style
 

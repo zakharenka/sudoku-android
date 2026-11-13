@@ -75,7 +75,9 @@ not with the version number.
   `release-notes.txt`. Icons and screenshots are used directly from
   `fastlane/metadata/android/`.
 - Upload the AAB to the chosen track and apply the listing and release notes.
-- Update titles, descriptions and images only when the product changes.
+- Update titles, descriptions and images only when the product changes. If the
+  in-game UI changed, refresh the store screenshots as described in
+  [`screenshots.md`](screenshots.md).
 
 ## F-Droid
 

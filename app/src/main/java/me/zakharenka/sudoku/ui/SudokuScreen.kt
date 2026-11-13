@@ -193,6 +193,11 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 .windowInsetsPadding(WindowInsets.safeDrawing),
         ) {
             val isWide = maxWidth >= 900.dp
+            val contentMax = when {
+                isWide -> 1120.dp
+                maxWidth >= 600.dp -> minOf(720.dp, maxWidth * 0.9f)
+                else -> 720.dp
+            }
             val wideBoardMax = maxOf(
                 320.dp,
                 minOf(760.dp, maxWidth * 0.56f, maxHeight - 160.dp),
@@ -207,6 +212,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             ) {
                 Header(
                     isWide = isWide,
+                    contentMax = contentMax,
                     onRules = { showRules = true },
                     onHistory = {
                         viewModel.openHistory()
@@ -220,6 +226,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 GamePanel(
                     state = state,
                     isWide = isWide,
+                    contentMax = contentMax,
                     boardMax = wideBoardMax,
                     straightGrid = viewModel.straightGrid,
                     sameHighlight = viewModel.sameHighlight,
@@ -359,6 +366,7 @@ private fun KeyEvent.digitNumber(): Int? {
 private fun GamePanel(
     state: GameUiState,
     isWide: Boolean,
+    contentMax: Dp,
     boardMax: Dp,
     straightGrid: Boolean,
     sameHighlight: Boolean,
@@ -371,7 +379,7 @@ private fun GamePanel(
 
     SketchSurface(
         modifier = Modifier
-            .widthIn(max = if (isWide) 1120.dp else 720.dp)
+            .widthIn(max = contentMax)
             .fillMaxWidth(),
         fill = colors.paperAlt,
         border = colors.inkSoft,
@@ -555,6 +563,7 @@ private fun BoardBox(
 @Composable
 private fun Header(
     isWide: Boolean,
+    contentMax: Dp,
     onRules: () -> Unit,
     onHistory: () -> Unit,
     onSettings: () -> Unit,
@@ -565,7 +574,7 @@ private fun Header(
 
     Row(
         modifier = Modifier
-            .widthIn(max = if (isWide) 1120.dp else 720.dp)
+            .widthIn(max = contentMax)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {

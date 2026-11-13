@@ -12,6 +12,7 @@ Instructions for AI agents and developers working with this repository.
 | [`docs/game-rules.md`](docs/game-rules.md) | rules, hints, records and history |
 | [`docs/ui-guidelines.md`](docs/ui-guidelines.md) | dialogs, top bar, keyboard, tablets, sketch style and icon |
 | [`docs/release-process.md`](docs/release-process.md) | versioning, release checklist, Google Play and F-Droid |
+| [`docs/screenshots.md`](docs/screenshots.md) | store screenshot sizes, capture steps and fixture data |
 | [`docs/languages.md`](docs/languages.md) | supported languages and translation plan |
 
 The docs above are the source of truth. Update them together with the code when
