@@ -1,4 +1,23 @@
-# Sudoku for Android
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/icon.png" width="96" alt="Sudoku app icon">
+</p>
+
+<h1 align="center">Sudoku for Android</h1>
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=me.zakharenka.sudoku">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="60" alt="Get it on Google Play">
+  </a>
+  <a href="https://f-droid.org/packages/me.zakharenka.sudoku/">
+    <img src="https://f-droid.org/badge/get-it-on.png" height="60" alt="Get it on F-Droid">
+  </a>
+</p>
+
+<p align="center">
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/01-game.jpg">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01-game.jpg" width="300" alt="Sudoku game screen">
+  </a>
+</p>
 
 A classic 9×9 Sudoku for Android built with Kotlin and Jetpack Compose. The
 interface is drawn by hand in a sketch style: paper texture, wobbly lines, a
