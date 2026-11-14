@@ -64,11 +64,23 @@ python3 scripts/set-version.py --check
    ```
 
 The tag push runs `.github/workflows/ci.yaml`. The workflow checks that the tag
-equals `app.version` and builds the unsigned release APK and AAB.
+equals `app.version`, builds the unsigned release APK and AAB, and creates a
+GitHub release from `docs/releases/X.Y.Z.md`.
 
 Only the version files, fastlane changelogs and release notes change for a
 normal release. README, AGENTS and the reference docs are updated with the code,
 not with the version number.
+
+## GitHub releases
+
+A release is created automatically on a tag push, and its body comes from
+`docs/releases/X.Y.Z.md`.
+
+To backfill releases for existing tags, run the workflow manually:
+**Actions → CI → Run workflow**, enter the tags separated by spaces or commas
+(for example `1.0.0 1.0.1 1.1.0 1.2.0 1.3.0`) and start it. This mode skips the
+build, creates one release per tag from `docs/releases/<tag>.md`, skips tags
+that already have a release and marks the newest tag as the latest release.
 
 ## Google Play
 

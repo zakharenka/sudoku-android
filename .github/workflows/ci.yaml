@@ -5,14 +5,23 @@ on:
     branches: [master]
     tags: ["*"]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Tags to publish, separated by spaces or commas, for example: 1.0.0 1.0.1 1.1.0 1.2.0 1.3.0"
+        required: true
+        type: string
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    name: ${{ github.ref_type == 'tag' && 'Release' || 'Check' }}
+    name: ${{ (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && 'Release' || 'Check' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,6 +49,7 @@ jobs:
           git -c safe.directory='*' clean -ffdx
 
       - name: Check version files
+        if: github.event_name != 'workflow_dispatch'
         run: |
           set -euo pipefail
           docker run --rm -v "$PWD":/src:z -w /src python:3-alpine \
@@ -50,6 +60,7 @@ jobs:
           fi
 
       - name: Test, lint and build
+        if: github.event_name != 'workflow_dispatch'
         run: |
           set -euo pipefail
           if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
@@ -72,7 +83,7 @@ jobs:
             bash -c "set -euo pipefail; ./gradlew --no-daemon $tasks; chown -R \$HOST_UID:\$HOST_GID app/build"
 
       - name: Upload debug APK
-        if: github.ref_type != 'tag'
+        if: github.event_name != 'workflow_dispatch' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
@@ -88,3 +99,47 @@ jobs:
             app/build/outputs/apk/release/*.apk
             app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
+
+      - name: Create GitHub releases
+        if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANUAL_TAGS: ${{ inputs.tags }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            tags=$(printf '%s' "${MANUAL_TAGS:-}" | tr ',' ' ')
+          else
+            tags="$GITHUB_REF_NAME"
+          fi
+          tags=$(printf '%s\n' $tags | sed '/^$/d' | sort -V | tr '\n' ' ')
+          if [ -z "$tags" ]; then
+            echo "::error::no tags provided"
+            exit 1
+          fi
+
+          for tag in $tags; do
+            notes="docs/releases/${tag}.md"
+            if [ ! -f "$notes" ]; then
+              echo "::error::missing $notes"
+              exit 1
+            fi
+            if gh release view "$tag" >/dev/null 2>&1; then
+              if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+                echo "skip $tag: release already exists"
+                continue
+              fi
+              gh release edit "$tag" \
+                --title "Sudoku $tag" \
+                --notes-file "$notes"
+              continue
+            fi
+            echo "create $tag"
+            gh release create "$tag" \
+              --title "Sudoku $tag" \
+              --notes-file "$notes" \
+              --verify-tag
+          done
+
+          latest=$(printf '%s\n' $tags | tail -n 1)
+          gh release edit "$latest" --latest
