@@ -1,0 +1,1 @@
+Sudoku 1.3.0: inserimento rapido — scegli una cifra e tocca le celle per riempirle o aggiungere note, e supporto per Android 8.0 e versioni successive.

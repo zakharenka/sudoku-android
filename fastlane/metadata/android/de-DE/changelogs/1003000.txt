@@ -1,0 +1,1 @@
+Sudoku 1.3.0: Schnelleingabe – Ziffer wählen und Zellen antippen, um sie zu füllen oder Notizen zu setzen, plus Unterstützung für Android 8.0 und neuer.

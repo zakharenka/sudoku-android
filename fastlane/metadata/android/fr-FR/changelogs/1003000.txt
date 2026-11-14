@@ -1,0 +1,1 @@
+Sudoku 1.3.0 : saisie rapide — choisissez un chiffre puis touchez des cases pour les remplir ou poser des notes, et prise en charge d'Android 8.0 et versions ultérieures.

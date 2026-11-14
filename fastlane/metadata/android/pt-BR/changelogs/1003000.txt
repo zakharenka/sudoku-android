@@ -1,0 +1,1 @@
+Sudoku 1.3.0: entrada rápida — escolha um número e toque nas células para preenchê-las ou marcar notas, e suporte ao Android 8.0 e versões mais recentes.

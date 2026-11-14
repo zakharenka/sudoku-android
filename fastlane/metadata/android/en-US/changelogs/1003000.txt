@@ -1,0 +1,1 @@
+Sudoku 1.3.0: fast input — choose a digit and tap cells to fill them or toggle notes, plus support for Android 8.0 and newer.

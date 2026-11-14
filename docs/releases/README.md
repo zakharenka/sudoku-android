@@ -2,6 +2,7 @@
 
 Each release adds a short entry here and a matching `<version>.md` file.
 
+- [1.3.0](1.3.0.md) — fast input mode and support for Android 8.0 and newer
 - [1.2.0](1.2.0.md) — history statuses and stats, records inside history, font scaling up to 2.0, calmer number pad and hand-drawn icons
 - [1.1.0](1.1.0.md) — game history, records from history, file backups, handwritten digits and keyboard input
 - [1.0.4](1.0.4.md) — refined board grid, larger digits, better notes and counters
