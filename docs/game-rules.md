@@ -13,10 +13,20 @@
 - A digit fills the selected non-given cell, replacing a previous value if
   present.
 - Notes mode writes candidate digits into an empty cell.
+- Notes are shown as a 3×3 mini-grid inside the cell. Each candidate keeps its
+  standard position: 1 in the top-left, 5 in the centre and 9 in the
+  bottom-right. Note digits use the same hand-written strokes as board digits
+  and are sized to fit their mini-cell.
 - Fast mode is toggled from the action row. A digit chosen on
   the number pad is only armed: it is highlighted and nothing is written yet.
   The next cell tap writes that digit and selects the cell; in notes mode the
   same tap toggles that note. Tapping the armed digit again disarms it.
+- While a digit is armed, same-digit highlighting starts immediately: every
+  cell with that value is highlighted, and every matching note digit is
+  highlighted inside its note, before any cell is tapped.
+- Same-digit highlighting also works in normal mode. When a filled cell is
+  selected, cells with matching notes highlight only the matching note digit,
+  not the whole cell.
 - In fast mode any non-given cell can be written over, including a cell filled
   by a hint. Givens are selected but never changed.
 - Arming is cleared on a new game, on victory, when the digit is fully placed

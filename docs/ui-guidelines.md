@@ -36,8 +36,20 @@
   switch them back to hand-drawn wobbly lines; this affects only the board, not
   buttons, panels or icons.
 - Same-digit highlighting can be disabled. This removes the highlight and the
-  special text colour from cells with the selected digit; peer highlighting
-  remains.
+  special text colour from cells with the selected digit and from matching note
+  digits; peer highlighting remains.
+- In fast mode the armed digit is highlighted on the board immediately, without
+  waiting for a cell tap. A matching note highlights only that note digit, not
+  the whole cell. The same note-digit highlight applies in normal mode when a
+  filled cell is selected.
+- Notes use a 3×3 mini-grid inside the cell, with each digit in its standard
+  position. Note digits are hand-written like board digits, centred in their
+  mini-cell and sized to fit. Highlighting a note paints the background of that
+  digit only.
+- The selected cell uses a light accent wash with a subtle hand-drawn hatch,
+  and its digits and notes stay in ink. A selected mistake uses the light
+  danger wash with red content. Peer cells use a weaker accent wash. Do not
+  draw an outline square around the selected cell.
 - The language is changed only through the native Android screen
   (`android.settings.APP_LOCALE_SETTINGS`), with no in-app language picker.
 - Import and export use the system file picker (SAF).

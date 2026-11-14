@@ -536,6 +536,7 @@ private fun BoardBox(
                     selectedIndex = state.selectedIndex,
                     straightGrid = straightGrid,
                     highlightSameDigits = sameHighlight,
+                    armedNumber = state.armedNumber,
                     gameId = state.gameId,
                     enabled = !state.loading && !state.paused && !state.won,
                     onSelect = onSelect,

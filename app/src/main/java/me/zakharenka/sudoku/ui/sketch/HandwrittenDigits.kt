@@ -158,6 +158,10 @@ private fun join(vararg segments: List<DigitPoint>): List<DigitPoint> =
  * Draws [value] as a hand-written pencil digit. The first appearance is drawn
  * instantly; later changes animate the strokes. A change to zero erases the
  * previous digit in reverse.
+ *
+ * When [fitToBounds] is true, the digit is scaled to the actual bounds of its
+ * strokes instead of a fixed square, so small note cells can use the full
+ * available space.
  */
 @Composable
 fun HandwrittenDigit(
@@ -166,6 +170,7 @@ fun HandwrittenDigit(
     seed: Int,
     modifier: Modifier = Modifier,
     boxFraction: Float = 0.66f,
+    fitToBounds: Boolean = false,
 ) {
     var displayedValue by remember { mutableIntStateOf(value) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -229,11 +234,11 @@ fun HandwrittenDigit(
         return
     }
 
-    val geometry = remember(displayedValue, seed, canvasSize, boxFraction) {
+    val geometry = remember(displayedValue, seed, canvasSize, boxFraction, fitToBounds) {
         if (canvasSize == IntSize.Zero) {
             null
         } else {
-            buildDigitGeometry(displayedValue, seed, canvasSize, boxFraction)
+            buildDigitGeometry(displayedValue, seed, canvasSize, boxFraction, fitToBounds)
         }
     }
 
@@ -269,17 +274,49 @@ private fun buildDigitGeometry(
     seed: Int,
     canvasSize: IntSize,
     boxFraction: Float,
+    fitToBounds: Boolean,
 ): DigitGeometry {
     val strokes = HandwrittenDigitStrokes[value].orEmpty()
+    if (strokes.isEmpty()) {
+        return DigitGeometry(strokes = emptyList(), totalLength = 0f, strokeWidth = 1f)
+    }
+
     val random = Random(seed * 31 + value * 1009)
     val result = mutableListOf<StrokeGeometry>()
     var totalLength = 0f
 
     val side = min(canvasSize.width, canvasSize.height).toFloat()
-    val box = max(1f, (side * boxFraction).roundToInt().toFloat())
-    val left = ((canvasSize.width - box) / 2f).roundToInt().toFloat()
-    val top = ((canvasSize.height - box) / 2f).roundToInt().toFloat()
-    val strokeWidth = max(1f, (box * 0.09f).roundToInt().toFloat())
+    val scale: Float
+    val offsetX: Float
+    val offsetY: Float
+
+    if (fitToBounds) {
+        val points = strokes.flatten()
+        val minX = points.minOf { it.x }
+        val maxX = points.maxOf { it.x }
+        val minY = points.minOf { it.y }
+        val maxY = points.maxOf { it.y }
+        val width = max(0.01f, maxX - minX)
+        val height = max(0.01f, maxY - minY)
+        val margin = 0.06f
+        val availableWidth = canvasSize.width * (1f - margin * 2f)
+        val availableHeight = canvasSize.height * (1f - margin * 2f)
+
+        scale = min(availableWidth / width, availableHeight / height)
+        offsetX = (canvasSize.width - width * scale) / 2f - minX * scale
+        offsetY = (canvasSize.height - height * scale) / 2f - minY * scale
+    } else {
+        val box = max(1f, (side * boxFraction).roundToInt().toFloat())
+
+        scale = box
+        offsetX = ((canvasSize.width - box) / 2f).roundToInt().toFloat()
+        offsetY = ((canvasSize.height - box) / 2f).roundToInt().toFloat()
+    }
+
+    val strokeWidth = max(
+        1f,
+        (if (fitToBounds) side * 0.06f else scale * 0.09f).roundToInt().toFloat(),
+    )
 
     for (source in strokes) {
         if (source.size < 2) {
@@ -290,8 +327,8 @@ private fun buildDigitGeometry(
         source.forEachIndexed { index, point ->
             val jitterX = (random.nextFloat() * 2f - 1f) * 0.006f
             val jitterY = (random.nextFloat() * 2f - 1f) * 0.006f
-            val x = left + (point.x + jitterX) * box
-            val y = top + (point.y + jitterY) * box
+            val x = offsetX + (point.x + jitterX) * scale
+            val y = offsetY + (point.y + jitterY) * scale
 
             if (index == 0) {
                 path.moveTo(x, y)

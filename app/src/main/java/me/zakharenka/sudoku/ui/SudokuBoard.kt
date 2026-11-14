@@ -1,6 +1,7 @@
 package me.zakharenka.sudoku.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -9,10 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -23,7 +23,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -32,18 +31,14 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import me.zakharenka.sudoku.R
 import me.zakharenka.sudoku.game.Cell
 import me.zakharenka.sudoku.ui.sketch.HandwrittenDigit
 import me.zakharenka.sudoku.ui.sketch.sketchFill
 import me.zakharenka.sudoku.ui.sketch.sketchLine
 import me.zakharenka.sudoku.ui.sketch.sketchRect
-import me.zakharenka.sudoku.ui.theme.HandFont
 import me.zakharenka.sudoku.ui.theme.SudokuTheme
 
 /** Stroke width of the outer board frame. */
@@ -57,6 +52,7 @@ fun SudokuBoard(
     selectedIndex: Int?,
     straightGrid: Boolean,
     highlightSameDigits: Boolean,
+    armedNumber: Int?,
     gameId: Long,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
@@ -65,6 +61,9 @@ fun SudokuBoard(
     val colors = SudokuTheme.colors
     val displayCells = if (cells.size == 81) cells else EmptyCells
     val selectedValue = selectedIndex?.let { displayCells.getOrNull(it)?.value } ?: 0
+    // In fast mode the armed digit drives the highlight immediately, so the
+    // player sees every matching digit before tapping the board.
+    val highlightedDigit = armedNumber ?: selectedValue
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val cellSize = maxWidth / 9
@@ -87,9 +86,14 @@ fun SudokuBoard(
                                     selectedIndex != index &&
                                     arePeers(selectedIndex, index),
                                 same = highlightSameDigits &&
-                                    selectedValue != 0 &&
-                                    cell.value == selectedValue &&
-                                    selectedIndex != index,
+                                    highlightedDigit != 0 &&
+                                    selectedIndex != index &&
+                                    cell.value == highlightedDigit,
+                                highlightedNote = highlightedDigit.takeIf {
+                                    highlightSameDigits &&
+                                        it != 0 &&
+                                        cell.notes.contains(it)
+                                },
                                 enabled = enabled,
                                 onClick = { onSelect(index) },
                                 modifier = Modifier
@@ -139,34 +143,6 @@ fun SudokuBoard(
                         color = color,
                         strokeWidth = width,
                         seed = 2_000 + index,
-                        wobble = 1.dp.toPx(),
-                    )
-                }
-            }
-
-            if (selectedIndex != null && selectedIndex in 0..80) {
-                val row = selectedIndex / 9
-                val col = selectedIndex % 9
-                val cell = displayCells[selectedIndex]
-                val inset = 3.dp.toPx()
-                val topLeft = Offset(col * cellPx + inset, row * cellPx + inset)
-                val rectSize = Size(cellPx - inset * 2f, cellPx - inset * 2f)
-                val color = if (cell.error) colors.danger else colors.accent
-
-                if (straightGrid) {
-                    drawRect(
-                        color = color,
-                        topLeft = topLeft,
-                        size = rectSize,
-                        style = Stroke(width = 2.dp.toPx()),
-                    )
-                } else {
-                    sketchRect(
-                        topLeft = topLeft,
-                        size = rectSize,
-                        color = color,
-                        strokeWidth = 2.dp.toPx(),
-                        seed = 3_000 + selectedIndex,
                         wobble = 1.dp.toPx(),
                     )
                 }
@@ -222,6 +198,7 @@ private fun SudokuCell(
     selected: Boolean,
     peer: Boolean,
     same: Boolean,
+    highlightedNote: Int?,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -229,7 +206,7 @@ private fun SudokuCell(
     val colors = SudokuTheme.colors
     val wash = when {
         selected && cell.error -> colors.dangerWash
-        selected -> colors.accentWash
+        selected -> colors.accentSoft.copy(alpha = 0.32f)
         cell.error -> colors.dangerWash
         same -> colors.highlight
         peer -> colors.accentWash.copy(alpha = 0.45f)
@@ -285,6 +262,39 @@ private fun SudokuCell(
                         wobble = 1.dp.toPx(),
                     )
                 }
+
+                if (selected) {
+                    val hatch = if (cell.error) {
+                        colors.danger.copy(alpha = 0.18f)
+                    } else {
+                        colors.accent.copy(alpha = 0.20f)
+                    }
+                    val side = minOf(size.width, size.height)
+
+                    repeat(3) { index ->
+                        val offset = side * (1f + index * 2f) / 3f
+                        val start = if (offset <= size.height) {
+                            Offset(0f, offset)
+                        } else {
+                            Offset(offset - size.height, size.height)
+                        }
+                        val end = if (offset <= size.width) {
+                            Offset(offset, 0f)
+                        } else {
+                            Offset(size.width, offset - size.width)
+                        }
+
+                        sketchLine(
+                            start = start,
+                            end = end,
+                            color = hatch,
+                            strokeWidth = 1.dp.toPx(),
+                            seed = 12_000 + row * 9 + col + index,
+                            wobble = 0.5.dp.toPx(),
+                            passes = 1,
+                        )
+                    }
+                }
             }
             .clickable(
                 enabled = enabled,
@@ -310,10 +320,11 @@ private fun SudokuCell(
         )
 
         if (cell.value == 0 && cell.notes.isNotEmpty()) {
-            NotesLine(
+            NotesGrid(
                 notes = cell.notes,
-                cellSize = cellSize,
                 color = textColor,
+                highlightedNote = highlightedNote,
+                seed = 8_000 + row * 9 + col,
                 modifier = Modifier.align(Alignment.TopStart),
             )
         }
@@ -321,47 +332,65 @@ private fun SudokuCell(
 }
 
 /**
- * Notes are shown top-left as ascending rows (for example "147"), one row for
- * up to five notes and two balanced rows for six to nine. The font is shrunk
- * automatically so the whole set fits the cell.
+ * Notes are shown as a 3×3 mini-grid inside the cell: each candidate digit
+ * keeps its standard position, from 1 in the top-left to 9 in the bottom-right.
+ * A highlighted note paints only its own mini-cell, not the whole board cell.
  */
 @Composable
-private fun NotesLine(
+private fun NotesGrid(
     notes: Set<Int>,
-    cellSize: Dp,
     color: Color,
+    highlightedNote: Int?,
+    seed: Int,
     modifier: Modifier = Modifier,
 ) {
-    val sorted = notes.sorted()
-    val lines = if (sorted.size <= 5) {
-        listOf(sorted)
-    } else {
-        val split = (sorted.size + 1) / 2
-        listOf(sorted.subList(0, split), sorted.subList(split, sorted.size))
-    }
-    val text = lines.joinToString("\n") { line -> line.joinToString("") }
-    val maxFontSize = with(LocalDensity.current) { (cellSize * 0.44f).toSp() }
-    val minFontSize = with(LocalDensity.current) { (cellSize * 0.14f).toSp() }
+    val colors = SudokuTheme.colors
 
-    BasicText(
-        text = text,
-        modifier = modifier.padding(
-            start = cellSize * 0.12f,
-            top = cellSize * 0.1f,
-            end = cellSize * 0.05f,
-            bottom = cellSize * 0.05f,
-        ),
-        style = TextStyle(
-            color = color,
-            fontFamily = HandFont,
-            fontWeight = FontWeight.Bold,
-        ),
-        maxLines = 2,
-        autoSize = TextAutoSize.StepBased(
-            minFontSize = minFontSize,
-            maxFontSize = maxFontSize,
-        ),
-    )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(1.dp),
+    ) {
+        for (row in 0..2) {
+            Row(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            ) {
+                for (col in 0..2) {
+                    val digit = row * 3 + col + 1
+                    val highlighted = digit == highlightedNote && digit in notes
+                    val digitSeed = seed + digit
+
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .background(
+                                if (highlighted) {
+                                    colors.highlight
+                                } else {
+                                    Color.Transparent
+                                },
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val digitSize = minOf(maxWidth, maxHeight) * 0.88f
+
+                        if (digit in notes) {
+                            HandwrittenDigit(
+                                value = digit,
+                                color = if (highlighted) colors.ink else color,
+                                seed = digitSeed,
+                                modifier = Modifier.size(digitSize),
+                                fitToBounds = true,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 private fun arePeers(first: Int, second: Int): Boolean {
