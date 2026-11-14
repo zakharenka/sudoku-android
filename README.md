@@ -76,7 +76,7 @@ for distribution on Google Play and F-Droid.
 
 - Kotlin 2.3.21, Jetpack Compose (Material 3), Compose BOM 2026.09.00;
 - AGP 9.4.1, Gradle 9.6, JDK 17+;
-- minSdk 30, targetSdk 37, compileSdk 37;
+- minSdk 26, targetSdk 37, compileSdk 37;
 - SharedPreferences for settings and one atomic local file for the current
   game and history;
 - `android:localeConfig` and native Android 13+ per-app language settings.

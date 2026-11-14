@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "me.zakharenka.sudoku"
-        minSdk = 30
+        minSdk = 26
         targetSdk = 37
 
         val appVersionName = providers.gradleProperty("app.version").getOrElse("1.0.0")
