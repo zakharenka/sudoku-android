@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    tags: ["*"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+jobs:
+  build:
+    name: ${{ github.ref_type == 'tag' && 'Release' || 'Check' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        env:
+          SERVER: ${{ github.server_url }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.sha }}
+          TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ ! -d .git ]; then
+            git init -q
+          fi
+          url="${SERVER%/}/${REPO}.git"
+          if git remote get-url origin >/dev/null 2>&1; then
+            git remote set-url origin "$url"
+          else
+            git remote add origin "$url"
+          fi
+          auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')
+          git -c safe.directory='*' -c advice.detachedHead=false \
+            -c http.extraheader="AUTHORIZATION: basic ${auth}" \
+            fetch --depth 1 origin "$REF"
+          git -c safe.directory='*' -c advice.detachedHead=false checkout --force FETCH_HEAD
+          git -c safe.directory='*' clean -ffdx
+
+      - name: Check version files
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD":/src:z -w /src python:3-alpine \
+            python3 scripts/set-version.py --check
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            version=$(sed -n 's/^app.version=//p' gradle.properties)
+            test "$version" = "$GITHUB_REF_NAME"
+          fi
+
+      - name: Test, lint and build
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            tasks=":app:testDebugUnitTest :app:lintDebug :app:assembleRelease :app:bundleRelease"
+          else
+            tasks=":app:testDebugUnitTest :app:lintDebug :app:assembleDebug"
+          fi
+          mkdir -p "${HOME}/.cache/sudoku-android/gradle"
+          # The published SDK image stops at platform 36. Its licenses are already
+          # accepted, so Gradle installs platform 37 itself.
+          # Gradle runs as root in the image. Hand the build tree back to the
+          # runner user here: a later chmod on the host cannot change root-owned files.
+          docker run --rm \
+            -e HOST_UID="$(id -u)" \
+            -e HOST_GID="$(id -g)" \
+            -v "$PWD":/src:z \
+            -v "${HOME}/.cache/sudoku-android/gradle":/root/.gradle:z \
+            -w /src \
+            ghcr.io/cirruslabs/android-sdk:36 \
+            bash -c "set -euo pipefail; ./gradlew --no-daemon $tasks; chown -R \$HOST_UID:\$HOST_GID app/build"
+
+      - name: Upload debug APK
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload release APK and AAB
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-${{ github.ref_name }}
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error

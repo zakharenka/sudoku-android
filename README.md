@@ -126,6 +126,11 @@ Release build (R8, unsigned):
 
 The APK is written to `app/build/outputs/apk/release/app-release-unsigned.apk`.
 
+GitHub and Gitea run `.github/workflows/ci.yaml` on `ubuntu-latest`. A push to
+`master` and a pull request run the unit tests, `lintDebug` and
+`assembleDebug`. A tag `X.Y.Z` must match `app.version` and also builds the
+unsigned release APK and AAB. The artifacts are attached to the workflow run.
+
 ## Documentation
 
 | Document | Contents |

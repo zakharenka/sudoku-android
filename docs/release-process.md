@@ -63,6 +63,9 @@ python3 scripts/set-version.py --check
    git push origin master --tags
    ```
 
+The tag push runs `.github/workflows/ci.yaml`. The workflow checks that the tag
+equals `app.version` and builds the unsigned release APK and AAB.
+
 Only the version files, fastlane changelogs and release notes change for a
 normal release. README, AGENTS and the reference docs are updated with the code,
 not with the version number.
