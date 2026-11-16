@@ -1,0 +1,1 @@
+Sudoku 1.3.2: las notas ahora se borran de las celdas vecinas incluso tras un dígito incorrecto y ya no revelan si el intento era correcto. Deshacer las restaura.

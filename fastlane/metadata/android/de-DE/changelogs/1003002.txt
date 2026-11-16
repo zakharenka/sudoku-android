@@ -1,0 +1,1 @@
+Sudoku 1.3.2: Notizen werden jetzt auch nach einer falschen Ziffer aus benachbarten Zellen entfernt und verraten nicht mehr, ob ein Eintrag richtig war. Rückgängig stellt die Notizen wieder her.

@@ -1,0 +1,1 @@
+Sudoku 1.3.2: le note ora vengono cancellate dalle celle vicine anche dopo una cifra errata e non rivelano più se l'inserimento era corretto. Annulla le ripristina.

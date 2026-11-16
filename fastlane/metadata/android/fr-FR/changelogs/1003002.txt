@@ -1,0 +1,1 @@
+Sudoku 1.3.2 : les notes sont désormais effacées des cases voisines même après un chiffre erroné et ne révèlent plus si la saisie était correcte. Annuler les restaure.

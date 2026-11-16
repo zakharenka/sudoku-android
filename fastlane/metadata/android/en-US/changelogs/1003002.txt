@@ -1,0 +1,1 @@
+Sudoku 1.3.2: notes are now cleared from peer cells even after a wrong digit, so they no longer reveal whether an entry was correct. Undo restores the removed notes.
