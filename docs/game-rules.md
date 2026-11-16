@@ -13,6 +13,10 @@
 - A digit fills the selected non-given cell, replacing a previous value if
   present.
 - Notes mode writes candidate digits into an empty cell.
+- Placing a digit clears that digit from the notes of its peers (same row,
+  column and box), even when the digit turns out to be wrong. This keeps notes
+  from revealing whether an entry was correct in games with hidden mistakes.
+  Undo restores the removed notes.
 - Notes are shown as a 3×3 mini-grid inside the cell. Each candidate keeps its
   standard position: 1 in the top-left, 5 in the centre and 9 in the
   bottom-right. Note digits use the same hand-written strokes as board digits

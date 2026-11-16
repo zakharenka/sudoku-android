@@ -25,6 +25,13 @@ class SudokuSessionTest {
         return puzzle
     }
 
+    private fun addNotes(session: SudokuSession, index: Int, vararg digits: Int) {
+        session.select(index)
+        session.toggleNotes()
+        digits.forEach { session.enter(it) }
+        session.toggleNotes()
+    }
+
     @Test
     fun wrongNumberCountsMistakeAndUndoDoesNotRestoreIt() {
         val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0))
@@ -120,6 +127,65 @@ class SudokuSessionTest {
 
         assertTrue(session.cells[0].notes.isEmpty())
         assertEquals(0, session.cells[0].value)
+    }
+
+    @Test
+    fun correctDigitRemovesTheNoteFromPeers() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1, 80))
+        addNotes(session, 1, 5, 3)
+        addNotes(session, 80, 5)
+
+        session.select(0)
+        session.enter(5)
+
+        assertEquals(setOf(3), session.cells[1].notes)
+        assertEquals(setOf(5), session.cells[80].notes)
+    }
+
+    @Test
+    fun wrongDigitRemovesTheNoteFromPeersToo() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1, 80))
+        addNotes(session, 1, 1, 2)
+        addNotes(session, 80, 1)
+
+        session.select(0)
+        session.enter(1)
+
+        assertTrue(session.cells[0].error)
+        assertEquals(1, session.mistakes)
+        assertEquals(setOf(2), session.cells[1].notes)
+        assertEquals(setOf(1), session.cells[80].notes)
+    }
+
+    @Test
+    fun hiddenErrorsClearPeerNotesForWrongDigit() {
+        val session = SudokuSession(
+            difficulty = Difficulty.EASY,
+            solution = solution,
+            puzzle = puzzleWithBlanks(0, 1),
+            showErrors = false,
+        )
+        addNotes(session, 1, 1, 2)
+
+        session.select(0)
+        session.enter(1)
+
+        assertFalse(session.cells[0].error)
+        assertEquals(0, session.mistakes)
+        assertEquals(setOf(2), session.cells[1].notes)
+    }
+
+    @Test
+    fun undoRestoresPeerNotesClearedByEntry() {
+        val session = SudokuSession(Difficulty.EASY, solution, puzzleWithBlanks(0, 1))
+        addNotes(session, 1, 1, 2)
+
+        session.select(0)
+        session.enter(1)
+        session.undo()
+
+        assertEquals(0, session.cells[0].value)
+        assertEquals(setOf(1, 2), session.cells[1].notes)
     }
 
     @Test
