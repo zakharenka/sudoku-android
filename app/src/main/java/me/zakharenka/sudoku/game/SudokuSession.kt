@@ -134,11 +134,7 @@ class SudokuSession(
         }
 
         val correct = number == solution[index]
-        val affected = if (correct) {
-            PEERS[index].filter { number in cells[it].notes }
-        } else {
-            emptyList()
-        }
+        val affected = PEERS[index].filter { number in cells[it].notes }
 
         val entry = snapshot(listOf(index) + affected)
         cells[index] = cell.copy(
@@ -147,11 +143,10 @@ class SudokuSession(
             error = showErrors && !correct,
         )
 
-        if (correct) {
-            for (peer in affected) {
-                cells[peer] = cells[peer].copy(notes = cells[peer].notes - number)
-            }
-        } else if (showErrors) {
+        for (peer in affected) {
+            cells[peer] = cells[peer].copy(notes = cells[peer].notes - number)
+        }
+        if (!correct && showErrors) {
             mistakes += 1
         }
 
