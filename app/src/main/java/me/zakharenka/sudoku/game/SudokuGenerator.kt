@@ -3,10 +3,10 @@ package me.zakharenka.sudoku.game
 import kotlin.random.Random
 
 /**
- * Генератор классического судоку 9×9.
+ * Generator for a classic 9×9 Sudoku.
  *
- * Сначала строится полное решение, затем из него удаляются цифры. Удаление
- * принимается только тогда, когда у поля остаётся ровно одно решение.
+ * A complete solution is built first, then digits are removed. A removal is
+ * kept only when the puzzle still has exactly one solution.
  */
 class SudokuGenerator(private val random: Random = Random.Default) {
 

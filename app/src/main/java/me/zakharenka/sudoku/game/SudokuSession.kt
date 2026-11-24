@@ -25,7 +25,7 @@ private data class HistoryEntry(
 )
 
 /**
- * Состояние одной партии. Не зависит от Android и UI, поэтому легко тестируется.
+ * State of one game. It does not depend on Android or the UI, so it is easy to test.
  */
 class SudokuSession(
     val difficulty: Difficulty,

@@ -19,7 +19,7 @@ data class WinResult(
 )
 
 /**
- * Все сохранённые данные приложения: текущая игра и история.
+ * All persisted app data: the current game and the history.
  *
  * Records are not stored: they are derived from solved games. A game belongs to
  * the "without mistakes" category when `errors == 0`, otherwise to the

@@ -24,21 +24,21 @@ class SudokuGeneratorTest {
             val generated = generator.generate(difficulty)
 
             assertTrue(
-                "Решение для ${difficulty.name} должно быть корректным",
+                "Solution for ${difficulty.name} must be valid",
                 generator.isValidSolution(generated.solution),
             )
             assertEquals(
-                "У поля ${difficulty.name} должно быть одно решение",
+                "Puzzle for ${difficulty.name} must have one solution",
                 1,
                 generator.countSolutions(generated.puzzle, 2),
             )
             assertTrue(
-                "Подсказок должно быть не больше целевого значения",
+                "Clue count must not exceed the target",
                 generated.clues <= difficulty.clues,
             )
-            assertTrue("Подсказок должно быть не меньше 17", generated.clues >= 17)
+            assertTrue("Clue count must be at least 17", generated.clues >= 17)
             assertEquals(
-                "Счётчик подсказок должен совпадать с полем",
+                "Clue count must match the puzzle",
                 generated.clues,
                 generated.puzzle.count { it != 0 },
             )
